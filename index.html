@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Model</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a0a;
+    --surface:   #141414;
+    --surface-2: #1c1c1c;
+    --border:    #262626;
+    --orange:    #E8650A;
+    --text:      #e5e5e5;
+    --muted:     #737373;
+    --small:     #525252;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ──────────────────────────────────────────────── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .site-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+  .site-title span { color: var(--orange); }
+  .updated {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+
+  /* ── Summary bar ─────────────────────────────────────────── */
+  .summary-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .divider { color: var(--border); }
+
+  /* ── Match card ──────────────────────────────────────────── */
+  .match-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+  }
+  .match-card:hover { border-color: #333; }
+  .match-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .match-teams {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .vs {
+    color: var(--muted);
+    font-weight: 400;
+    margin: 0 6px;
+  }
+  .match-time {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ── Player row ──────────────────────────────────────────── */
+  .players-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 540px) {
+    .players-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── Player card ─────────────────────────────────────────── */
+  .player-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .player-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .player-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--small);
+  }
+  .stat-value {
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Signal badge ────────────────────────────────────────── */
+  .signal-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .recommendation {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ── Error / empty states ────────────────────────────────── */
+  .match-error { border-color: #374151; }
+  .error-msg {
+    font-size: 13px;
+    color: #f59e0b;
+    margin-top: 4px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    margin-top: 24px;
+  }
+  .empty-icon {
+    font-size: 32px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .empty-body {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    font-size: 11px;
+    color: var(--small);
+    text-align: center;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">the<span>·</span>model</div>
+  <div class="updated">Updated 2026-04-14 16:45 UTC</div>
+</header>
+
+<main>
+  
+        <div class="summary-bar">
+            <span class="summary-item"><strong>12</strong> matches</span>
+            <span class="divider">·</span>
+            <span class="summary-item" style="color:#10b981;"><strong>7</strong> value bets found</span>
+        </div>
+  
+    <div class="match-card" style="border-left: 3px solid #2a2a2a;">
+        <div class="match-header">
+            <span class="match-teams">Corentin Moutet <span class="vs">vs</span> Lorenzo Musetti</span>
+            <span class="match-time">Thu 16 Apr · 08:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Corentin Moutet</div>
+            <div class="player-meta">Rank #31 &nbsp;·&nbsp; 1,433 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">28.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">32.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-4.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.6%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Corentin Moutet. Model (28.3%) does not beat the bookmaker's raw price (32.3%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Lorenzo Musetti</div>
+            <div class="player-meta">Rank #9 &nbsp;·&nbsp; 3,625 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">71.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">72.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-1.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.5%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Lorenzo Musetti. Model (71.7%) does not beat the bookmaker's raw price (72.7%). Vig would erase any edge.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #f59e0b;">
+        <div class="match-header">
+            <span class="match-teams">Botic van de Zandschulp <span class="vs">vs</span> Francisco Cerundolo</span>
+            <span class="match-time">Wed 15 Apr · 09:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #f59e0b;">
+            <div class="player-name">Botic van de Zandschulp</div>
+            <div class="player-meta">Rank #49 &nbsp;·&nbsp; 931 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">31.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">31.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#f59e0b;">+0.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.5%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
+                MARGINAL
+            </div>
+            <div class="recommendation">Marginal edge on Botic van de Zandschulp (0.1%). Model (31.5%) barely beats the raw price (31.4%). Proceed with caution.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Francisco Cerundolo</div>
+            <div class="player-meta">Rank #19 &nbsp;·&nbsp; 2,020 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">68.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">73.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-5.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.5%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Francisco Cerundolo. Model (68.5%) does not beat the bookmaker's raw price (73.6%). Vig would erase any edge.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Arthur Rinderknech <span class="vs">vs</span> Joao Fonseca</span>
+            <span class="match-time">Wed 15 Apr · 08:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Arthur Rinderknech</div>
+            <div class="player-meta">Rank #26 &nbsp;·&nbsp; 1,676 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">56.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">29.9%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+26.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.5%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Arthur Rinderknech. Model gives 56.0% vs bookmaker raw price of 29.9% — edge of 26.2% survives the vig.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Joao Fonseca</div>
+            <div class="player-meta">Rank #35 &nbsp;·&nbsp; 1,315 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">44.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">75.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-31.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.8%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Joao Fonseca. Model (44.0%) does not beat the bookmaker's raw price (75.4%). Vig would erase any edge.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #f59e0b;">
+        <div class="match-header">
+            <span class="match-teams">Alexander Zverev <span class="vs">vs</span> Gabriel Diallo</span>
+            <span class="match-time">Wed 15 Apr · 08:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Alexander Zverev</div>
+            <div class="player-meta">Rank #3 &nbsp;·&nbsp; 5,555 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">82.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">89.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-6.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-4.3%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Alexander Zverev. Model (82.5%) does not beat the bookmaker's raw price (89.3%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #f59e0b;">
+            <div class="player-name">Gabriel Diallo</div>
+            <div class="player-meta">Rank #37 &nbsp;·&nbsp; 1,175 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">17.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">15.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#f59e0b;">+1.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-0.8%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
+                MARGINAL
+            </div>
+            <div class="recommendation">Marginal edge on Gabriel Diallo (1.7%). Model (17.5%) barely beats the raw price (15.8%). Proceed with caution.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Daniel Altmaier <span class="vs">vs</span> Alex Molcan</span>
+            <span class="match-time">Wed 15 Apr · 08:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Daniel Altmaier</div>
+            <div class="player-meta">Rank #56 &nbsp;·&nbsp; 880 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">42.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">56.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-14.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-2.6%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Daniel Altmaier. Model (42.3%) does not beat the bookmaker's raw price (56.8%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Alex Molcan</div>
+            <div class="player-meta">Rank #36 &nbsp;·&nbsp; 1,200 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">57.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">48.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+9.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-2.2%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Alex Molcan. Model gives 57.7% vs bookmaker raw price of 48.1% — edge of 9.6% survives the vig.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #f59e0b;">
+        <div class="match-header">
+            <span class="match-teams">Nuno Borges <span class="vs">vs</span> Tomas Martin Etcheverry</span>
+            <span class="match-time">Wed 15 Apr · 09:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #f59e0b;">
+            <div class="player-name">Nuno Borges</div>
+            <div class="player-meta">Rank #52 &nbsp;·&nbsp; 895 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">36.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">32.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#f59e0b;">+3.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.5%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
+                MARGINAL
+            </div>
+            <div class="recommendation">Marginal edge on Nuno Borges (3.7%). Model (36.0%) barely beats the raw price (32.3%). Proceed with caution.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Tomas Martin Etcheverry</div>
+            <div class="player-meta">Rank #29 &nbsp;·&nbsp; 1,590 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">64.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">72.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-8.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.3%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Tomas Martin Etcheverry. Model (64.0%) does not beat the bookmaker's raw price (72.5%). Vig would erase any edge.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Arthur Fils <span class="vs">vs</span> Terence Atmane</span>
+            <span class="match-time">Tue 14 Apr · 17:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Arthur Fils</div>
+            <div class="player-meta">Rank #30 &nbsp;·&nbsp; 1,440 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">56.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">84.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-27.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.9%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Arthur Fils. Model (56.5%) does not beat the bookmaker's raw price (84.3%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Terence Atmane</div>
+            <div class="player-meta">Rank #41 &nbsp;·&nbsp; 1,108 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">43.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">20.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+22.9%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-0.9%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Terence Atmane. Model gives 43.5% vs bookmaker raw price of 20.5% — edge of 22.9% survives the vig.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Alexander Blockx <span class="vs">vs</span> Ben Shelton</span>
+            <span class="match-time">Wed 15 Apr · 09:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Alexander Blockx</div>
+            <div class="player-meta">Rank #72 &nbsp;·&nbsp; 772 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">16.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">38.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-22.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.9%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Alexander Blockx. Model (16.5%) does not beat the bookmaker's raw price (38.6%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Ben Shelton</div>
+            <div class="player-meta">Rank #6 &nbsp;·&nbsp; 3,900 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">83.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">66.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+17.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.2%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Ben Shelton. Model gives 83.5% vs bookmaker raw price of 66.4% — edge of 17.1% survives the vig.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Alex de Minaur <span class="vs">vs</span> Hamad Medjedovic</span>
+            <span class="match-time">Wed 15 Apr · 10:30 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Alex de Minaur</div>
+            <div class="player-meta">Rank #7 &nbsp;·&nbsp; 3,895 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">85.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">70.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+15.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.1%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Alex de Minaur. Model gives 85.4% vs bookmaker raw price of 70.4% — edge of 15.0% survives the vig.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Hamad Medjedovic</div>
+            <div class="player-meta">Rank #88 &nbsp;·&nbsp; 664 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">14.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">34.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-19.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.5%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Hamad Medjedovic. Model (14.6%) does not beat the bookmaker's raw price (34.3%). Vig would erase any edge.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Rafael Jodar <span class="vs">vs</span> Camilo Ugo Carabelli</span>
+            <span class="match-time">Wed 15 Apr · 14:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Rafael Jodar</div>
+            <div class="player-meta">Rank #55 &nbsp;·&nbsp; 886 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">51.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">76.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-24.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.3%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Rafael Jodar. Model (51.8%) does not beat the bookmaker's raw price (76.3%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Camilo Ugo Carabelli</div>
+            <div class="player-meta">Rank #64 &nbsp;·&nbsp; 825 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">48.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">28.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+20.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.2%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Camilo Ugo Carabelli. Model gives 48.2% vs bookmaker raw price of 28.2% — edge of 20.0% survives the vig.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #f59e0b;">
+        <div class="match-header">
+            <span class="match-teams">Cameron Norrie <span class="vs">vs</span> Ethan Quinn</span>
+            <span class="match-time">Wed 15 Apr · 15:30 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #f59e0b;">
+            <div class="player-name">Cameron Norrie</div>
+            <div class="player-meta">Rank #24 &nbsp;·&nbsp; 1,778 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">65.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">65.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#f59e0b;">+0.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.1%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
+                MARGINAL
+            </div>
+            <div class="recommendation">Marginal edge on Cameron Norrie (0.4%). Model (65.7%) barely beats the raw price (65.4%). Proceed with caution.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Ethan Quinn</div>
+            <div class="player-meta">Rank #50 &nbsp;·&nbsp; 927 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">34.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">39.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-5.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.9%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Ethan Quinn. Model (34.3%) does not beat the bookmaker's raw price (39.7%). Vig would erase any edge.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #10b981;">
+        <div class="match-header">
+            <span class="match-teams">Vit Kopriva <span class="vs">vs</span> Luciano Darderi</span>
+            <span class="match-time">Wed 15 Apr · 08:00 UTC</span>
+        </div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Vit Kopriva</div>
+            <div class="player-meta">Rank #78 &nbsp;·&nbsp; 738 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">27.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">41.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-13.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-2.0%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Vit Kopriva. Model (27.8%) does not beat the bookmaker's raw price (41.3%). Vig would erase any edge.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #10b981;">
+            <div class="player-name">Luciano Darderi</div>
+            <div class="player-meta">Rank #21 &nbsp;·&nbsp; 1,920 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">72.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">63.7%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+8.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.0%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
+                VALUE BET
+            </div>
+            <div class="recommendation">Bet on Luciano Darderi. Model gives 72.2% vs bookmaker raw price of 63.7% — edge of 8.5% survives the vig.</div>
+        </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+  Pre-match predictions only &nbsp;·&nbsp; Model: ATP ranking-points ratio &nbsp;·&nbsp;
+  For informational purposes only — not financial or betting advice &nbsp;·&nbsp;
+  <a href="https://github.com/elouelyt/the-model" target="_blank">Source</a>
+</footer>
+
+</body>
+</html>
