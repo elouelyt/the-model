@@ -1,0 +1,3 @@
+gcp:
+  project_id: "tennis-data-487809"
+  bucket_name: "raw-tennis-data"

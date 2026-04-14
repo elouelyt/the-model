@@ -1,0 +1,482 @@
+"""Static site generator — runs the full prediction pipeline and writes index.html.
+
+Designed to run in CI (GitHub Actions) with no GCP dependencies.
+Only requires THE_ODDS_API_KEY in the environment.
+
+Usage:
+    python generate_html.py
+"""
+
+import logging
+import os
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
+logger = logging.getLogger(__name__)
+
+# ── Signal styling ─────────────────────────────────────────────────────────────
+_SIGNAL_META = {
+    "value_bet": {
+        "label": "VALUE BET",
+        "color": "#10b981",
+        "bg": "rgba(16,185,129,0.10)",
+        "border": "#10b981",
+    },
+    "marginal": {
+        "label": "MARGINAL",
+        "color": "#f59e0b",
+        "bg": "rgba(245,158,11,0.10)",
+        "border": "#f59e0b",
+    },
+    "no_bet": {
+        "label": "NO BET",
+        "color": "#6b7280",
+        "bg": "rgba(107,114,128,0.10)",
+        "border": "#374151",
+    },
+}
+
+
+def run_pipeline() -> list[dict]:
+    """Run the full prediction pipeline and return a list of match result dicts."""
+    from src.ingestion.extract_odds import fetch_odds
+    from src.processing.transform import flatten_odds, filter_upcoming
+    from src.agents.ranking_agent import fetch_atp_rankings
+    from src.agents.probability_calculator import calculate_win_probability, compare_with_bookmaker
+
+    logger.info("Fetching live odds...")
+    data = fetch_odds()
+
+    if not data:
+        logger.warning("No active tournaments found.")
+        return []
+
+    df = flatten_odds(data)
+    df = filter_upcoming(df)
+
+    if df.empty:
+        logger.warning("All matches are currently in-play. No pre-match odds available.")
+        return []
+
+    players = df["outcome_name"].unique().tolist()
+    logger.info("Fetching rankings for %d players...", len(players))
+    rankings = fetch_atp_rankings(player_names=players)
+
+    results = []
+    for (event_id, home, away), group in df.groupby(["event_id", "home_team", "away_team"]):
+        commence_time = group["commence_time"].iloc[0]
+        missing = [p for p in [home, away] if p not in rankings]
+
+        if missing:
+            results.append({
+                "home": home,
+                "away": away,
+                "commence_time": commence_time,
+                "error": f"Rankings not found for: {', '.join(missing)}",
+            })
+            continue
+
+        prob_home, prob_away = calculate_win_probability(
+            rankings[home]["points"], rankings[away]["points"]
+        )
+
+        players_data = []
+        for player, model_prob in [(home, prob_home), (away, prob_away)]:
+            rows = group[group["outcome_name"] == player]
+            rec = compare_with_bookmaker(
+                model_prob,
+                rows["raw_implied"].mean(),
+                rows["true_implied"].mean(),
+                player,
+            )
+            rec["rank"] = rankings[player]["rank"]
+            rec["points"] = rankings[player]["points"]
+            players_data.append(rec)
+
+        results.append({
+            "home": home,
+            "away": away,
+            "commence_time": commence_time,
+            "players": players_data,
+        })
+
+    logger.info("Pipeline complete — %d matches processed.", len(results))
+    return results
+
+
+# ── HTML rendering ─────────────────────────────────────────────────────────────
+
+def _player_card_html(p: dict) -> str:
+    meta = _SIGNAL_META[p["signal"]]
+    edge_sign = "+" if p["edge"] >= 0 else ""
+    edge_color = "#10b981" if p["edge"] > 0.05 else ("#f59e0b" if p["edge"] > 0 else "#6b7280")
+    return f"""
+        <div class="player-card" style="border-top: 3px solid {meta['border']};">
+            <div class="player-name">{p['player']}</div>
+            <div class="player-meta">Rank #{p['rank']} &nbsp;·&nbsp; {p['points']:,} pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">{p['model_prob']:.1%}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">{p['raw_implied']:.1%}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:{edge_color};">{edge_sign}{p['edge']:.1%}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">{p['vig_per_player']:.1%}</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:{meta['color']};background:{meta['bg']};border:1px solid {meta['border']};">
+                {meta['label']}
+            </div>
+            <div class="recommendation">{p['recommendation']}</div>
+        </div>"""
+
+
+def _match_card_html(match: dict) -> str:
+    ct = match["commence_time"]
+    ct_str = ct.strftime("%a %d %b · %H:%M UTC") if hasattr(ct, "strftime") else str(ct)
+
+    if "error" in match:
+        return f"""
+    <div class="match-card match-error">
+        <div class="match-header">
+            <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
+            <span class="match-time">{ct_str}</span>
+        </div>
+        <div class="error-msg">⚠ {match['error']}</div>
+    </div>"""
+
+    players = match["players"]
+    signals = [p["signal"] for p in players]
+    # determine border accent by best signal in match
+    if "value_bet" in signals:
+        accent = _SIGNAL_META["value_bet"]["border"]
+    elif "marginal" in signals:
+        accent = _SIGNAL_META["marginal"]["border"]
+    else:
+        accent = "#2a2a2a"
+
+    player_cols = "".join(_player_card_html(p) for p in players)
+
+    return f"""
+    <div class="match-card" style="border-left: 3px solid {accent};">
+        <div class="match-header">
+            <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
+            <span class="match-time">{ct_str}</span>
+        </div>
+        <div class="players-row">
+            {player_cols}
+        </div>
+    </div>"""
+
+
+def _no_matches_html() -> str:
+    return """
+    <div class="empty-state">
+        <div class="empty-icon">○</div>
+        <div class="empty-title">No pre-match odds available right now</div>
+        <div class="empty-body">This page updates daily at 08:00 UTC. Check back when the next event is active.</div>
+    </div>"""
+
+
+def _error_html(message: str) -> str:
+    return f"""
+    <div class="empty-state" style="border-color:#ef4444;">
+        <div class="empty-icon" style="color:#ef4444;">✕</div>
+        <div class="empty-title" style="color:#ef4444;">Pipeline error</div>
+        <div class="empty-body">{message}</div>
+    </div>"""
+
+
+def generate_html(results: list[dict] | None, error: str | None = None) -> str:
+    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    if error:
+        content = _error_html(error)
+        summary_html = ""
+    elif not results:
+        content = _no_matches_html()
+        summary_html = ""
+    else:
+        value_bets = sum(
+            1 for m in results if "players" in m
+            for p in m["players"] if p["signal"] == "value_bet"
+        )
+        total_matches = len(results)
+        summary_html = f"""
+        <div class="summary-bar">
+            <span class="summary-item"><strong>{total_matches}</strong> match{'es' if total_matches != 1 else ''}</span>
+            <span class="divider">·</span>
+            <span class="summary-item" style="color:#10b981;"><strong>{value_bets}</strong> value bet{'s' if value_bets != 1 else ''} found</span>
+        </div>"""
+        content = "\n".join(_match_card_html(m) for m in results)
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Model</title>
+<style>
+  *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+  :root {{
+    --bg:        #0a0a0a;
+    --surface:   #141414;
+    --surface-2: #1c1c1c;
+    --border:    #262626;
+    --orange:    #E8650A;
+    --text:      #e5e5e5;
+    --muted:     #737373;
+    --small:     #525252;
+  }}
+
+  body {{
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }}
+
+  /* ── Header ──────────────────────────────────────────────── */
+  header {{
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }}
+  .site-title {{
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }}
+  .site-title span {{ color: var(--orange); }}
+  .updated {{
+    font-size: 12px;
+    color: var(--muted);
+  }}
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  main {{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }}
+
+  /* ── Summary bar ─────────────────────────────────────────── */
+  .summary-bar {{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }}
+  .divider {{ color: var(--border); }}
+
+  /* ── Match card ──────────────────────────────────────────── */
+  .match-card {{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+  }}
+  .match-card:hover {{ border-color: #333; }}
+  .match-header {{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }}
+  .match-teams {{
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }}
+  .vs {{
+    color: var(--muted);
+    font-weight: 400;
+    margin: 0 6px;
+  }}
+  .match-time {{
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }}
+
+  /* ── Player row ──────────────────────────────────────────── */
+  .players-row {{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }}
+  @media (max-width: 540px) {{
+    .players-row {{ grid-template-columns: 1fr; }}
+  }}
+
+  /* ── Player card ─────────────────────────────────────────── */
+  .player-card {{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }}
+  .player-name {{
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }}
+  .player-meta {{
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }}
+  .stats-grid {{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }}
+  .stat {{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }}
+  .stat-label {{
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--small);
+  }}
+  .stat-value {{
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }}
+
+  /* ── Signal badge ────────────────────────────────────────── */
+  .signal-badge {{
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }}
+  .recommendation {{
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.45;
+  }}
+
+  /* ── Error / empty states ────────────────────────────────── */
+  .match-error {{ border-color: #374151; }}
+  .error-msg {{
+    font-size: 13px;
+    color: #f59e0b;
+    margin-top: 4px;
+  }}
+  .empty-state {{
+    text-align: center;
+    padding: 64px 24px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    margin-top: 24px;
+  }}
+  .empty-icon {{
+    font-size: 32px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }}
+  .empty-title {{
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }}
+  .empty-body {{
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 340px;
+    margin: 0 auto;
+  }}
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  footer {{
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    font-size: 11px;
+    color: var(--small);
+    text-align: center;
+  }}
+  footer a {{ color: var(--muted); text-decoration: none; }}
+  footer a:hover {{ color: var(--text); }}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">the<span>·</span>model</div>
+  <div class="updated">Updated {now_utc}</div>
+</header>
+
+<main>
+  {summary_html}
+  {content}
+</main>
+
+<footer>
+  Pre-match predictions only &nbsp;·&nbsp; Model: ATP ranking-points ratio &nbsp;·&nbsp;
+  For informational purposes only — not financial or betting advice &nbsp;·&nbsp;
+  <a href="https://github.com/mateotenis98/the-model" target="_blank">Source</a>
+</footer>
+
+</body>
+</html>
+"""
+
+
+def main() -> None:
+    if not os.getenv("THE_ODDS_API_KEY"):
+        logger.error("THE_ODDS_API_KEY is not set. Aborting.")
+        sys.exit(1)
+
+    results = None
+    error = None
+
+    try:
+        results = run_pipeline()
+    except Exception as exc:
+        logger.error("Pipeline failed: %s", exc, exc_info=True)
+        error = str(exc)
+
+    html = generate_html(results, error=error)
+    out = Path("index.html")
+    out.write_text(html, encoding="utf-8")
+    logger.info("Written %s (%d bytes)", out, len(html))
+
+
+if __name__ == "__main__":
+    main()

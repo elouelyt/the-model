@@ -1,0 +1,53 @@
+swagger: "2.0"
+info:
+  title: Tennis AI Prediction API
+  description: ATP pre-match predictions via ranking-based model vs bookmaker odds.
+  version: "1.0.0"
+host: tennis-api-gateway-PLACEHOLDER.uc.gateway.dev
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: health
+      responses:
+        "200":
+          description: OK
+      x-google-backend:
+        address: https://tennis-api-er2jgzyldq-uc.a.run.app/health
+        jwt_audience: https://tennis-api-er2jgzyldq-uc.a.run.app
+        protocol: h2
+      x-google-backend-credentials:
+        service_account: api-gateway-invoker@tennis-data-487809.iam.gserviceaccount.com
+  /predict:
+    options:
+      summary: CORS preflight for /predict
+      operationId: predictOptions
+      responses:
+        "204":
+          description: CORS preflight response
+      x-google-backend:
+        address: https://tennis-api-er2jgzyldq-uc.a.run.app/predict
+        jwt_audience: https://tennis-api-er2jgzyldq-uc.a.run.app
+        protocol: h2
+      x-google-backend-credentials:
+        service_account: api-gateway-invoker@tennis-data-487809.iam.gserviceaccount.com
+    post:
+      summary: Run ATP pre-match prediction pipeline
+      operationId: predict
+      responses:
+        "200":
+          description: Predictions returned successfully
+        "401":
+          description: Invalid or missing API key
+        "503":
+          description: Upstream pipeline error
+      x-google-backend:
+        address: https://tennis-api-er2jgzyldq-uc.a.run.app/predict
+        jwt_audience: https://tennis-api-er2jgzyldq-uc.a.run.app
+        protocol: h2
+      x-google-backend-credentials:
+        service_account: api-gateway-invoker@tennis-data-487809.iam.gserviceaccount.com
