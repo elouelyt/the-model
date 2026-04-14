@@ -119,35 +119,52 @@ def _bookmaker_table_html(bookmakers: list[dict]) -> str:
             </details>"""
 
 
+def _prob_bar_html(model_prob: float, raw_implied: float) -> str:
+    """Render a dual probability bar: model (orange) vs bookmaker (grey)."""
+    m = min(max(model_prob * 100, 0), 100)
+    b = min(max(raw_implied * 100, 0), 100)
+    return f"""
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:{m:.1f}%;"></div>
+                </div>
+                <span class="prob-val">{m:.1f}%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:{b:.1f}%;"></div>
+                </div>
+                <span class="prob-val">{b:.1f}%</span>
+            </div>
+        </div>"""
+
+
 def _player_card_html(p: dict) -> str:
     meta = _SIGNAL_META[p["signal"]]
     edge_sign = "+" if p["edge"] >= 0 else ""
     edge_color = "#10b981" if p["edge"] > 0.05 else ("#f59e0b" if p["edge"] > 0 else "#6b7280")
     sentiment_tag = _sentiment_html(p.get("sentiment", {}))
+    prob_bars = _prob_bar_html(p["model_prob"], p["raw_implied"])
     return f"""
-        <div class="player-card" style="border-top: 3px solid {meta['border']};">
-            <div class="player-name">{p['player']}</div>
-            <div class="player-meta">Rank #{p['rank']} &nbsp;·&nbsp; {p['points']:,} pts{(" &nbsp;·&nbsp; " + sentiment_tag) if sentiment_tag else ""}</div>
+        <div class="player-card" style="border-top: 2px solid {meta['border']};">
+            <div class="player-name">{p['player']}{(" <span class='sentiment-sep'>·</span> " + sentiment_tag) if sentiment_tag else ""}</div>
+            <div class="player-meta">Rank <strong>#{p['rank']}</strong> &nbsp;·&nbsp; {p['points']:,} pts</div>
+            {prob_bars}
             <div class="stats-grid">
-                <div class="stat">
-                    <span class="stat-label">Model prob</span>
-                    <span class="stat-value">{p['model_prob']:.1%}</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">{p['raw_implied']:.1%}</span>
-                </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
                     <span class="stat-value" style="color:{edge_color};">{edge_sign}{p['edge']:.1%}</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">{p['vig_per_player']:.1%}</span>
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">{p['vig_per_player']:.1%}</span>
                 </div>
             </div>
-            <div class="signal-badge" style="color:{meta['color']};background:{meta['bg']};border:1px solid {meta['border']};">
-                {meta['label']}
+            <div class="signal-pill" style="color:{meta['color']};background:{meta['bg']};border:1px solid {meta['border']}20;">
+                <span class="signal-dot" style="background:{meta['color']};"></span>{meta['label']}
             </div>
             <div class="recommendation">{p['recommendation']}</div>
             {_bookmaker_table_html(p.get("bookmakers", []))}
@@ -270,9 +287,10 @@ def _match_card_html(match: dict) -> str:
 
     h2h_html = _h2h_html(match.get("h2h", {}), match["home"], match["away"], match.get("surface", "hard"))
     player_cols = "".join(_player_card_html(p) for p in players)
+    glow_color = accent if accent != "#2a2a2a" else "transparent"
 
     return f"""
-    <div class="match-card" style="border-left: 3px solid {accent};">
+    <div class="match-card" style="border-left: 3px solid {accent}; --card-glow: {glow_color};">
         <div class="match-header">
             <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
             <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
@@ -316,12 +334,17 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
             1 for m in results if "players" in m
             for p in m["players"] if p["signal"] == "value_bet"
         )
+        marginals = sum(
+            1 for m in results if "players" in m
+            for p in m["players"] if p["signal"] == "marginal"
+        )
         total_matches = len(results)
+        vb_html = f'<span class="pill pill-green"><strong>{value_bets}</strong> value bet{"s" if value_bets != 1 else ""}</span>' if value_bets else ""
+        mg_html = f'<span class="pill pill-amber"><strong>{marginals}</strong> marginal{"s" if marginals != 1 else ""}</span>' if marginals else ""
         summary_html = f"""
         <div class="summary-bar">
-            <span class="summary-item"><strong>{total_matches}</strong> match{'es' if total_matches != 1 else ''}</span>
-            <span class="divider">·</span>
-            <span class="summary-item" style="color:#10b981;"><strong>{value_bets}</strong> value bet{'s' if value_bets != 1 else ''} found</span>
+            <span class="summary-matches"><strong>{total_matches}</strong> match{'es' if total_matches != 1 else ''}</span>
+            <span class="summary-pills">{vb_html}{mg_html}</span>
         </div>"""
         content = "\n".join(_match_card_html(m) for m in results)
 
@@ -330,96 +353,187 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Model</title>
+<title>The Model · ATP Predictions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
   :root {{
-    --bg:        #0a0a0a;
-    --surface:   #141414;
-    --surface-2: #1c1c1c;
-    --border:    #262626;
-    --orange:    #E8650A;
-    --text:      #e5e5e5;
-    --muted:     #737373;
-    --small:     #525252;
+    --bg:        #080808;
+    --surface:   #111111;
+    --surface-2: #181818;
+    --surface-3: #1f1f1f;
+    --border:    #242424;
+    --border-2:  #2e2e2e;
+    --orange:    #f97316;
+    --orange-dim: rgba(249,115,22,0.12);
+    --green:     #10b981;
+    --amber:     #f59e0b;
+    --red:       #f87171;
+    --text:      #ededed;
+    --muted:     #6b6b6b;
+    --small:     #4a4a4a;
   }}
+
+  /* ── Scrollbar ───────────────────────────────────────────── */
+  ::-webkit-scrollbar {{ width: 6px; height: 6px; }}
+  ::-webkit-scrollbar-track {{ background: var(--bg); }}
+  ::-webkit-scrollbar-thumb {{ background: var(--border-2); border-radius: 3px; }}
+  ::-webkit-scrollbar-thumb:hover {{ background: #3a3a3a; }}
 
   body {{
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.55;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }}
 
   /* ── Header ──────────────────────────────────────────────── */
   header {{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
-    padding: 20px 24px;
+    padding: 0 24px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
   }}
   .site-title {{
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }}
-  .site-title span {{ color: var(--orange); }}
+  .site-title .logo-mark {{
+    width: 26px;
+    height: 26px;
+    background: var(--orange);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }}
+  .header-right {{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }}
   .updated {{
-    font-size: 12px;
-    color: var(--muted);
+    font-size: 11px;
+    color: var(--small);
+    font-variant-numeric: tabular-nums;
+  }}
+  .header-tag {{
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--small);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
   }}
 
   /* ── Layout ──────────────────────────────────────────────── */
   main {{
-    max-width: 860px;
+    max-width: 880px;
     margin: 0 auto;
-    padding: 24px 16px 48px;
+    padding: 28px 16px 64px;
   }}
 
   /* ── Summary bar ─────────────────────────────────────────── */
   .summary-bar {{
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }}
+  .summary-matches {{
     font-size: 13px;
     color: var(--muted);
   }}
-  .divider {{ color: var(--border); }}
+  .summary-matches strong {{ color: var(--text); font-weight: 600; }}
+  .summary-pills {{
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }}
+  .pill {{
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.1px;
+  }}
+  .pill-green {{
+    color: var(--green);
+    background: rgba(16,185,129,0.10);
+    border: 1px solid rgba(16,185,129,0.20);
+  }}
+  .pill-amber {{
+    color: var(--amber);
+    background: rgba(245,158,11,0.10);
+    border: 1px solid rgba(245,158,11,0.20);
+  }}
 
   /* ── Match card ──────────────────────────────────────────── */
   .match-card {{
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 20px;
-    margin-bottom: 16px;
-    transition: border-color 0.15s;
+    margin-bottom: 14px;
+    transition: box-shadow 0.2s, border-color 0.2s;
   }}
-  .match-card:hover {{ border-color: #333; }}
+  .match-card:hover {{
+    border-color: var(--border-2);
+    box-shadow: 0 0 0 1px var(--border-2),
+                0 8px 32px rgba(0,0,0,0.4),
+                0 0 20px color-mix(in srgb, var(--card-glow, transparent) 8%, transparent);
+  }}
   .match-header {{
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
   }}
   .match-teams {{
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text);
+    letter-spacing: -0.2px;
   }}
   .vs {{
-    color: var(--muted);
+    color: var(--small);
     font-weight: 400;
-    margin: 0 6px;
+    font-size: 13px;
+    margin: 0 7px;
   }}
   .match-meta {{
     display: flex;
@@ -428,17 +542,19 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     flex-shrink: 0;
   }}
   .match-time {{
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }}
   .surface-badge {{
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.7px;
     padding: 2px 7px;
-    border-radius: 3px;
+    border-radius: 4px;
     white-space: nowrap;
+    text-transform: uppercase;
   }}
 
   /* ── H2H bar ─────────────────────────────────────────────── */
@@ -447,79 +563,125 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     align-items: center;
     gap: 6px;
     padding: 7px 12px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 12px;
     flex-wrap: wrap;
     font-variant-numeric: tabular-nums;
   }}
   .h2h-label {{
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.7px;
     color: var(--small);
     text-transform: uppercase;
+    padding: 1px 5px;
+    background: var(--surface-3);
+    border-radius: 3px;
     margin-right: 2px;
   }}
-  .h2h-leader {{
-    color: var(--orange);
-    font-weight: 700;
-  }}
-  .h2h-trailer {{
-    color: var(--muted);
-    font-weight: 500;
-  }}
-  .h2h-record {{
-    color: var(--text);
-    font-weight: 500;
-  }}
-  .h2h-sep {{
-    color: var(--small);
-    margin: 0 1px;
-  }}
-  .h2h-total {{
-    color: var(--small);
-    font-size: 11px;
-    margin-left: 2px;
-  }}
-  .h2h-divider {{ color: var(--border); margin: 0 4px; }}
+  .h2h-leader  {{ color: var(--orange); font-weight: 700; }}
+  .h2h-trailer {{ color: var(--muted);  font-weight: 500; }}
+  .h2h-record  {{ color: var(--text);   font-weight: 500; }}
+  .h2h-sep     {{ color: var(--small);  margin: 0 2px; }}
+  .h2h-total   {{ color: var(--small);  font-size: 11px; }}
+  .h2h-divider {{ color: var(--border); margin: 0 6px; }}
   .h2h-surf-label {{ color: var(--muted); }}
-  .h2h-no-data {{ color: var(--small); font-style: italic; }}
+  .h2h-no-data {{ color: var(--small); font-style: italic; font-size: 11px; }}
 
-  /* ── Player row ──────────────────────────────────────────── */
+  /* ── Player grid ─────────────────────────────────────────── */
   .players-row {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
   }}
-  @media (max-width: 540px) {{
+  @media (max-width: 560px) {{
     .players-row {{ grid-template-columns: 1fr; }}
+    .match-teams {{ font-size: 14px; }}
   }}
 
   /* ── Player card ─────────────────────────────────────────── */
   .player-card {{
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
   }}
   .player-name {{
     font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 2px;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
   }}
+  .sentiment-sep {{ color: var(--border); }}
   .player-meta {{
     font-size: 11px;
     color: var(--muted);
     margin-bottom: 12px;
   }}
+  .player-meta strong {{ color: var(--text); font-weight: 600; }}
   .sentiment-flag {{
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     cursor: default;
+    letter-spacing: 0.1px;
   }}
+
+  /* ── Probability bars ────────────────────────────────────── */
+  .prob-bars {{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+  }}
+  .prob-row {{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }}
+  .prob-label {{
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--small);
+    width: 26px;
+    flex-shrink: 0;
+  }}
+  .prob-track {{
+    flex: 1;
+    height: 5px;
+    background: var(--surface-3);
+    border-radius: 99px;
+    overflow: hidden;
+  }}
+  .prob-fill {{
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }}
+  .prob-model {{ background: var(--orange); }}
+  .prob-mkt   {{ background: var(--muted); }}
+  .prob-val {{
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    width: 34px;
+    text-align: right;
+    flex-shrink: 0;
+  }}
+
+  /* ── Stats grid ──────────────────────────────────────────── */
   .stats-grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -532,38 +694,48 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     gap: 2px;
   }}
   .stat-label {{
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--small);
   }}
   .stat-value {{
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    color: var(--text);
   }}
 
-  /* ── Signal badge ────────────────────────────────────────── */
-  .signal-badge {{
-    display: inline-block;
+  /* ── Signal pill ─────────────────────────────────────────── */
+  .signal-pill {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.8px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-bottom: 8px;
+    letter-spacing: 0.6px;
+    padding: 4px 10px 4px 7px;
+    border-radius: 99px;
+    margin-bottom: 9px;
+    text-transform: uppercase;
+  }}
+  .signal-dot {{
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }}
   .recommendation {{
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    line-height: 1.45;
+    line-height: 1.5;
   }}
 
   /* ── Bookmaker odds toggle ───────────────────────────────── */
   .odds-details {{
-    margin-top: 10px;
+    margin-top: 11px;
     border-top: 1px solid var(--border);
-    padding-top: 8px;
+    padding-top: 9px;
   }}
   .odds-summary {{
     font-size: 11px;
@@ -572,15 +744,17 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     list-style: none;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     user-select: none;
+    transition: color 0.15s;
   }}
   .odds-summary::-webkit-details-marker {{ display: none; }}
   .odds-summary::before {{
     content: "▸";
-    font-size: 9px;
+    font-size: 8px;
     transition: transform 0.15s;
     display: inline-block;
+    color: var(--small);
   }}
   details[open] .odds-summary::before {{ transform: rotate(90deg); }}
   .odds-summary:hover {{ color: var(--muted); }}
@@ -593,72 +767,89 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
   }}
   .odds-table th {{
     text-align: left;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.5px;
     color: var(--small);
-    padding: 3px 6px;
+    padding: 4px 6px;
     border-bottom: 1px solid var(--border);
+    font-weight: 600;
   }}
   .odds-table td {{
-    padding: 4px 6px;
-    border-bottom: 1px solid #1e1e1e;
-    color: var(--muted);
+    padding: 5px 6px;
+    border-bottom: 1px solid rgba(36,36,36,0.6);
     font-variant-numeric: tabular-nums;
   }}
   .odds-table tr:last-child td {{ border-bottom: none; }}
-  .bk-name  {{ color: var(--text); }}
-  .bk-price {{ font-weight: 500; }}
+  .odds-table tr:hover td {{ background: var(--surface-3); }}
+  .bk-name    {{ color: var(--text); }}
+  .bk-price   {{ color: var(--muted); font-weight: 500; }}
   .bk-implied {{ color: var(--small); }}
 
   /* ── Error / empty states ────────────────────────────────── */
-  .match-error {{ border-color: #374151; }}
+  .match-error {{ border-color: rgba(55,65,81,0.6); }}
   .error-msg {{
-    font-size: 13px;
-    color: #f59e0b;
-    margin-top: 4px;
+    font-size: 12px;
+    color: var(--amber);
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: rgba(245,158,11,0.06);
+    border-radius: 6px;
+    border: 1px solid rgba(245,158,11,0.15);
   }}
   .empty-state {{
     text-align: center;
-    padding: 64px 24px;
-    border: 1px dashed var(--border);
-    border-radius: 12px;
+    padding: 72px 24px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
     margin-top: 24px;
+    background: var(--surface);
   }}
   .empty-icon {{
-    font-size: 32px;
-    color: var(--muted);
-    margin-bottom: 12px;
+    font-size: 28px;
+    color: var(--small);
+    margin-bottom: 16px;
+    opacity: 0.6;
   }}
   .empty-title {{
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
+    color: var(--text);
     margin-bottom: 8px;
+    letter-spacing: -0.2px;
   }}
   .empty-body {{
     font-size: 13px;
     color: var(--muted);
-    max-width: 340px;
+    max-width: 360px;
     margin: 0 auto;
+    line-height: 1.6;
   }}
 
   /* ── Footer ──────────────────────────────────────────────── */
   footer {{
     border-top: 1px solid var(--border);
-    padding: 16px 24px;
+    padding: 18px 24px;
     font-size: 11px;
     color: var(--small);
     text-align: center;
+    line-height: 1.8;
   }}
-  footer a {{ color: var(--muted); text-decoration: none; }}
+  footer a {{ color: var(--muted); text-decoration: none; transition: color 0.15s; }}
   footer a:hover {{ color: var(--text); }}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="site-title">the<span>·</span>model</div>
-  <div class="updated">Updated {now_utc}</div>
+  <div class="site-title">
+    <div class="logo-mark">tm</div>
+    the model
+  </div>
+  <div class="header-right">
+    <span class="header-tag">ATP · Pre-match</span>
+    <span class="updated">Updated {now_utc}</span>
+  </div>
 </header>
 
 <main>
@@ -667,9 +858,10 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
 </main>
 
 <footer>
-  Pre-match predictions only &nbsp;·&nbsp; Model: logistic regression (ranking pts, rank, surface) &nbsp;·&nbsp;
-  For informational purposes only — not financial or betting advice &nbsp;·&nbsp;
-  <a href="https://github.com/elouelyt/the-model" target="_blank">Source</a>
+  Pre-match predictions only &nbsp;·&nbsp;
+  Model: logistic regression (63.7% CV) &nbsp;·&nbsp;
+  Not financial or betting advice &nbsp;·&nbsp;
+  <a href="https://github.com/elouelyt/the-model" target="_blank">Source ↗</a>
 </footer>
 
 </body>
