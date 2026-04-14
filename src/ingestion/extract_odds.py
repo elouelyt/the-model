@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 _BASE_URL = "https://api.the-odds-api.com/v4/sports"
 _ATP_KEY_PREFIX = "tennis_atp_"
-_REGIONS = "us"
+_REGIONS = "us,uk,eu"
 _MARKETS = "h2h"
 
 
