@@ -50,13 +50,11 @@ _SIGNAL_META = {
 }
 
 
-def run_pipeline() -> list[dict]:
+def run_pipeline() -> tuple[list[dict], list[dict]]:
     """Run the full prediction pipeline via LangGraph coordinator.
 
-    Delegates to ``src.pipeline.coordinator.run_pipeline`` which executes the
-    stateful graph: fetch_odds → fetch_rankings (retry ×2) → fetch_sentiment
-    → compute_predictions. Each stage has fallback behaviour so the page
-    always renders with whatever data is available.
+    Returns:
+        (results, parlays) — match result dicts and rated parlay dicts.
     """
     from src.pipeline.coordinator import run_pipeline as _coordinator_run
     return _coordinator_run()
@@ -320,15 +318,103 @@ def _error_html(message: str) -> str:
     </div>"""
 
 
-def generate_html(results: list[dict] | None, error: str | None = None) -> str:
+def _parlays_html(parlays: list[dict]) -> str:
+    """Render the collapsed Recommended Parlays section."""
+    if not parlays:
+        return ""
+
+    _SURFACE_COLORS = {
+        "clay": "#ea580c", "grass": "#16a34a",
+        "hard": "#2563eb", "indoor_hard": "#7c3aed",
+    }
+    _SURFACE_LABELS = {
+        "clay": "Clay", "grass": "Grass",
+        "hard": "Hard", "indoor_hard": "Indoor",
+    }
+    _RISK_META = {
+        "low":    {"color": "#10b981", "bg": "rgba(16,185,129,0.10)",  "border": "rgba(16,185,129,0.25)"},
+        "medium": {"color": "#f59e0b", "bg": "rgba(245,158,11,0.10)",  "border": "rgba(245,158,11,0.25)"},
+        "high":   {"color": "#f87171", "bg": "rgba(248,113,113,0.10)", "border": "rgba(248,113,113,0.25)"},
+    }
+
+    cards_html = ""
+    for i, parlay in enumerate(parlays):
+        risk = parlay.get("risk", "medium")
+        risk_meta = _RISK_META.get(risk, _RISK_META["medium"])
+        rating = parlay.get("rating", 5)
+        summary = parlay.get("summary", "")
+
+        # Rating bar fill (out of 10)
+        rating_pct = rating * 10
+
+        # Pick rows
+        picks_html = ""
+        for p in parlay["picks"]:
+            surf_color = _SURFACE_COLORS.get(p["surface"], "#2563eb")
+            surf_label = _SURFACE_LABELS.get(p["surface"], p["surface"].title())
+            sent = p.get("sentiment", {})
+            sent_flag = sent.get("flag", "neutral") if sent else "neutral"
+            sent_icon = "↑" if sent_flag == "positive" else ("⚠" if sent_flag == "concern" else "")
+            sent_color = "#10b981" if sent_flag == "positive" else ("#f87171" if sent_flag == "concern" else "")
+            picks_html += f"""
+                <div class="parlay-pick">
+                    <span class="parlay-pick-name">{p['player']}</span>
+                    <span class="parlay-pick-meta">
+                        #{p['rank']} &nbsp;·&nbsp;
+                        <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
+                        {p['model_prob']:.0%} model &nbsp;·&nbsp;
+                        {p['best_price']:.2f}
+                        {f'&nbsp;<span style="color:{sent_color};font-size:10px;">{sent_icon}</span>' if sent_icon else ""}
+                    </span>
+                </div>"""
+
+        cards_html += f"""
+        <div class="parlay-card">
+            <div class="parlay-card-header">
+                <div class="parlay-legs">{parlay['size']}-leg parlay</div>
+                <div class="parlay-header-right">
+                    <span class="risk-badge" style="color:{risk_meta['color']};background:{risk_meta['bg']};border:1px solid {risk_meta['border']};">{risk.upper()}</span>
+                    <span class="parlay-odds">{parlay['total_odds']:.2f}</span>
+                </div>
+            </div>
+            <div class="parlay-picks">{picks_html}</div>
+            <div class="parlay-footer">
+                <div class="rating-row">
+                    <span class="rating-label">Gemini</span>
+                    <div class="rating-track">
+                        <div class="rating-fill" style="width:{rating_pct}%;background:{'#10b981' if rating>=7 else '#f59e0b' if rating>=5 else '#f87171'};"></div>
+                    </div>
+                    <span class="rating-val">{rating}/10</span>
+                </div>
+                <div class="parlay-cum-prob">Cumulative model prob: <strong>{parlay['cum_prob']:.1%}</strong></div>
+            </div>
+            {f'<div class="parlay-summary">{summary}</div>' if summary else ""}
+        </div>"""
+
+    return f"""
+    <details class="parlays-section">
+        <summary class="parlays-summary">
+            <span class="parlays-title">Recommended Parlays</span>
+            <span class="parlays-count">({len(parlays)})</span>
+            <span class="parlays-chevron">▸</span>
+        </summary>
+        <div class="parlays-grid">{cards_html}</div>
+    </details>"""
+
+
+def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
+                  error: str | None = None) -> str:
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    parlays = parlays or []
 
     if error:
         content = _error_html(error)
         summary_html = ""
+        parlays_html = ""
     elif not results:
         content = _no_matches_html()
         summary_html = ""
+        parlays_html = ""
     else:
         value_bets = sum(
             1 for m in results if "players" in m
@@ -346,6 +432,7 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
             <span class="summary-matches"><strong>{total_matches}</strong> match{'es' if total_matches != 1 else ''}</span>
             <span class="summary-pills">{vb_html}{mg_html}</span>
         </div>"""
+        parlays_html = _parlays_html(parlays)
         content = "\n".join(_match_card_html(m) for m in results)
 
     return f"""<!DOCTYPE html>
@@ -826,6 +913,168 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     line-height: 1.6;
   }}
 
+  /* ── Parlays section ────────────────────────────────────── */
+  .parlays-section {{
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }}
+  .parlays-summary {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background 0.15s;
+  }}
+  .parlays-summary::-webkit-details-marker {{ display: none; }}
+  .parlays-summary:hover {{ background: var(--surface-2); }}
+  .parlays-title {{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.1px;
+  }}
+  .parlays-count {{
+    font-size: 12px;
+    color: var(--muted);
+  }}
+  .parlays-chevron {{
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--small);
+    transition: transform 0.2s;
+    display: inline-block;
+  }}
+  details[open] .parlays-chevron {{ transform: rotate(90deg); }}
+  .parlays-grid {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    padding: 0 16px 16px;
+  }}
+  .parlay-card {{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }}
+  .parlay-card-header {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }}
+  .parlay-legs {{
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }}
+  .parlay-header-right {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }}
+  .parlay-odds {{
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--orange);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+  }}
+  .risk-badge {{
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    padding: 2px 7px;
+    border-radius: 99px;
+    text-transform: uppercase;
+  }}
+  .parlay-picks {{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }}
+  .parlay-pick {{
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 8px;
+    background: var(--surface-3);
+    border-radius: 6px;
+  }}
+  .parlay-pick-name {{
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }}
+  .parlay-pick-meta {{
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }}
+  .parlay-footer {{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }}
+  .rating-row {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }}
+  .rating-label {{
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--small);
+    width: 40px;
+    flex-shrink: 0;
+  }}
+  .rating-track {{
+    flex: 1;
+    height: 5px;
+    background: var(--surface-3);
+    border-radius: 99px;
+    overflow: hidden;
+  }}
+  .rating-fill {{
+    height: 100%;
+    border-radius: 99px;
+  }}
+  .rating-val {{
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    width: 30px;
+    text-align: right;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }}
+  .parlay-cum-prob {{
+    font-size: 11px;
+    color: var(--small);
+  }}
+  .parlay-cum-prob strong {{ color: var(--muted); }}
+  .parlay-summary {{
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-style: italic;
+    padding-top: 2px;
+  }}
+
   /* ── Footer ──────────────────────────────────────────────── */
   footer {{
     border-top: 1px solid var(--border);
@@ -854,6 +1103,7 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
 
 <main>
   {summary_html}
+  {parlays_html}
   {content}
 </main>
 
@@ -875,15 +1125,16 @@ def main() -> None:
         sys.exit(1)
 
     results = None
+    parlays: list[dict] = []
     error = None
 
     try:
-        results = run_pipeline()
+        results, parlays = run_pipeline()
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
 
-    html = generate_html(results, error=error)
+    html = generate_html(results, parlays=parlays, error=error)
     out = Path("index.html")
     out.write_text(html, encoding="utf-8")
     logger.info("Written %s (%d bytes)", out, len(html))

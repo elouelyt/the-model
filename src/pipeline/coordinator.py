@@ -42,6 +42,9 @@ class PipelineState(TypedDict, total=False):
     # Final match result dicts (what generate_html.py consumes)
     results: list[dict]
 
+    # Top-5 rated parlays (populated by generate_parlays_node)
+    parlays: list[dict]
+
     # Retry counter for the rankings node
     rankings_retries: int
 
@@ -255,6 +258,25 @@ def generate_explanations_node(state: PipelineState) -> PipelineState:
     return {**state, "results": updated}
 
 
+def generate_parlays_node(state: PipelineState) -> PipelineState:
+    """Select top parlays and rate each with Gemini Flash.
+
+    Runs after generate_explanations so recommendation text is already final.
+    Non-fatal — empty list on any failure.
+    """
+    from src.agents.parlay_agent import generate_parlays
+
+    results = state.get("results", [])
+    try:
+        parlays = generate_parlays(results)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] generate_parlays_node failed (non-fatal): %s", exc)
+        parlays = []
+
+    logger.info("[coordinator] generate_parlays_node — %d parlays rated", len(parlays))
+    return {**state, "parlays": parlays}
+
+
 # ── Conditional routing ────────────────────────────────────────────────────────
 
 
@@ -289,6 +311,7 @@ def _build_graph() -> StateGraph:
     graph.add_node("fetch_sentiment", fetch_sentiment_node)
     graph.add_node("compute_predictions", compute_predictions_node)
     graph.add_node("generate_explanations", generate_explanations_node)
+    graph.add_node("generate_parlays", generate_parlays_node)
 
     graph.set_entry_point("fetch_odds")
 
@@ -304,7 +327,8 @@ def _build_graph() -> StateGraph:
 
     graph.add_edge("fetch_sentiment", "compute_predictions")
     graph.add_edge("compute_predictions", "generate_explanations")
-    graph.add_edge("generate_explanations", END)
+    graph.add_edge("generate_explanations", "generate_parlays")
+    graph.add_edge("generate_parlays", END)
 
     return graph
 
@@ -338,5 +362,6 @@ def run_pipeline() -> list[dict]:
 
     final_state = _GRAPH.invoke(initial_state)
     results = final_state.get("results", [])
-    logger.info("[coordinator] Pipeline complete — %d matches", len(results))
-    return results
+    parlays = final_state.get("parlays", [])
+    logger.info("[coordinator] Pipeline complete — %d matches, %d parlays", len(results), len(parlays))
+    return results, parlays
