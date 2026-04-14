@@ -3,8 +3,9 @@
 Replaces the linear ``run_pipeline()`` function with a stateful graph that
 supports retry logic and conditional routing:
 
-    fetch_odds → fetch_rankings → fetch_sentiment → compute_predictions → END
-                      ↑ retry ×2
+    fetch_odds → fetch_rankings → fetch_sentiment → compute_predictions
+                      ↑ retry ×2                         ↓
+                                              generate_explanations → END
     fetch_odds → (empty) → END
 
 Each node receives and returns the shared ``PipelineState`` TypedDict.
@@ -195,6 +196,65 @@ def compute_predictions_node(state: PipelineState) -> PipelineState:
     return {**state, "results": results}
 
 
+def generate_explanations_node(state: PipelineState) -> PipelineState:
+    """Replace template recommendation text with Gemini Flash insights.
+
+    Calls the explanation agent once per match (not per player). If the call
+    fails for any match the original template text is kept — fully non-fatal.
+    Matches with ``error`` keys (missing rankings) are skipped.
+    """
+    from src.agents.explanation_agent import generate_match_explanations
+
+    results = state.get("results", [])
+    if not results:
+        return state
+
+    import os
+    if not os.getenv("GEMINI_API_KEY"):
+        logger.info("[coordinator] GEMINI_API_KEY not set — skipping explanations node")
+        return state
+
+    updated: list[dict] = []
+    for match in results:
+        if "error" in match or not match.get("players"):
+            updated.append(match)
+            continue
+
+        players = match["players"]
+        if len(players) < 2:
+            updated.append(match)
+            continue
+
+        home_p = next((p for p in players if p["player"] == match["home"]), players[0])
+        away_p = next((p for p in players if p["player"] == match["away"]), players[1])
+
+        insights = generate_match_explanations(
+            home=match["home"],
+            away=match["away"],
+            surface=match.get("surface", "hard"),
+            home_player=home_p,
+            away_player=away_p,
+            h2h=match.get("h2h", {}),
+        )
+
+        if insights:
+            # Patch recommendation field in-place (copy to avoid mutating original)
+            new_players = []
+            for p in players:
+                pc = dict(p)
+                if pc["player"] == match["home"]:
+                    pc["recommendation"] = insights["home_insight"]
+                elif pc["player"] == match["away"]:
+                    pc["recommendation"] = insights["away_insight"]
+                new_players.append(pc)
+            updated.append({**match, "players": new_players})
+        else:
+            updated.append(match)
+
+    logger.info("[coordinator] generate_explanations_node — %d matches processed", len(updated))
+    return {**state, "results": updated}
+
+
 # ── Conditional routing ────────────────────────────────────────────────────────
 
 
@@ -228,6 +288,7 @@ def _build_graph() -> StateGraph:
     graph.add_node("fetch_rankings", fetch_rankings_node)
     graph.add_node("fetch_sentiment", fetch_sentiment_node)
     graph.add_node("compute_predictions", compute_predictions_node)
+    graph.add_node("generate_explanations", generate_explanations_node)
 
     graph.set_entry_point("fetch_odds")
 
@@ -242,7 +303,8 @@ def _build_graph() -> StateGraph:
     )
 
     graph.add_edge("fetch_sentiment", "compute_predictions")
-    graph.add_edge("compute_predictions", END)
+    graph.add_edge("compute_predictions", "generate_explanations")
+    graph.add_edge("generate_explanations", END)
 
     return graph
 

@@ -29,6 +29,7 @@ jobs:
       - name: Run prediction pipeline
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python generate_html.py
 
       - name: Commit and push index.html
