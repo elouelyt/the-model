@@ -58,6 +58,7 @@ def run_pipeline() -> list[dict]:
     from src.agents.probability_calculator import calculate_win_probability, compare_with_bookmaker
     from src.agents.surface_agent import get_surface, SURFACE_NOTE
     from src.agents.h2h_agent import get_h2h
+    from src.agents.sentiment_agent import fetch_sentiment_batch
 
     logger.info("Fetching live odds...")
     data = fetch_odds()
@@ -76,6 +77,9 @@ def run_pipeline() -> list[dict]:
     players = df["outcome_name"].unique().tolist()
     logger.info("Fetching rankings for %d players...", len(players))
     rankings = fetch_atp_rankings(player_names=players)
+
+    logger.info("Fetching sentiment for %d players...", len(players))
+    sentiment_map = fetch_sentiment_batch(players)
 
     results = []
     for (event_id, home, away), group in df.groupby(["event_id", "home_team", "away_team"]):
@@ -110,6 +114,9 @@ def run_pipeline() -> list[dict]:
             )
             rec["rank"] = rankings[player]["rank"]
             rec["points"] = rankings[player]["points"]
+            rec["sentiment"] = sentiment_map.get(
+                player, {"available": False, "flag": "neutral", "label": None, "headline": None}
+            )
             # Append surface context to recommendation when it adds useful signal
             if surface_note:
                 rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
@@ -132,14 +139,35 @@ def run_pipeline() -> list[dict]:
 
 # ── HTML rendering ─────────────────────────────────────────────────────────────
 
+_SENTIMENT_STYLE: dict[str, dict] = {
+    "positive": {"color": "#10b981", "icon": "↑"},
+    "concern":  {"color": "#f87171", "icon": "⚠"},
+}
+
+
+def _sentiment_html(sentiment: dict) -> str:
+    """Render a small inline sentiment indicator. Empty string if neutral/unavailable."""
+    flag = sentiment.get("flag", "neutral")
+    label = sentiment.get("label")
+    if not label or flag not in _SENTIMENT_STYLE:
+        return ""
+    s = _SENTIMENT_STYLE[flag]
+    return (
+        f'<span class="sentiment-flag" style="color:{s["color"]};" '
+        f'title="{sentiment.get("headline") or ""}">'
+        f'{s["icon"]} {label}</span>'
+    )
+
+
 def _player_card_html(p: dict) -> str:
     meta = _SIGNAL_META[p["signal"]]
     edge_sign = "+" if p["edge"] >= 0 else ""
     edge_color = "#10b981" if p["edge"] > 0.05 else ("#f59e0b" if p["edge"] > 0 else "#6b7280")
+    sentiment_tag = _sentiment_html(p.get("sentiment", {}))
     return f"""
         <div class="player-card" style="border-top: 3px solid {meta['border']};">
             <div class="player-name">{p['player']}</div>
-            <div class="player-meta">Rank #{p['rank']} &nbsp;·&nbsp; {p['points']:,} pts</div>
+            <div class="player-meta">Rank #{p['rank']} &nbsp;·&nbsp; {p['points']:,} pts{(" &nbsp;·&nbsp; " + sentiment_tag) if sentiment_tag else ""}</div>
             <div class="stats-grid">
                 <div class="stat">
                     <span class="stat-label">Model prob</span>
@@ -454,6 +482,11 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     font-size: 11px;
     color: var(--muted);
     margin-bottom: 12px;
+  }}
+  .sentiment-flag {{
+    font-size: 11px;
+    font-weight: 600;
+    cursor: default;
   }}
   .stats-grid {{
     display: grid;
