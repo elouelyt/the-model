@@ -57,6 +57,7 @@ def run_pipeline() -> list[dict]:
     from src.agents.ranking_agent import fetch_atp_rankings
     from src.agents.probability_calculator import calculate_win_probability, compare_with_bookmaker
     from src.agents.surface_agent import get_surface, SURFACE_NOTE
+    from src.agents.h2h_agent import get_h2h
 
     logger.info("Fetching live odds...")
     data = fetch_odds()
@@ -114,11 +115,14 @@ def run_pipeline() -> list[dict]:
                 rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
             players_data.append(rec)
 
+        h2h = get_h2h(home, away, surface)
+
         results.append({
             "home": home,
             "away": away,
             "commence_time": commence_time,
             "surface": surface,
+            "h2h": h2h,
             "players": players_data,
         })
 
@@ -161,6 +165,35 @@ def _player_card_html(p: dict) -> str:
         </div>"""
 
 
+def _h2h_html(h2h: dict, home: str, away: str, surface: str) -> str:
+    """Render a compact H2H line for the match card. Returns empty string if unavailable."""
+    if not h2h.get("available") or h2h["total"] == 0:
+        return ""
+
+    home_short = home.split()[-1]   # last name only for compactness
+    away_short = away.split()[-1]
+
+    overall = f"{home_short} {h2h['a_wins']}–{h2h['b_wins']} {away_short}"
+
+    surface_part = ""
+    if h2h["total_surface"] > 0:
+        from src.agents.surface_agent import SURFACE_LABEL
+        surf_label = SURFACE_LABEL.get(surface, surface.title())
+        surface_part = (
+            f'<span class="h2h-divider">·</span>'
+            f'<span class="h2h-surface">{surf_label}: '
+            f'{home_short} {h2h["a_wins_surface"]}–{h2h["b_wins_surface"]} {away_short}</span>'
+        )
+
+    return (
+        f'<div class="h2h-bar">'
+        f'<span class="h2h-label">H2H</span>'
+        f'<span class="h2h-record">{overall}</span>'
+        f'{surface_part}'
+        f'</div>'
+    )
+
+
 def _surface_badge_html(surface: str) -> str:
     s = _SURFACE_META.get(surface, _SURFACE_META["hard"])
     return (
@@ -194,6 +227,7 @@ def _match_card_html(match: dict) -> str:
     else:
         accent = "#2a2a2a"
 
+    h2h_html = _h2h_html(match.get("h2h", {}), match["home"], match["away"], match.get("surface", "hard"))
     player_cols = "".join(_player_card_html(p) for p in players)
 
     return f"""
@@ -202,6 +236,7 @@ def _match_card_html(match: dict) -> str:
             <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
             <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
         </div>
+        {h2h_html}
         <div class="players-row">
             {player_cols}
         </div>
@@ -364,6 +399,34 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     border-radius: 3px;
     white-space: nowrap;
   }}
+
+  /* ── H2H bar ─────────────────────────────────────────────── */
+  .h2h-bar {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+  }}
+  .h2h-label {{
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--small);
+    text-transform: uppercase;
+  }}
+  .h2h-record {{
+    color: var(--text);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }}
+  .h2h-divider {{ color: var(--border); }}
+  .h2h-surface {{ color: var(--muted); }}
 
   /* ── Player row ──────────────────────────────────────────── */
   .players-row {{

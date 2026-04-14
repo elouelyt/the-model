@@ -114,6 +114,34 @@
     white-space: nowrap;
   }
 
+  /* ── H2H bar ─────────────────────────────────────────────── */
+  .h2h-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+  .h2h-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--small);
+    text-transform: uppercase;
+  }
+  .h2h-record {
+    color: var(--text);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .h2h-divider { color: var(--border); }
+  .h2h-surface { color: var(--muted); }
+
   /* ── Player row ──────────────────────────────────────────── */
   .players-row {
     display: grid;
@@ -227,13 +255,13 @@
 
 <header>
   <div class="site-title">the<span>·</span>model</div>
-  <div class="updated">Updated 2026-04-14 17:06 UTC</div>
+  <div class="updated">Updated 2026-04-14 17:17 UTC</div>
 </header>
 
 <main>
   
         <div class="summary-bar">
-            <span class="summary-item"><strong>13</strong> matches</span>
+            <span class="summary-item"><strong>14</strong> matches</span>
             <span class="divider">·</span>
             <span class="summary-item" style="color:#10b981;"><strong>7</strong> value bets found</span>
         </div>
@@ -243,6 +271,7 @@
             <span class="match-teams">Corentin Moutet <span class="vs">vs</span> Lorenzo Musetti</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Thu 16 Apr · 08:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -305,6 +334,7 @@
             <span class="match-teams">Botic van de Zandschulp <span class="vs">vs</span> Francisco Cerundolo</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 09:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -367,6 +397,7 @@
             <span class="match-teams">Arthur Rinderknech <span class="vs">vs</span> Joao Fonseca</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 08:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #10b981;">
@@ -429,6 +460,7 @@
             <span class="match-teams">Alexander Zverev <span class="vs">vs</span> Gabriel Diallo</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 08:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -491,6 +523,7 @@
             <span class="match-teams">Daniel Altmaier <span class="vs">vs</span> Alex Molcan</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 08:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -553,6 +586,7 @@
             <span class="match-teams">Carlos Alcaraz <span class="vs">vs</span> Tomas Machac</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Thu 16 Apr · 08:00 UTC</span></span>
         </div>
+        <div class="h2h-bar"><span class="h2h-label">H2H</span><span class="h2h-record">Alcaraz 0–1 Machac</span></div>
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #f59e0b;">
@@ -565,21 +599,21 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">91.4%</span>
+                    <span class="stat-value">90.9%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
-                    <span class="stat-value" style="color:#f59e0b;">+1.7%</span>
+                    <span class="stat-value" style="color:#f59e0b;">+2.2%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-3.3%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.8%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
                 MARGINAL
             </div>
-            <div class="recommendation">Marginal edge on Carlos Alcaraz (1.7%). Model (93.1%) barely beats the raw price (91.4%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">Marginal edge on Carlos Alcaraz (2.2%). Model (93.1%) barely beats the raw price (90.9%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Tomas Machac</div>
@@ -591,21 +625,21 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">12.4%</span>
+                    <span class="stat-value">13.4%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
-                    <span class="stat-value" style="color:#6b7280;">-5.5%</span>
+                    <span class="stat-value" style="color:#6b7280;">-6.6%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-0.5%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-0.6%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
                 NO BET
             </div>
-            <div class="recommendation">No bet on Tomas Machac. Model (6.9%) does not beat the bookmaker's raw price (12.4%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">No bet on Tomas Machac. Model (6.9%) does not beat the bookmaker's raw price (13.4%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
         </div>
         </div>
     </div>
@@ -615,6 +649,7 @@
             <span class="match-teams">Nuno Borges <span class="vs">vs</span> Tomas Martin Etcheverry</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 09:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #f59e0b;">
@@ -675,8 +710,9 @@
     <div class="match-card" style="border-left: 3px solid #10b981;">
         <div class="match-header">
             <span class="match-teams">Arthur Fils <span class="vs">vs</span> Terence Atmane</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Tue 14 Apr · 17:20 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Tue 14 Apr · 17:30 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -689,7 +725,7 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">84.7%</span>
+                    <span class="stat-value">84.8%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
@@ -697,13 +733,13 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-4.0%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-4.1%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
                 NO BET
             </div>
-            <div class="recommendation">No bet on Arthur Fils. Model (56.5%) does not beat the bookmaker's raw price (84.7%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">No bet on Arthur Fils. Model (56.5%) does not beat the bookmaker's raw price (84.8%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
         </div>
         <div class="player-card" style="border-top: 3px solid #10b981;">
             <div class="player-name">Terence Atmane</div>
@@ -739,6 +775,7 @@
             <span class="match-teams">Alexander Blockx <span class="vs">vs</span> Ben Shelton</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 09:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -751,21 +788,21 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">41.8%</span>
+                    <span class="stat-value">42.1%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
-                    <span class="stat-value" style="color:#6b7280;">-25.2%</span>
+                    <span class="stat-value" style="color:#6b7280;">-25.6%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-2.0%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-2.1%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
                 NO BET
             </div>
-            <div class="recommendation">No bet on Alexander Blockx. Model (16.5%) does not beat the bookmaker's raw price (41.8%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">No bet on Alexander Blockx. Model (16.5%) does not beat the bookmaker's raw price (42.1%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
         </div>
         <div class="player-card" style="border-top: 3px solid #10b981;">
             <div class="player-name">Ben Shelton</div>
@@ -777,21 +814,21 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">63.3%</span>
+                    <span class="stat-value">63.1%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
-                    <span class="stat-value" style="color:#10b981;">+20.2%</span>
+                    <span class="stat-value" style="color:#10b981;">+20.4%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-3.0%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.1%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b981;">
                 VALUE BET
             </div>
-            <div class="recommendation">Bet on Ben Shelton. Model gives 83.5% vs bookmaker raw price of 63.3% — edge of 20.2% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">Bet on Ben Shelton. Model gives 83.5% vs bookmaker raw price of 63.1% — edge of 20.4% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
         </div>
         </div>
     </div>
@@ -801,6 +838,7 @@
             <span class="match-teams">Alex de Minaur <span class="vs">vs</span> Hamad Medjedovic</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 10:30 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #10b981;">
@@ -863,6 +901,7 @@
             <span class="match-teams">Rafael Jodar <span class="vs">vs</span> Camilo Ugo Carabelli</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 14:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
@@ -922,9 +961,73 @@
 
     <div class="match-card" style="border-left: 3px solid #f59e0b;">
         <div class="match-header">
+            <span class="match-teams">Flavio Cobolli <span class="vs">vs</span> Zizou Bergs</span>
+            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 08:00 UTC</span></span>
+        </div>
+        <div class="h2h-bar"><span class="h2h-label">H2H</span><span class="h2h-record">Cobolli 1–1 Bergs</span></div>
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 3px solid #f59e0b;">
+            <div class="player-name">Flavio Cobolli</div>
+            <div class="player-meta">Rank #16 &nbsp;·&nbsp; 2,320 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">67.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">64.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#f59e0b;">+3.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.1%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
+                MARGINAL
+            </div>
+            <div class="recommendation">Marginal edge on Flavio Cobolli (3.1%). Model (67.6%) barely beats the raw price (64.5%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
+        </div>
+        <div class="player-card" style="border-top: 3px solid #374151;">
+            <div class="player-name">Zizou Bergs</div>
+            <div class="player-meta">Rank #40 &nbsp;·&nbsp; 1,110 pts</div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Model prob</span>
+                    <span class="stat-value">32.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bookmaker</span>
+                    <span class="stat-value">40.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-8.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig (est.)</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.9%</span>
+                </div>
+            </div>
+            <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
+                NO BET
+            </div>
+            <div class="recommendation">No bet on Zizou Bergs. Model (32.4%) does not beat the bookmaker's raw price (40.5%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="match-card" style="border-left: 3px solid #f59e0b;">
+        <div class="match-header">
             <span class="match-teams">Cameron Norrie <span class="vs">vs</span> Ethan Quinn</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 15:30 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #f59e0b;">
@@ -987,6 +1090,7 @@
             <span class="match-teams">Vit Kopriva <span class="vs">vs</span> Luciano Darderi</span>
             <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Wed 15 Apr · 08:00 UTC</span></span>
         </div>
+        
         <div class="players-row">
             
         <div class="player-card" style="border-top: 3px solid #374151;">
