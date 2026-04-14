@@ -450,7 +450,7 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
 <footer>
   Pre-match predictions only &nbsp;·&nbsp; Model: ATP ranking-points ratio &nbsp;·&nbsp;
   For informational purposes only — not financial or betting advice &nbsp;·&nbsp;
-  <a href="https://github.com/mateotenis98/the-model" target="_blank">Source</a>
+  <a href="https://github.com/elouelyt/the-model" target="_blank">Source</a>
 </footer>
 
 </body>

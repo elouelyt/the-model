@@ -2,7 +2,7 @@
 
 A static prediction engine that runs daily, fetches live pre-match odds, compares them against a ranking-based probability model, and publishes the results as a self-contained HTML page via GitHub Pages.
 
-**Live:** [mateotenis98.github.io/the-model](https://mateotenis98.github.io/the-model)
+**Live:** [elouelyt.github.io/the-model](https://elouelyt.github.io/the-model)
 
 ---
 
@@ -39,7 +39,7 @@ A **value bet** is flagged when `model_prob > raw_implied + 0.05` (i.e. the mode
 
 ```bash
 # 1. Clone
-git clone https://github.com/mateotenis98/the-model.git
+git clone https://github.com/elouelyt/the-model.git
 cd the-model
 
 # 2. Install minimal deps
