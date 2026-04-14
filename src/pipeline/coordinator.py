@@ -1,0 +1,280 @@
+"""LangGraph coordinator for the Tennis AI prediction pipeline.
+
+Replaces the linear ``run_pipeline()`` function with a stateful graph that
+supports retry logic and conditional routing:
+
+    fetch_odds → fetch_rankings → fetch_sentiment → compute_predictions → END
+                      ↑ retry ×2
+    fetch_odds → (empty) → END
+
+Each node receives and returns the shared ``PipelineState`` TypedDict.
+Errors are captured as non-fatal fallbacks so the page always renders
+with whatever data is available.
+"""
+
+import logging
+from typing import Annotated, TypedDict
+
+from langgraph.graph import StateGraph, END
+
+logger = logging.getLogger(__name__)
+
+# ── State schema ───────────────────────────────────────────────────────────────
+
+
+class PipelineState(TypedDict, total=False):
+    """Shared state passed between all nodes in the pipeline graph."""
+
+    # Raw odds fetched from The-Odds-API
+    raw_odds: list[dict]
+
+    # Flat DataFrame-compatible rows after transform (stored as list of dicts
+    # because TypedDict cannot hold a pandas DataFrame directly)
+    processed_rows: list[dict]
+
+    # Ranking lookup: player_name → {"rank": int, "points": int}
+    rankings: dict[str, dict]
+
+    # Sentiment lookup: player_name → sentinel dict
+    sentiment_map: dict[str, dict]
+
+    # Final match result dicts (what generate_html.py consumes)
+    results: list[dict]
+
+    # Retry counter for the rankings node
+    rankings_retries: int
+
+    # Signals that downstream nodes should not run
+    abort: bool
+
+
+# ── Nodes ──────────────────────────────────────────────────────────────────────
+
+
+def fetch_odds_node(state: PipelineState) -> PipelineState:
+    """Fetch live pre-match ATP odds and flatten into processed rows."""
+    from src.ingestion.extract_odds import fetch_odds
+    from src.processing.transform import flatten_odds, filter_upcoming
+
+    logger.info("[coordinator] fetch_odds_node — fetching live odds")
+    try:
+        raw = fetch_odds()
+    except Exception as exc:  # noqa: BLE001
+        logger.error("[coordinator] fetch_odds failed: %s", exc)
+        return {**state, "raw_odds": [], "processed_rows": [], "abort": True}
+
+    if not raw:
+        logger.warning("[coordinator] No active ATP tournaments — aborting pipeline")
+        return {**state, "raw_odds": [], "processed_rows": [], "abort": True}
+
+    df = filter_upcoming(flatten_odds(raw))
+
+    if df.empty:
+        logger.warning("[coordinator] All matches in-play — aborting pipeline")
+        return {**state, "raw_odds": raw, "processed_rows": [], "abort": True}
+
+    logger.info("[coordinator] %d pre-match rows ready", len(df))
+    return {**state, "raw_odds": raw, "processed_rows": df.to_dict("records"), "abort": False}
+
+
+def fetch_rankings_node(state: PipelineState) -> PipelineState:
+    """Scrape ATP rankings with up to 2 retries on failure."""
+    from src.agents.ranking_agent import fetch_atp_rankings
+    import pandas as pd
+
+    rows = state.get("processed_rows", [])
+    retries = state.get("rankings_retries", 0)
+
+    players = list({r["outcome_name"] for r in rows})
+    logger.info("[coordinator] fetch_rankings_node — %d players (attempt %d)", len(players), retries + 1)
+
+    try:
+        rankings = fetch_atp_rankings(player_names=players)
+        if not rankings:
+            raise ValueError("Empty rankings returned")
+        logger.info("[coordinator] Rankings fetched for %d players", len(rankings))
+        return {**state, "rankings": rankings, "rankings_retries": retries + 1}
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] Rankings fetch failed (attempt %d): %s", retries + 1, exc)
+        return {**state, "rankings": {}, "rankings_retries": retries + 1}
+
+
+def fetch_sentiment_node(state: PipelineState) -> PipelineState:
+    """Fetch news sentiment for all players. Non-fatal — defaults to neutral."""
+    from src.agents.sentiment_agent import fetch_sentiment_batch
+
+    rows = state.get("processed_rows", [])
+    players = list({r["outcome_name"] for r in rows})
+    logger.info("[coordinator] fetch_sentiment_node — %d players", len(players))
+
+    try:
+        sentiment_map = fetch_sentiment_batch(players)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] Sentiment fetch failed (non-fatal): %s", exc)
+        sentiment_map = {}
+
+    return {**state, "sentiment_map": sentiment_map}
+
+
+def compute_predictions_node(state: PipelineState) -> PipelineState:
+    """Assemble final match predictions from all upstream data."""
+    import pandas as pd
+    from src.agents.probability_calculator import compare_with_bookmaker
+    from src.agents.model_agent import predict_win_probability
+    from src.agents.surface_agent import get_surface, SURFACE_NOTE
+    from src.agents.h2h_agent import get_h2h
+
+    rows = state.get("processed_rows", [])
+    rankings = state.get("rankings", {})
+    sentiment_map = state.get("sentiment_map", {})
+
+    if not rows:
+        return {**state, "results": []}
+
+    df = pd.DataFrame(rows)
+    results: list[dict] = []
+
+    for (event_id, home, away), group in df.groupby(["event_id", "home_team", "away_team"]):
+        commence_time = group["commence_time"].iloc[0]
+        sport_key = group["sport_key"].iloc[0]
+        surface = get_surface(sport_key)
+        surface_note = SURFACE_NOTE.get(surface)
+
+        missing = [p for p in [home, away] if p not in rankings]
+        if missing:
+            results.append({
+                "home": home,
+                "away": away,
+                "commence_time": commence_time,
+                "surface": surface,
+                "error": f"Rankings not found for: {', '.join(missing)}",
+            })
+            continue
+
+        prob_home, prob_away = predict_win_probability(
+            rankings[home]["points"], rankings[away]["points"],
+            rankings[home]["rank"],   rankings[away]["rank"],
+            surface,
+        )
+
+        players_data = []
+        for player, model_prob in [(home, prob_home), (away, prob_away)]:
+            player_rows = group[group["outcome_name"] == player]
+            rec = compare_with_bookmaker(
+                model_prob,
+                player_rows["raw_implied"].mean(),
+                player_rows["true_implied"].mean(),
+                player,
+            )
+            rec["rank"] = rankings[player]["rank"]
+            rec["points"] = rankings[player]["points"]
+            rec["sentiment"] = sentiment_map.get(
+                player, {"available": False, "flag": "neutral", "label": None, "headline": None}
+            )
+            bk = (
+                player_rows[["bookmaker_title", "price", "raw_implied"]]
+                .drop_duplicates(subset=["bookmaker_title"])
+                .sort_values("price", ascending=False)
+            )
+            rec["bookmakers"] = bk.to_dict("records")
+            if surface_note:
+                rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
+            players_data.append(rec)
+
+        h2h = get_h2h(home, away, surface)
+        results.append({
+            "home": home,
+            "away": away,
+            "commence_time": commence_time,
+            "surface": surface,
+            "h2h": h2h,
+            "players": players_data,
+        })
+
+    logger.info("[coordinator] compute_predictions_node — %d matches", len(results))
+    return {**state, "results": results}
+
+
+# ── Conditional routing ────────────────────────────────────────────────────────
+
+
+def _should_abort(state: PipelineState) -> str:
+    """Route to END if no odds data; otherwise continue to rankings."""
+    return END if state.get("abort") else "fetch_rankings"
+
+
+def _retry_or_continue(state: PipelineState) -> str:
+    """Retry rankings up to 2 times; then proceed regardless (fallback to no-ranking cards)."""
+    retries = state.get("rankings_retries", 0)
+    rankings = state.get("rankings", {})
+
+    if not rankings and retries < 2:
+        logger.info("[coordinator] Rankings empty — retrying (attempt %d/2)", retries + 1)
+        return "fetch_rankings"
+
+    if not rankings:
+        logger.warning("[coordinator] Rankings unavailable after %d attempts — all matches will show error cards", retries)
+
+    return "fetch_sentiment"
+
+
+# ── Graph construction ─────────────────────────────────────────────────────────
+
+
+def _build_graph() -> StateGraph:
+    graph = StateGraph(PipelineState)
+
+    graph.add_node("fetch_odds", fetch_odds_node)
+    graph.add_node("fetch_rankings", fetch_rankings_node)
+    graph.add_node("fetch_sentiment", fetch_sentiment_node)
+    graph.add_node("compute_predictions", compute_predictions_node)
+
+    graph.set_entry_point("fetch_odds")
+
+    # After fetch_odds: abort if no data, else go to rankings
+    graph.add_conditional_edges("fetch_odds", _should_abort, {"fetch_rankings": "fetch_rankings", END: END})
+
+    # After fetch_rankings: retry up to 2× or proceed
+    graph.add_conditional_edges(
+        "fetch_rankings",
+        _retry_or_continue,
+        {"fetch_rankings": "fetch_rankings", "fetch_sentiment": "fetch_sentiment"},
+    )
+
+    graph.add_edge("fetch_sentiment", "compute_predictions")
+    graph.add_edge("compute_predictions", END)
+
+    return graph
+
+
+_GRAPH = _build_graph().compile()
+
+
+# ── Public interface ───────────────────────────────────────────────────────────
+
+
+def run_pipeline() -> list[dict]:
+    """Execute the LangGraph prediction pipeline and return match result dicts.
+
+    This is a drop-in replacement for the former linear ``run_pipeline()``
+    in ``generate_html.py``.
+
+    Returns:
+        A list of match result dicts (same schema as before).
+        Empty list if no active tournaments or all matches are in-play.
+    """
+    logger.info("[coordinator] Starting LangGraph pipeline")
+    initial_state: PipelineState = {
+        "raw_odds": [],
+        "processed_rows": [],
+        "rankings": {},
+        "sentiment_map": {},
+        "results": [],
+        "rankings_retries": 0,
+        "abort": False,
+    }
+
+    final_state = _GRAPH.invoke(initial_state)
+    results = final_state.get("results", [])
+    logger.info("[coordinator] Pipeline complete — %d matches", len(results))
+    return results

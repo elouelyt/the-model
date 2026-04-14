@@ -95,19 +95,23 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 **Key lesson from Sprint 6:** Log-compress skewed ratio features before training. `log(pts_A / pts_B)` is approximately normally distributed; raw `pts_A / pts_B` has extreme outliers that dominate gradient updates.
 **Key lesson from Sprint 6:** `@lru_cache(maxsize=1)` on a zero-argument function is the simplest in-process cache. Downloading Sackmann CSVs once per pipeline run reduces H2H latency from ~4s per call to ~0s after the first match.
 
-## Sprint 5 (Planned) — LangGraph Agent Architecture
+## Sprint 5 — LangGraph Agent Architecture — COMPLETE ✓
 
-**Goal:** Refactor the linear pipeline into a proper coordinator → sub-agent graph. LangGraph provides the routing and fallback infrastructure needed before adding more data sources in Sprint 6.
+**Goal:** Refactor the linear pipeline into a proper coordinator → sub-agent graph.
 
-**Trigger:** Introduce LangGraph when the pipeline stops being linear — i.e., when the coordinator needs to make routing decisions, not just call functions in order.
+**Deliverable:** `src/pipeline/coordinator.py` — `PipelineState` TypedDict + `StateGraph` with 4 nodes:
+- `fetch_odds` → conditional edge (abort if no data / all in-play)
+- `fetch_rankings` → conditional edge (retry ×2 on empty result, then fall through)
+- `fetch_sentiment` → always runs; errors default to neutral
+- `compute_predictions` → assembles final match dicts
 
-**Planned work:**
-1. Introduce LangGraph as the coordinator layer
-2. Refactor sub-agents (odds, rankings, model, explanation) into LangGraph nodes
-3. Add retry/fallback logic (e.g., ranking fetch fails → use cached data)
-4. Conditional routing based on data availability or confidence thresholds
+`generate_html.py.run_pipeline()` is now a one-liner delegation to the coordinator.
 
-**Key decision:** Do NOT introduce LangGraph in Sprint 3 or 4. Go live first, refactor second.
+**Key decision:** Do NOT introduce LangGraph in Sprint 3 or 4. Go live first, refactor second. ✓
+
+**Key lesson from Sprint 5:** LangGraph `StateGraph` self-loops (conditional edge pointing back to the same node) are a clean retry pattern — increment a counter in state and route back until the counter threshold is reached. No external retry library needed.
+**Key lesson from Sprint 5:** TypedDict state with `total=False` lets nodes add keys incrementally without needing to initialise all fields upfront. Use it as the graph's single shared context object.
+**Key lesson from Sprint 5:** Keep node functions side-effect-free and returning `{**state, "new_key": value}` — this makes the graph trivially testable by calling nodes directly with mock state dicts.
 
 ## Sprint 6+ (Planned) — Data Enrichment & Model Upgrade
 

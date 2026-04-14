@@ -51,100 +51,15 @@ _SIGNAL_META = {
 
 
 def run_pipeline() -> list[dict]:
-    """Run the full prediction pipeline and return a list of match result dicts."""
-    from src.ingestion.extract_odds import fetch_odds
-    from src.processing.transform import flatten_odds, filter_upcoming
-    from src.agents.ranking_agent import fetch_atp_rankings
-    from src.agents.probability_calculator import compare_with_bookmaker
-    from src.agents.model_agent import predict_win_probability
-    from src.agents.surface_agent import get_surface, SURFACE_NOTE
-    from src.agents.h2h_agent import get_h2h
-    from src.agents.sentiment_agent import fetch_sentiment_batch
+    """Run the full prediction pipeline via LangGraph coordinator.
 
-    logger.info("Fetching live odds...")
-    data = fetch_odds()
-
-    if not data:
-        logger.warning("No active tournaments found.")
-        return []
-
-    df = flatten_odds(data)
-    df = filter_upcoming(df)
-
-    if df.empty:
-        logger.warning("All matches are currently in-play. No pre-match odds available.")
-        return []
-
-    players = df["outcome_name"].unique().tolist()
-    logger.info("Fetching rankings for %d players...", len(players))
-    rankings = fetch_atp_rankings(player_names=players)
-
-    logger.info("Fetching sentiment for %d players...", len(players))
-    sentiment_map = fetch_sentiment_batch(players)
-
-    results = []
-    for (event_id, home, away), group in df.groupby(["event_id", "home_team", "away_team"]):
-        commence_time = group["commence_time"].iloc[0]
-        sport_key = group["sport_key"].iloc[0]
-        surface = get_surface(sport_key)
-        surface_note = SURFACE_NOTE.get(surface)
-        missing = [p for p in [home, away] if p not in rankings]
-
-        if missing:
-            results.append({
-                "home": home,
-                "away": away,
-                "commence_time": commence_time,
-                "surface": surface,
-                "error": f"Rankings not found for: {', '.join(missing)}",
-            })
-            continue
-
-        prob_home, prob_away = predict_win_probability(
-            rankings[home]["points"], rankings[away]["points"],
-            rankings[home]["rank"],   rankings[away]["rank"],
-            surface,
-        )
-
-        players_data = []
-        for player, model_prob in [(home, prob_home), (away, prob_away)]:
-            rows = group[group["outcome_name"] == player]
-            rec = compare_with_bookmaker(
-                model_prob,
-                rows["raw_implied"].mean(),
-                rows["true_implied"].mean(),
-                player,
-            )
-            rec["rank"] = rankings[player]["rank"]
-            rec["points"] = rankings[player]["points"]
-            rec["sentiment"] = sentiment_map.get(
-                player, {"available": False, "flag": "neutral", "label": None, "headline": None}
-            )
-            # Per-bookmaker odds — one row per bookmaker, sorted best price first
-            bk = (
-                rows[["bookmaker_title", "price", "raw_implied"]]
-                .drop_duplicates(subset=["bookmaker_title"])
-                .sort_values("price", ascending=False)
-            )
-            rec["bookmakers"] = bk.to_dict("records")
-            # Append surface context to recommendation when it adds useful signal
-            if surface_note:
-                rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
-            players_data.append(rec)
-
-        h2h = get_h2h(home, away, surface)
-
-        results.append({
-            "home": home,
-            "away": away,
-            "commence_time": commence_time,
-            "surface": surface,
-            "h2h": h2h,
-            "players": players_data,
-        })
-
-    logger.info("Pipeline complete — %d matches processed.", len(results))
-    return results
+    Delegates to ``src.pipeline.coordinator.run_pipeline`` which executes the
+    stateful graph: fetch_odds → fetch_rankings (retry ×2) → fetch_sentiment
+    → compute_predictions. Each stage has fallback behaviour so the page
+    always renders with whatever data is available.
+    """
+    from src.pipeline.coordinator import run_pipeline as _coordinator_run
+    return _coordinator_run()
 
 
 # ── HTML rendering ─────────────────────────────────────────────────────────────
