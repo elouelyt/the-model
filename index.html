@@ -213,6 +213,58 @@
     line-height: 1.45;
   }
 
+  /* ── Bookmaker odds toggle ───────────────────────────────── */
+  .odds-details {
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+  .odds-summary {
+    font-size: 11px;
+    color: var(--small);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+  }
+  .odds-summary::-webkit-details-marker { display: none; }
+  .odds-summary::before {
+    content: "▸";
+    font-size: 9px;
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  details[open] .odds-summary::before { transform: rotate(90deg); }
+  .odds-summary:hover { color: var(--muted); }
+  .odds-count { color: var(--small); }
+  .odds-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 11px;
+  }
+  .odds-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--small);
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .odds-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #1e1e1e;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .odds-table tr:last-child td { border-bottom: none; }
+  .bk-name  { color: var(--text); }
+  .bk-price { font-weight: 500; }
+  .bk-implied { color: var(--small); }
+
   /* ── Error / empty states ────────────────────────────────── */
   .match-error { border-color: #374151; }
   .error-msg {
@@ -260,7 +312,7 @@
 
 <header>
   <div class="site-title">the<span>·</span>model</div>
-  <div class="updated">Updated 2026-04-14 17:32 UTC</div>
+  <div class="updated">Updated 2026-04-14 17:37 UTC</div>
 </header>
 
 <main>
@@ -304,6 +356,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Corentin Moutet. Model (31.8%) does not beat the bookmaker's raw price (32.3%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(2)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.10</td><td class="bk-implied">32.3%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">3.09</td><td class="bk-implied">32.4%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Lorenzo Musetti</div>
@@ -330,6 +396,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Lorenzo Musetti. Model (68.2%) does not beat the bookmaker's raw price (72.7%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(2)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">1.37</td><td class="bk-implied">73.0%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -344,7 +424,7 @@
             
         <div class="player-card" style="border-top: 3px solid #f59e0b;">
             <div class="player-name">Botic van de Zandschulp</div>
-            <div class="player-meta">Rank #49 &nbsp;·&nbsp; 931 pts &nbsp;·&nbsp; <span class="sentiment-flag" style="color:#10b981;" title="Alex De Minaur Vs Botic Van De Zandschulp | Rotterdam Quarter-Final 2026 | LIVE TENNIS WATCHALONG Weather Singapore (Oiy6r5NKte) - Mshale">↑ In form</span></div>
+            <div class="player-meta">Rank #49 &nbsp;·&nbsp; 931 pts &nbsp;·&nbsp; <span class="sentiment-flag" style="color:#10b981;" title="Botic Van de Zandschulp vs. Francisco Cerundolo prediction, odds, picks for ATP Bavarian International Tennis Championships 2026 - dimers.com">↑ In form</span></div>
             <div class="stats-grid">
                 <div class="stat">
                     <span class="stat-label">Model prob</span>
@@ -367,6 +447,20 @@
                 MARGINAL
             </div>
             <div class="recommendation">Marginal edge on Botic van de Zandschulp (3.5%). Model (35.2%) barely beats the raw price (31.7%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(7)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Bovada</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.20</td><td class="bk-implied">31.2%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.20</td><td class="bk-implied">31.2%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.20</td><td class="bk-implied">31.2%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price">3.14</td><td class="bk-implied">31.8%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price">3.14</td><td class="bk-implied">31.8%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">3.10</td><td class="bk-implied">32.3%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">3.09</td><td class="bk-implied">32.4%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Francisco Cerundolo</div>
@@ -393,6 +487,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Francisco Cerundolo. Model (64.8%) does not beat the bookmaker's raw price (73.3%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(7)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">1.36</td><td class="bk-implied">73.5%</td></tr><tr><td class="bk-name">Bovada</td><td class="bk-price">1.36</td><td class="bk-implied">73.5%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">1.35</td><td class="bk-implied">74.1%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">1.34</td><td class="bk-implied">74.6%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -430,6 +538,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Arthur Rinderknech. Model gives 54.8% vs bookmaker raw price of 29.3% — edge of 25.5% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(5)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.52</td><td class="bk-implied">28.4%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.52</td><td class="bk-implied">28.4%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">3.40</td><td class="bk-implied">29.4%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">3.40</td><td class="bk-implied">29.4%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">3.25</td><td class="bk-implied">30.8%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Joao Fonseca</div>
@@ -456,6 +578,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Joao Fonseca. Model (45.2%) does not beat the bookmaker's raw price (75.5%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(5)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.34</td><td class="bk-implied">74.6%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">1.33</td><td class="bk-implied">75.2%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price">1.32</td><td class="bk-implied">75.8%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price">1.32</td><td class="bk-implied">75.8%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">1.31</td><td class="bk-implied">76.3%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -493,6 +629,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Alexander Zverev. Model (78.3%) does not beat the bookmaker's raw price (89.3%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.12</td><td class="bk-implied">89.3%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #10b981;">
             <div class="player-name">Gabriel Diallo</div>
@@ -519,6 +669,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Gabriel Diallo. Model gives 21.7% vs bookmaker raw price of 15.8% — edge of 5.9% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">6.33</td><td class="bk-implied">15.8%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -533,7 +697,7 @@
             
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Daniel Altmaier</div>
-            <div class="player-meta">Rank #56 &nbsp;·&nbsp; 880 pts &nbsp;·&nbsp; <span class="sentiment-flag" style="color:#10b981;" title="Marin Cilic vs. Daniel Altmaier prediction, odds, picks for ATP Bavarian International Tennis Championships 2026 - dimers.com">↑ In form</span></div>
+            <div class="player-meta">Rank #56 &nbsp;·&nbsp; 880 pts</div>
             <div class="stats-grid">
                 <div class="stat">
                     <span class="stat-label">Model prob</span>
@@ -556,6 +720,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Daniel Altmaier. Model (44.4%) does not beat the bookmaker's raw price (58.1%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.72</td><td class="bk-implied">58.1%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #10b981;">
             <div class="player-name">Alex Molcan</div>
@@ -582,6 +760,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Alex Molcan. Model gives 55.6% vs bookmaker raw price of 46.7% — edge of 8.9% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.14</td><td class="bk-implied">46.7%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -619,6 +811,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Carlos Alcaraz. Model (89.8%) does not beat the bookmaker's raw price (91.8%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(2)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.11</td><td class="bk-implied">90.1%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">1.07</td><td class="bk-implied">93.5%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Tomas Machac</div>
@@ -645,6 +851,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Tomas Machac. Model (10.2%) does not beat the bookmaker's raw price (12.2%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(2)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">9.90</td><td class="bk-implied">10.1%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">7.00</td><td class="bk-implied">14.3%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -682,6 +902,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Nuno Borges. Model gives 38.9% vs bookmaker raw price of 32.3% — edge of 6.6% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(7)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.20</td><td class="bk-implied">31.2%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price">3.19</td><td class="bk-implied">31.3%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price">3.19</td><td class="bk-implied">31.3%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">3.10</td><td class="bk-implied">32.3%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">3.00</td><td class="bk-implied">33.3%</td></tr><tr><td class="bk-name">Bovada</td><td class="bk-price">3.00</td><td class="bk-implied">33.3%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">2.98</td><td class="bk-implied">33.6%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Tomas Martin Etcheverry</div>
@@ -708,6 +942,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Tomas Martin Etcheverry. Model (61.1%) does not beat the bookmaker's raw price (72.5%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(7)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.40</td><td class="bk-implied">71.4%</td></tr><tr><td class="bk-name">Bovada</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.40</td><td class="bk-implied">71.4%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price">1.38</td><td class="bk-implied">72.5%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">1.36</td><td class="bk-implied">73.5%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">1.36</td><td class="bk-implied">73.5%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -745,6 +993,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Alexander Blockx. Model (22.0%) does not beat the bookmaker's raw price (43.9%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(5)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.30</td><td class="bk-implied">43.5%</td></tr><tr><td class="bk-name">Bovada</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.30</td><td class="bk-implied">43.5%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">2.28</td><td class="bk-implied">43.9%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">2.27</td><td class="bk-implied">44.1%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">2.25</td><td class="bk-implied">44.4%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #10b981;">
             <div class="player-name">Ben Shelton</div>
@@ -771,6 +1033,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Ben Shelton. Model gives 78.0% vs bookmaker raw price of 61.3% — edge of 16.7% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(5)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Bovada</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.65</td><td class="bk-implied">60.6%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">1.64</td><td class="bk-implied">61.0%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">1.63</td><td class="bk-implied">61.3%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">1.62</td><td class="bk-implied">61.7%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">1.62</td><td class="bk-implied">61.7%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -808,6 +1084,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Alex de Minaur. Model gives 79.6% vs bookmaker raw price of 70.4% — edge of 9.2% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(5)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.43</td><td class="bk-implied">69.9%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.43</td><td class="bk-implied">69.9%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price">1.42</td><td class="bk-implied">70.4%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price">1.42</td><td class="bk-implied">70.4%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">1.40</td><td class="bk-implied">71.4%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Hamad Medjedovic</div>
@@ -834,6 +1124,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Hamad Medjedovic. Model (20.4%) does not beat the bookmaker's raw price (34.3%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(5)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.00</td><td class="bk-implied">33.3%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.00</td><td class="bk-implied">33.3%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">2.97</td><td class="bk-implied">33.7%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">2.84</td><td class="bk-implied">35.2%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">2.80</td><td class="bk-implied">35.7%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -848,7 +1152,7 @@
             
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Rafael Jodar</div>
-            <div class="player-meta">Rank #55 &nbsp;·&nbsp; 886 pts &nbsp;·&nbsp; <span class="sentiment-flag" style="color:#10b981;" title="19-Year-Old Spaniard Rafael Jodar Reaches First ATP Final in Marrakech - National Today">↑ In form</span></div>
+            <div class="player-meta">Rank #55 &nbsp;·&nbsp; 886 pts</div>
             <div class="stats-grid">
                 <div class="stat">
                     <span class="stat-label">Model prob</span>
@@ -871,6 +1175,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Rafael Jodar. Model (51.0%) does not beat the bookmaker's raw price (76.6%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(4)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.31</td><td class="bk-implied">76.3%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.31</td><td class="bk-implied">76.3%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.31</td><td class="bk-implied">76.3%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">1.29</td><td class="bk-implied">77.5%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #10b981;">
             <div class="player-name">Camilo Ugo Carabelli</div>
@@ -897,6 +1215,20 @@
                 VALUE BET
             </div>
             <div class="recommendation">Bet on Camilo Ugo Carabelli. Model gives 48.9% vs bookmaker raw price of 27.8% — edge of 21.1% survives the vig. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(4)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.63</td><td class="bk-implied">27.5%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">3.63</td><td class="bk-implied">27.5%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">3.60</td><td class="bk-implied">27.8%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">3.53</td><td class="bk-implied">28.3%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -934,10 +1266,24 @@
                 MARGINAL
             </div>
             <div class="recommendation">Marginal edge on Flavio Cobolli (2.2%). Model (64.3%) barely beats the raw price (62.1%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.61</td><td class="bk-implied">62.1%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Zizou Bergs</div>
-            <div class="player-meta">Rank #40 &nbsp;·&nbsp; 1,110 pts &nbsp;·&nbsp; <span class="sentiment-flag" style="color:#f87171;" title="Zizou Bergs responds to Jannik Sinner’s withdrawal from Monte-Carlo doubles tournament - Yahoo Sports">⚠ Form concern</span></div>
+            <div class="player-meta">Rank #40 &nbsp;·&nbsp; 1,110 pts</div>
             <div class="stats-grid">
                 <div class="stat">
                     <span class="stat-label">Model prob</span>
@@ -960,6 +1306,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Zizou Bergs. Model (35.7%) does not beat the bookmaker's raw price (42.6%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.35</td><td class="bk-implied">42.6%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -997,6 +1357,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Cameron Norrie. Model (62.5%) does not beat the bookmaker's raw price (64.8%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(7)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.56</td><td class="bk-implied">64.1%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.56</td><td class="bk-implied">64.1%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.56</td><td class="bk-implied">64.1%</td></tr><tr><td class="bk-name">Bovada</td><td class="bk-price">1.54</td><td class="bk-implied">64.9%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">1.53</td><td class="bk-implied">65.4%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">1.53</td><td class="bk-implied">65.4%</td></tr><tr><td class="bk-name">FanDuel</td><td class="bk-price">1.52</td><td class="bk-implied">65.8%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #374151;">
             <div class="player-name">Ethan Quinn</div>
@@ -1023,6 +1397,20 @@
                 NO BET
             </div>
             <div class="recommendation">No bet on Ethan Quinn. Model (37.5%) does not beat the bookmaker's raw price (39.6%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(7)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">FanDuel</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.58</td><td class="bk-implied">38.8%</td></tr><tr><td class="bk-name">BetOnline.ag</td><td class="bk-price">2.57</td><td class="bk-implied">38.9%</td></tr><tr><td class="bk-name">LowVig.ag</td><td class="bk-price">2.57</td><td class="bk-implied">38.9%</td></tr><tr><td class="bk-name">Bovada</td><td class="bk-price">2.55</td><td class="bk-implied">39.2%</td></tr><tr><td class="bk-name">BetRivers</td><td class="bk-price">2.50</td><td class="bk-implied">40.0%</td></tr><tr><td class="bk-name">DraftKings</td><td class="bk-price">2.46</td><td class="bk-implied">40.7%</td></tr><tr><td class="bk-name">BetMGM</td><td class="bk-price">2.45</td><td class="bk-implied">40.8%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>
@@ -1045,21 +1433,35 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">41.5%</span>
+                    <span class="stat-value">38.6%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
-                    <span class="stat-value" style="color:#6b7280;">-8.5%</span>
+                    <span class="stat-value" style="color:#6b7280;">-5.6%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-1.9%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-1.8%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #374151;">
                 NO BET
             </div>
-            <div class="recommendation">No bet on Vit Kopriva. Model (33.0%) does not beat the bookmaker's raw price (41.5%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">No bet on Vit Kopriva. Model (33.0%) does not beat the bookmaker's raw price (38.6%). Vig would erase any edge. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.59</td><td class="bk-implied">38.6%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         <div class="player-card" style="border-top: 3px solid #f59e0b;">
             <div class="player-name">Luciano Darderi</div>
@@ -1071,21 +1473,35 @@
                 </div>
                 <div class="stat">
                     <span class="stat-label">Bookmaker</span>
-                    <span class="stat-value">63.3%</span>
+                    <span class="stat-value">66.2%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Edge</span>
-                    <span class="stat-value" style="color:#f59e0b;">+3.7%</span>
+                    <span class="stat-value" style="color:#f59e0b;">+0.8%</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">Vig (est.)</span>
-                    <span class="stat-value" style="color:#9ca3af;">-2.9%</span>
+                    <span class="stat-value" style="color:#9ca3af;">-3.0%</span>
                 </div>
             </div>
             <div class="signal-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b;">
                 MARGINAL
             </div>
-            <div class="recommendation">Marginal edge on Luciano Darderi (3.7%). Model (67.0%) barely beats the raw price (63.3%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
+            <div class="recommendation">Marginal edge on Luciano Darderi (0.8%). Model (67.0%) barely beats the raw price (66.2%). Proceed with caution. · Clay court — surface specialists may outperform the ranking model.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">DraftKings</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.51</td><td class="bk-implied">66.2%</td></tr></tbody>
+                </table>
+            </details>
         </div>
         </div>
     </div>

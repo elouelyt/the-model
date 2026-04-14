@@ -120,6 +120,13 @@ def run_pipeline() -> list[dict]:
             rec["sentiment"] = sentiment_map.get(
                 player, {"available": False, "flag": "neutral", "label": None, "headline": None}
             )
+            # Per-bookmaker odds — one row per bookmaker, sorted best price first
+            bk = (
+                rows[["bookmaker_title", "price", "raw_implied"]]
+                .drop_duplicates(subset=["bookmaker_title"])
+                .sort_values("price", ascending=False)
+            )
+            rec["bookmakers"] = bk.to_dict("records")
             # Append surface context to recommendation when it adds useful signal
             if surface_note:
                 rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
@@ -162,6 +169,41 @@ def _sentiment_html(sentiment: dict) -> str:
     )
 
 
+def _bookmaker_table_html(bookmakers: list[dict]) -> str:
+    """Render a collapsible <details> block with per-bookmaker odds table."""
+    if not bookmakers:
+        return ""
+
+    best_price = max(b["price"] for b in bookmakers)
+
+    rows_html = ""
+    for b in bookmakers:
+        is_best = abs(b["price"] - best_price) < 0.001
+        price_style = ' style="color:#10b981;font-weight:700;"' if is_best else ""
+        rows_html += (
+            f'<tr>'
+            f'<td class="bk-name">{b["bookmaker_title"]}</td>'
+            f'<td class="bk-price"{price_style}>{b["price"]:.2f}</td>'
+            f'<td class="bk-implied">{b["raw_implied"]:.1%}</td>'
+            f'</tr>'
+        )
+
+    return f"""
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">({len(bookmakers)})</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody>{rows_html}</tbody>
+                </table>
+            </details>"""
+
+
 def _player_card_html(p: dict) -> str:
     meta = _SIGNAL_META[p["signal"]]
     edge_sign = "+" if p["edge"] >= 0 else ""
@@ -193,6 +235,7 @@ def _player_card_html(p: dict) -> str:
                 {meta['label']}
             </div>
             <div class="recommendation">{p['recommendation']}</div>
+            {_bookmaker_table_html(p.get("bookmakers", []))}
         </div>"""
 
 
@@ -529,6 +572,58 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     color: var(--muted);
     line-height: 1.45;
   }}
+
+  /* ── Bookmaker odds toggle ───────────────────────────────── */
+  .odds-details {{
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }}
+  .odds-summary {{
+    font-size: 11px;
+    color: var(--small);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+  }}
+  .odds-summary::-webkit-details-marker {{ display: none; }}
+  .odds-summary::before {{
+    content: "▸";
+    font-size: 9px;
+    transition: transform 0.15s;
+    display: inline-block;
+  }}
+  details[open] .odds-summary::before {{ transform: rotate(90deg); }}
+  .odds-summary:hover {{ color: var(--muted); }}
+  .odds-count {{ color: var(--small); }}
+  .odds-table {{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 11px;
+  }}
+  .odds-table th {{
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--small);
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--border);
+  }}
+  .odds-table td {{
+    padding: 4px 6px;
+    border-bottom: 1px solid #1e1e1e;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }}
+  .odds-table tr:last-child td {{ border-bottom: none; }}
+  .bk-name  {{ color: var(--text); }}
+  .bk-price {{ font-weight: 500; }}
+  .bk-implied {{ color: var(--small); }}
 
   /* ── Error / empty states ────────────────────────────────── */
   .match-error {{ border-color: #374151; }}
