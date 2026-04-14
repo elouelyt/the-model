@@ -155,29 +155,81 @@ def _player_card_html(p: dict) -> str:
 
 
 def _h2h_html(h2h: dict, home: str, away: str, surface: str) -> str:
-    """Render a compact H2H line for the match card. Returns empty string if unavailable."""
-    if not h2h.get("available") or h2h["total"] == 0:
+    """Render the H2H section for a match card.
+
+    Always renders (returns a bar even for zero-meeting pairs) so every card
+    surfaces the historical context — or explicitly says there is none.
+    Returns empty string only when the agent could not retrieve data at all.
+    """
+    if not h2h.get("available"):
         return ""
 
-    home_short = home.split()[-1]   # last name only for compactness
+    home_short = home.split()[-1]
     away_short = away.split()[-1]
+    total = h2h.get("total", 0)
 
-    overall = f"{home_short} {h2h['a_wins']}–{h2h['b_wins']} {away_short}"
+    # ── No previous meetings ──────────────────────────────────────────────
+    if total == 0:
+        return (
+            f'<div class="h2h-bar">'
+            f'<span class="h2h-label">H2H</span>'
+            f'<span class="h2h-no-data">No previous meetings (last 4 years)</span>'
+            f'</div>'
+        )
 
+    # ── Head-to-head with data ────────────────────────────────────────────
+    a_wins = h2h["a_wins"]
+    b_wins = h2h["b_wins"]
+    leader = h2h.get("leader")  # "a", "b", or None (tied)
+
+    # Highlight the leader in orange
+    if leader == "a":
+        a_str = f'<span class="h2h-leader">{home_short} {a_wins}</span>'
+        b_str = f'<span class="h2h-trailer">{b_wins} {away_short}</span>'
+    elif leader == "b":
+        a_str = f'<span class="h2h-trailer">{home_short} {a_wins}</span>'
+        b_str = f'<span class="h2h-leader">{b_wins} {away_short}</span>'
+    else:
+        a_str = f'<span class="h2h-record">{home_short} {a_wins}</span>'
+        b_str = f'<span class="h2h-record">{b_wins} {away_short}</span>'
+
+    overall_html = (
+        f'{a_str}'
+        f'<span class="h2h-sep">–</span>'
+        f'{b_str}'
+        f'<span class="h2h-total">({total} match{"es" if total != 1 else ""})</span>'
+    )
+
+    # ── Surface breakdown ─────────────────────────────────────────────────
     surface_part = ""
-    if h2h["total_surface"] > 0:
+    total_surf = h2h.get("total_surface", 0)
+    if total_surf > 0:
         from src.agents.surface_agent import SURFACE_LABEL
         surf_label = SURFACE_LABEL.get(surface, surface.title())
+        as_wins = h2h["a_wins_surface"]
+        bs_wins = h2h["b_wins_surface"]
+        leader_s = h2h.get("leader_surface")
+        if leader_s == "a":
+            as_str = f'<span class="h2h-leader">{home_short} {as_wins}</span>'
+            bs_str = f'<span class="h2h-trailer">{bs_wins} {away_short}</span>'
+        elif leader_s == "b":
+            as_str = f'<span class="h2h-trailer">{home_short} {as_wins}</span>'
+            bs_str = f'<span class="h2h-leader">{bs_wins} {away_short}</span>'
+        else:
+            as_str = f'<span class="h2h-record">{home_short} {as_wins}</span>'
+            bs_str = f'<span class="h2h-record">{bs_wins} {away_short}</span>'
+
         surface_part = (
             f'<span class="h2h-divider">·</span>'
-            f'<span class="h2h-surface">{surf_label}: '
-            f'{home_short} {h2h["a_wins_surface"]}–{h2h["b_wins_surface"]} {away_short}</span>'
+            f'<span class="h2h-surf-label">{surf_label}:</span> '
+            f'{as_str}<span class="h2h-sep">–</span>{bs_str}'
+            f'<span class="h2h-total">({total_surf})</span>'
         )
 
     return (
         f'<div class="h2h-bar">'
         f'<span class="h2h-label">H2H</span>'
-        f'<span class="h2h-record">{overall}</span>'
+        f'{overall_html}'
         f'{surface_part}'
         f'</div>'
     )
@@ -393,14 +445,15 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
   .h2h-bar {{
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
+    gap: 6px;
+    padding: 7px 12px;
     margin-bottom: 12px;
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 12px;
     flex-wrap: wrap;
+    font-variant-numeric: tabular-nums;
   }}
   .h2h-label {{
     font-size: 10px;
@@ -408,14 +461,32 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     letter-spacing: 0.5px;
     color: var(--small);
     text-transform: uppercase;
+    margin-right: 2px;
+  }}
+  .h2h-leader {{
+    color: var(--orange);
+    font-weight: 700;
+  }}
+  .h2h-trailer {{
+    color: var(--muted);
+    font-weight: 500;
   }}
   .h2h-record {{
     color: var(--text);
     font-weight: 500;
-    font-variant-numeric: tabular-nums;
   }}
-  .h2h-divider {{ color: var(--border); }}
-  .h2h-surface {{ color: var(--muted); }}
+  .h2h-sep {{
+    color: var(--small);
+    margin: 0 1px;
+  }}
+  .h2h-total {{
+    color: var(--small);
+    font-size: 11px;
+    margin-left: 2px;
+  }}
+  .h2h-divider {{ color: var(--border); margin: 0 4px; }}
+  .h2h-surf-label {{ color: var(--muted); }}
+  .h2h-no-data {{ color: var(--small); font-style: italic; }}
 
   /* ── Player row ──────────────────────────────────────────── */
   .players-row {{
