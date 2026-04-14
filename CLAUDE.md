@@ -32,11 +32,10 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 - `data/raw/tennis_odds_<timestamp>.json` — raw API response (mirrors GCS)
 - `data/processed/tennis_odds_processed_<timestamp>.csv` — flat transformed data (mirrors BigQuery)
 
-## CURRENT FOCUS: Sprint 4 — Deploy to GCP + mateogrisales.com
+## Sprint 4 — Deploy to GCP + mateogrisales.com — COMPLETE ✓
 
-**Goal:** Go live as fast as possible with the working ranking-based model. A live public demo is more valuable for the portfolio than a local Streamlit app.
+**Goal:** Go live as fast as possible with the working ranking-based model.
 
-**Story 1 — COMPLETE ✓**
 - `api/main.py`: FastAPI app, `POST /predict` + `GET /health`, `X-API-Key` auth, Pydantic response models, CORS configurable via env var
 - `Dockerfile`: `python:3.12-slim`, built and pushed to Artifact Registry via **Cloud Build** (no local Docker needed)
 - Cloud Run deployed **privately** (`--no-allow-unauthenticated`) in `us-central1` — never exposed directly to the internet
@@ -45,19 +44,21 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 - `X-API-Key` auth validated by FastAPI — gateway passes it through, does not validate at gateway layer
 - **Public gateway URL:** `https://tennis-gateway-agmlnd9p.uc.gateway.dev`
 - **Cloud Run URL (private):** `https://tennis-api-er2jgzyldq-uc.a.run.app`
+- React UI live at `https://orange-court-ai.lovable.app` — confirmed working end-to-end
+- All secrets moved to GCP Secret Manager, Cloud Run capped at 3 max instances, budget alert wired to email
+- DNS configured in GoDaddy pointing `tennis.mateogrisales.com` → Lovable frontend
 
-**Story 2 — IN PROGRESS 🔄**
-- React app scaffolded in Lovable — clay orange (#E8650A) design, Roland Garros inspired
-- `POST /predict` wired with `X-API-Key` header (hardcoded `local-test-key` temporarily for testing)
-- CORS preflight (`OPTIONS /predict`) added to `api-gateway.yaml` — gateway config `tennis-api-config-v3` deployed
-- Cloud Run `CORS_ORIGINS` set to Lovable preview domain: `https://fae197c3-a5e9-4e2e-b4c6-c77f45c87b38.lovableproject.com`
-- **Lovable preview confirmed working** — Monte Carlo Masters matches loading with predictions
+## Sprint 4b — GitHub Pages Static Site — COMPLETE ✓
 
-**Remaining work (Stories 3–5):**
-1. Configure CORS on Cloud Run to allow final frontend origin only (not preview URL)
-2. Deploy live at `tennis.mateogrisales.com`
-3. Move secrets from plain Cloud Run env vars → GCP Secret Manager (Story 4 hardening)
-4. Weekly Claude Code cost review agent (Story 5)
+**Goal:** Zero-cost public portfolio page that updates daily without any backend or GCP dependency.
+
+- `generate_html.py`: runs full pipeline (fetch odds → scrape rankings → compute probabilities) and writes a self-contained dark-themed `index.html`
+- `.github/workflows/daily.yml`: GitHub Actions cron at 08:00 UTC — installs minimal deps, runs pipeline, commits `index.html` back to repo
+- `requirements-generate.txt`: minimal dep set (requests, pandas, beautifulsoup4, cloudscraper) — no GCP packages needed
+- `extract_odds.py`: `google.cloud.storage` import made lazy (moved inside `upload_to_gcs`) so the module loads cleanly without GCP credentials
+- **Live URL:** `https://elouelyt.github.io/the-model`
+- **Repo:** `https://github.com/elouelyt/the-model`
+- Only secret required: `THE_ODDS_API_KEY` as a GitHub Actions secret
 
 **Story 4 cost controls — DONE ✓**
 - GCP budget alert scoped to `tennis-data-487809`, email notifications wired to `mateo@grisalogic.com` via Cloud Monitoring channel `14755856984491073698`
@@ -76,6 +77,8 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 **Key lesson from Sprint 4:** For a public React frontend, `VITE_` env vars are embedded in the compiled JS bundle at build time — they are visible in DevTools regardless of how they are set. Real protection must live server-side (strong key validation, CORS, max instances). Documented in `docs/SECURITY.md`.
 **Key lesson from Sprint 4:** API Gateway only routes paths defined in the OpenAPI spec — browser CORS preflight (`OPTIONS`) requests must be explicitly defined as a separate method on each path, otherwise the gateway returns 404 and the browser blocks the request.
 **Key lesson from Sprint 4:** `gemini-2.5-flash` with Google Search grounding returns 0 content parts (`response.text = None`) — a known SDK incompatibility with the thinking model. Do not use Gemini for real-time rankings at all. Scrape `atptour.com/en/rankings/singles` directly with `requests` + `BeautifulSoup` — full player names are in the profile link slug (`/en/players/carlos-alcaraz/`), points are in `cells[2]`, and only the first occurrence of each player should be stored (breakdown rows later in the table overwrite totals with tournament-specific points).
+**Key lesson from Sprint 4b:** `atptour.com` blocks plain `requests` with 403 regardless of headers — the site is protected by Cloudflare/WAF. Use `cloudscraper` (drop-in replacement for `requests`) which handles the Cloudflare challenge automatically.
+**Key lesson from Sprint 4b:** GitHub Pages + GitHub Actions cron is the simplest zero-cost pattern for a daily-updated static site — no server, no cloud bills, one secret. `workflow_dispatch` allows manual runs for testing before the cron fires. Lazy-import any cloud SDK at the function level (not module level) so the pipeline runs cleanly in environments without those packages installed.
 
 ## Sprint 5 (Planned) — LangGraph Agent Architecture
 
