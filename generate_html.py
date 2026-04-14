@@ -21,6 +21,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s �
 logger = logging.getLogger(__name__)
 
 # ── Signal styling ─────────────────────────────────────────────────────────────
+_SURFACE_META: dict[str, dict] = {
+    "clay":        {"label": "Clay",        "color": "#ea580c", "bg": "rgba(234,88,12,0.12)"},
+    "grass":       {"label": "Grass",       "color": "#16a34a", "bg": "rgba(22,163,74,0.12)"},
+    "hard":        {"label": "Hard",        "color": "#2563eb", "bg": "rgba(37,99,235,0.12)"},
+    "indoor_hard": {"label": "Indoor Hard", "color": "#7c3aed", "bg": "rgba(124,58,237,0.12)"},
+}
+
 _SIGNAL_META = {
     "value_bet": {
         "label": "VALUE BET",
@@ -49,6 +56,7 @@ def run_pipeline() -> list[dict]:
     from src.processing.transform import flatten_odds, filter_upcoming
     from src.agents.ranking_agent import fetch_atp_rankings
     from src.agents.probability_calculator import calculate_win_probability, compare_with_bookmaker
+    from src.agents.surface_agent import get_surface, SURFACE_NOTE
 
     logger.info("Fetching live odds...")
     data = fetch_odds()
@@ -71,6 +79,9 @@ def run_pipeline() -> list[dict]:
     results = []
     for (event_id, home, away), group in df.groupby(["event_id", "home_team", "away_team"]):
         commence_time = group["commence_time"].iloc[0]
+        sport_key = group["sport_key"].iloc[0]
+        surface = get_surface(sport_key)
+        surface_note = SURFACE_NOTE.get(surface)
         missing = [p for p in [home, away] if p not in rankings]
 
         if missing:
@@ -78,6 +89,7 @@ def run_pipeline() -> list[dict]:
                 "home": home,
                 "away": away,
                 "commence_time": commence_time,
+                "surface": surface,
                 "error": f"Rankings not found for: {', '.join(missing)}",
             })
             continue
@@ -97,12 +109,16 @@ def run_pipeline() -> list[dict]:
             )
             rec["rank"] = rankings[player]["rank"]
             rec["points"] = rankings[player]["points"]
+            # Append surface context to recommendation when it adds useful signal
+            if surface_note:
+                rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
             players_data.append(rec)
 
         results.append({
             "home": home,
             "away": away,
             "commence_time": commence_time,
+            "surface": surface,
             "players": players_data,
         })
 
@@ -145,23 +161,32 @@ def _player_card_html(p: dict) -> str:
         </div>"""
 
 
+def _surface_badge_html(surface: str) -> str:
+    s = _SURFACE_META.get(surface, _SURFACE_META["hard"])
+    return (
+        f'<span class="surface-badge" '
+        f'style="color:{s["color"]};background:{s["bg"]};">'
+        f'{s["label"]}</span>'
+    )
+
+
 def _match_card_html(match: dict) -> str:
     ct = match["commence_time"]
     ct_str = ct.strftime("%a %d %b · %H:%M UTC") if hasattr(ct, "strftime") else str(ct)
+    surface_badge = _surface_badge_html(match.get("surface", "hard"))
 
     if "error" in match:
         return f"""
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
-            <span class="match-time">{ct_str}</span>
+            <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
         </div>
         <div class="error-msg">⚠ {match['error']}</div>
     </div>"""
 
     players = match["players"]
     signals = [p["signal"] for p in players]
-    # determine border accent by best signal in match
     if "value_bet" in signals:
         accent = _SIGNAL_META["value_bet"]["border"]
     elif "marginal" in signals:
@@ -175,7 +200,7 @@ def _match_card_html(match: dict) -> str:
     <div class="match-card" style="border-left: 3px solid {accent};">
         <div class="match-header">
             <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
-            <span class="match-time">{ct_str}</span>
+            <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
         </div>
         <div class="players-row">
             {player_cols}
@@ -320,9 +345,23 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
     font-weight: 400;
     margin: 0 6px;
   }}
+  .match-meta {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }}
   .match-time {{
     font-size: 12px;
     color: var(--muted);
+    white-space: nowrap;
+  }}
+  .surface-badge {{
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: 3px;
     white-space: nowrap;
   }}
 
