@@ -14,5 +14,7 @@ build/
 .venv/
 venv/
 
-# GCP credentials
+# GCP credentials (exclude service account JSON files)
 *.json
+# Exception: committed model artifacts are not credentials
+!models/*.json

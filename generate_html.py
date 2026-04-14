@@ -55,7 +55,8 @@ def run_pipeline() -> list[dict]:
     from src.ingestion.extract_odds import fetch_odds
     from src.processing.transform import flatten_odds, filter_upcoming
     from src.agents.ranking_agent import fetch_atp_rankings
-    from src.agents.probability_calculator import calculate_win_probability, compare_with_bookmaker
+    from src.agents.probability_calculator import compare_with_bookmaker
+    from src.agents.model_agent import predict_win_probability
     from src.agents.surface_agent import get_surface, SURFACE_NOTE
     from src.agents.h2h_agent import get_h2h
     from src.agents.sentiment_agent import fetch_sentiment_batch
@@ -99,8 +100,10 @@ def run_pipeline() -> list[dict]:
             })
             continue
 
-        prob_home, prob_away = calculate_win_probability(
-            rankings[home]["points"], rankings[away]["points"]
+        prob_home, prob_away = predict_win_probability(
+            rankings[home]["points"], rankings[away]["points"],
+            rankings[home]["rank"],   rankings[away]["rank"],
+            surface,
         )
 
         players_data = []
@@ -583,7 +586,7 @@ def generate_html(results: list[dict] | None, error: str | None = None) -> str:
 </main>
 
 <footer>
-  Pre-match predictions only &nbsp;·&nbsp; Model: ATP ranking-points ratio &nbsp;·&nbsp;
+  Pre-match predictions only &nbsp;·&nbsp; Model: logistic regression (ranking pts, rank, surface) &nbsp;·&nbsp;
   For informational purposes only — not financial or betting advice &nbsp;·&nbsp;
   <a href="https://github.com/elouelyt/the-model" target="_blank">Source</a>
 </footer>

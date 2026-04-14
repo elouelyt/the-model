@@ -80,6 +80,21 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 **Key lesson from Sprint 4b:** `atptour.com` blocks plain `requests` with 403 regardless of headers — the site is protected by Cloudflare/WAF. Use `cloudscraper` (drop-in replacement for `requests`) which handles the Cloudflare challenge automatically.
 **Key lesson from Sprint 4b:** GitHub Pages + GitHub Actions cron is the simplest zero-cost pattern for a daily-updated static site — no server, no cloud bills, one secret. `workflow_dispatch` allows manual runs for testing before the cron fires. Lazy-import any cloud SDK at the function level (not module level) so the pipeline runs cleanly in environments without those packages installed.
 
+## Sprint 6 — Data Enrichment & Model Upgrade — COMPLETE ✓
+
+**Surface feature:** `src/agents/surface_agent.py` — ordered substring lookup (80+ ATP tournaments) maps `sport_key` → surface. Badge displayed in match card header. Surface context note appended to recommendations for clay/grass/indoor.
+
+**H2H feature:** `src/agents/h2h_agent.py` — downloads 4 years of Sackmann CSVs at runtime, `lru_cache` prevents re-download within a run, excludes RET/W/O/DEF, fuzzy name matching (cutoff 0.82). Shown as compact bar between match header and player cards.
+
+**Sentiment agent:** `src/agents/sentiment_agent.py` — Google News RSS + keyword scoring (no API key), `ThreadPoolExecutor` parallelizes 28+ players in ~4s. Flag (↑ In form / ⚠ Form concern) shown inline on player card with headline as tooltip.
+
+**Logistic regression model:** `scripts/train_model.py` trains on 18,043 matches (2018–2024), serializes to `models/lr_model.json` (coefficients + scaler params). `src/agents/model_agent.py` applies the model with plain Python — no sklearn at inference time. CV accuracy 63.7% ± 0.5%.
+
+**Key lesson from Sprint 6:** Serialize ML models as JSON (coefficients + scaler params), not as pickle files. JSON is human-readable, version-control friendly, and eliminates sklearn as a runtime dependency. Load and apply with `math.exp` + dot product — no framework needed.
+**Key lesson from Sprint 6:** For symmetric binary classification (who wins a match has no inherent home/away), mirror each training example: create two rows per match (home=winner, label=1) and (home=loser, label=0). This prevents the model from learning a spurious home-field advantage.
+**Key lesson from Sprint 6:** Log-compress skewed ratio features before training. `log(pts_A / pts_B)` is approximately normally distributed; raw `pts_A / pts_B` has extreme outliers that dominate gradient updates.
+**Key lesson from Sprint 6:** `@lru_cache(maxsize=1)` on a zero-argument function is the simplest in-process cache. Downloading Sackmann CSVs once per pipeline run reduces H2H latency from ~4s per call to ~0s after the first match.
+
 ## Sprint 5 (Planned) — LangGraph Agent Architecture
 
 **Goal:** Refactor the linear pipeline into a proper coordinator → sub-agent graph. LangGraph provides the routing and fallback infrastructure needed before adding more data sources in Sprint 6.
