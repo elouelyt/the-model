@@ -11,3 +11,6 @@ google-cloud-secret-manager>=2.16.0
 streamlit>=1.32.0
 fastapi>=0.111.0
 uvicorn[standard]>=0.29.0
+slowapi>=0.1.9
+cloudscraper>=1.2.71
+langgraph>=1.0.0
