@@ -1,0 +1,17 @@
+name: Debug Stake Endpoint
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GET /odds/46453677-r16p1-r16p2 raw curl
+        run: |
+          curl -v \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            -H "Referer: https://stake.com/" \
+            "https://odds-data.stake.com/odds/46453677-r16p1-r16p2"

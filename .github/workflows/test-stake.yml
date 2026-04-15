@@ -20,52 +20,10 @@ jobs:
             "https://odds-data.stake.com/sport/tennis/category" \
             | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
 
-      - name: Fetch raw fixture JSON - 46453218-r16p3-r16p4
+      - name: GET /odds/46453218-r16p3-r16p4 raw
         run: |
           echo "============================================================"
-          echo "GET /fixtures/46453218-r16p3-r16p4  (RAW - exact competitor names)"
-          echo "============================================================"
-          curl -s \
-            -H "Accept: application/json" \
-            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
-            -H "Origin: https://stake.com" \
-            -H "Referer: https://stake.com/" \
-            "https://odds-data.stake.com/fixtures/46453218-r16p3-r16p4" \
-            -o /tmp/stake_fix1.json
-          echo "--- FULL RESPONSE (pretty) ---"
-          python3 -m json.tool /tmp/stake_fix1.json 2>/dev/null || cat /tmp/stake_fix1.json
-          echo ""
-          echo "--- COMPETITORS LIST ---"
-          python3 -c "import json; d=json.load(open('/tmp/stake_fix1.json')); f=d.get('fixture',d); [print(repr(c)) for c in f.get('competitors',[])]" 2>/dev/null || echo "parse error"
-          echo ""
-          echo "--- MARKET OUTCOMES (name + odds) ---"
-          python3 -c "import json; d=json.load(open('/tmp/stake_fix1.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
-
-      - name: Fetch raw fixture JSON - 46453677-r16p1-r16p2
-        run: |
-          echo "============================================================"
-          echo "GET /fixtures/46453677-r16p1-r16p2  (RAW - exact competitor names)"
-          echo "============================================================"
-          curl -s \
-            -H "Accept: application/json" \
-            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
-            -H "Origin: https://stake.com" \
-            -H "Referer: https://stake.com/" \
-            "https://odds-data.stake.com/fixtures/46453677-r16p1-r16p2" \
-            -o /tmp/stake_fix2.json
-          echo "--- FULL RESPONSE (pretty) ---"
-          python3 -m json.tool /tmp/stake_fix2.json 2>/dev/null || cat /tmp/stake_fix2.json
-          echo ""
-          echo "--- COMPETITORS LIST ---"
-          python3 -c "import json; d=json.load(open('/tmp/stake_fix2.json')); f=d.get('fixture',d); [print(repr(c)) for c in f.get('competitors',[])]" 2>/dev/null || echo "parse error"
-          echo ""
-          echo "--- MARKET OUTCOMES (name + odds) ---"
-          python3 -c "import json; d=json.load(open('/tmp/stake_fix2.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
-
-      - name: GET /odds/46453218-r16p3-r16p4 (undocumented endpoint - raw JSON)
-        run: |
-          echo "============================================================"
-          echo "GET /odds/46453218-r16p3-r16p4  (raw - no filtering)"
+          echo "GET /odds/46453218-r16p3-r16p4"
           echo "============================================================"
           curl -s \
             -H "Accept: application/json" \
@@ -73,12 +31,15 @@ jobs:
             -H "Origin: https://stake.com" \
             -H "Referer: https://stake.com/" \
             "https://odds-data.stake.com/odds/46453218-r16p3-r16p4" \
-            | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
+            -o /tmp/stake_odds1.json
+          python3 -m json.tool /tmp/stake_odds1.json 2>/dev/null || cat /tmp/stake_odds1.json
+          echo "--- MARKET OUTCOMES ---"
+          python3 -c "import json; d=json.load(open('/tmp/stake_odds1.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| specs:', repr(m.get('specifiers')), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
 
-      - name: GET /odds/46453677-r16p1-r16p2 (undocumented endpoint - raw JSON)
+      - name: GET /odds/46453677-r16p1-r16p2 raw
         run: |
           echo "============================================================"
-          echo "GET /odds/46453677-r16p1-r16p2  (raw - no filtering)"
+          echo "GET /odds/46453677-r16p1-r16p2"
           echo "============================================================"
           curl -s \
             -H "Accept: application/json" \
@@ -86,7 +47,10 @@ jobs:
             -H "Origin: https://stake.com" \
             -H "Referer: https://stake.com/" \
             "https://odds-data.stake.com/odds/46453677-r16p1-r16p2" \
-            | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
+            -o /tmp/stake_odds2.json
+          python3 -m json.tool /tmp/stake_odds2.json 2>/dev/null || cat /tmp/stake_odds2.json
+          echo "--- MARKET OUTCOMES ---"
+          python3 -c "import json; d=json.load(open('/tmp/stake_odds2.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| specs:', repr(m.get('specifiers')), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
 
       - name: Test GET /sports (all sports list)
         run: |
