@@ -74,6 +74,13 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      - name: Show commit hash being tested
+        run: |
+          echo "stake_agent.py HEAD commit:"
+          git log --oneline -1 -- src/agents/stake_agent.py
+          echo "---"
+          grep -n "GET /odds\|GET /fixtures\|market_list\|_extract_winner" src/agents/stake_agent.py | head -20
+
       - name: Run stake_agent.fetch_stake_odds with sample players
         env:
           STAKE_API_KEY: ${{ secrets.STAKE_API_KEY }}
@@ -83,11 +90,22 @@ jobs:
           logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
           sys.path.insert(0, ".")
-          from src.agents.stake_agent import fetch_stake_odds, _get
+          from src.agents.stake_agent import fetch_stake_odds, _get, _is_atp_category
 
-          print("\n=== Raw /sport/tennis/category ===")
+          # Show active ATP fixture slugs so we can test current IDs
+          print("\n=== Active ATP fixture slugs ===")
           data = _get("/sport/tennis/category")
-          print(json.dumps(data, indent=2) if data else "NONE / unreachable")
+          raw_cats = data.get("category", []) if isinstance(data, dict) else (data or [])
+          atp_cats = [c for c in raw_cats if _is_atp_category(c)]
+          if not atp_cats:
+              atp_cats = raw_cats
+          for cat in atp_cats[:3]:
+              slug = cat.get("slug", "")
+              fix_data = _get(f"/sport/tennis/category/{slug}/fixture")
+              fixtures = fix_data.get("fixture", []) if isinstance(fix_data, dict) else []
+              active = [f for f in fixtures if f.get("status") == "active"]
+              for f in active[:3]:
+                  print(f"  slug={f.get('slug')}  name={f.get('name')}  competitors={f.get('competitors')}")
 
           sample_players = [
               "Carlos Alcaraz", "Holger Rune", "Alexander Zverev",

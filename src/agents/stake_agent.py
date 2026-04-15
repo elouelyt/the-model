@@ -12,8 +12,8 @@ Flow:
        → pre-match fixtures per category; each has competitors[] and slug
   3. Fuzzy-match competitors against pipeline player names (early filter —
        avoids fetching odds for fixtures we can't cross-reference)
-  4. GET /fixtures/{fixture_slug}    (concurrent)
-       → groups → markets → Match Winner outcomes → decimal odds
+  4. GET /odds/{fixture_slug}    (concurrent)
+       → groups[][].markets[][] → "Winner" market (specifiers="") → decimal odds
   5. Return {pipeline_player_name: stake_decimal_price}
 
 Non-fatal throughout — returns {} on any network or parsing failure.
