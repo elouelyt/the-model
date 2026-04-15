@@ -216,24 +216,28 @@ def _extract_winner_odds(odds_response: dict) -> dict[str, float]:
     groups  = fixture.get("groups", [])
 
     for group in groups:
-        for market in group.get("markets", []):
-            if market.get("status") != "active":
-                continue
-            market_name  = (market.get("name") or "").strip()
-            market_specs = (market.get("specifiers") or "").strip()
-            if market_name.lower() != "winner" or market_specs != "":
-                continue
-            outcomes = market.get("outcomes", [])
-            if len(outcomes) < 2:
-                continue
-            result: dict[str, float] = {}
-            for outcome in outcomes:
-                name  = (outcome.get("name") or "").strip()
-                price = outcome.get("odds")
-                if outcome.get("active") and price and name:
-                    result[name] = float(price)
-            if len(result) >= 2:
-                return result
+        # markets is a list of lists: groups[].markets[][] — iterate both levels
+        for market_list in group.get("markets", []):
+            if not isinstance(market_list, list):
+                market_list = [market_list]
+            for market in market_list:
+                if market.get("status") != "active":
+                    continue
+                market_name  = (market.get("name") or "").strip()
+                market_specs = (market.get("specifiers") or "").strip()
+                if market_name.lower() != "winner" or market_specs != "":
+                    continue
+                outcomes = market.get("outcomes", [])
+                if len(outcomes) < 2:
+                    continue
+                result: dict[str, float] = {}
+                for outcome in outcomes:
+                    name  = (outcome.get("name") or "").strip()
+                    price = outcome.get("odds")
+                    if outcome.get("active") and price and name:
+                        result[name] = float(price)
+                if len(result) >= 2:
+                    return result
 
     return {}
 
