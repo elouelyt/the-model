@@ -7,11 +7,98 @@ jobs:
   debug:
     runs-on: ubuntu-latest
     steps:
-      - name: GET /odds/46453677-r16p1-r16p2 raw curl
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Discover active ATP fixtures and test /odds/ endpoint
         run: |
-          curl -v \
-            -H "Accept: application/json" \
-            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
-            -H "Origin: https://stake.com" \
-            -H "Referer: https://stake.com/" \
-            "https://odds-data.stake.com/odds/46453677-r16p1-r16p2"
+          python - <<'EOF'
+          import json, requests, sys
+
+          BASE = "https://odds-data.stake.com"
+          HEADERS = {
+              "Accept": "application/json",
+              "User-Agent": "Mozilla/5.0 (compatible; tennis-ai-test/1.0)",
+              "Origin": "https://stake.com",
+              "Referer": "https://stake.com/",
+          }
+
+          def get(path):
+              try:
+                  r = requests.get(BASE + path, headers=HEADERS, timeout=12)
+                  r.raise_for_status()
+                  return r.json()
+              except Exception as e:
+                  print(f"  ERROR {path}: {e}")
+                  return None
+
+          # Step 1: find ATP categories
+          data = get("/sport/tennis/category")
+          cats = data.get("category", []) if isinstance(data, dict) else (data or [])
+          atp_frags = {"atp", "men's singles", "men singles", "men's tour"}
+          atp_cats = [c for c in cats if any(f in f"{c.get('name','')} {c.get('slug','')}".lower() for f in atp_frags)]
+          if not atp_cats:
+              atp_cats = cats
+          print(f"ATP categories found: {len(atp_cats)}")
+
+          # Step 2: collect active fixtures
+          active_fixtures = []
+          for cat in atp_cats:
+              slug = cat.get("slug", "")
+              fix_data = get(f"/sport/tennis/category/{slug}/fixture")
+              if not fix_data:
+                  continue
+              fixtures = fix_data.get("fixture", []) if isinstance(fix_data, dict) else []
+              for f in fixtures:
+                  if f.get("status") == "active":
+                      active_fixtures.append(f)
+
+          print(f"\nActive pre-match fixtures today: {len(active_fixtures)}")
+          for f in active_fixtures:
+              print(f"  slug={f.get('slug')}  name={f.get('name')}  competitors={f.get('competitors')}")
+
+          if not active_fixtures:
+              print("No active fixtures — nothing to test")
+              sys.exit(0)
+
+          # Step 3: test /odds/ on the first 3 active fixtures
+          print("\n=== Testing GET /odds/{slug} on first 3 active fixtures ===")
+          for fix in active_fixtures[:3]:
+              slug = fix["slug"]
+              print(f"\n--- /odds/{slug} ---")
+              odds_data = get(f"/odds/{slug}")
+              if not odds_data:
+                  print("  No response")
+                  continue
+
+              fixture = odds_data.get("fixture", odds_data)
+              groups = fixture.get("groups", [])
+              print(f"  groups count: {len(groups)}")
+
+              found_winner = False
+              for g in groups:
+                  for market_list in g.get("markets", []):
+                      if not isinstance(market_list, list):
+                          market_list = [market_list]
+                      for m in market_list:
+                          name = (m.get("name") or "").strip()
+                          specs = (m.get("specifiers") or "").strip()
+                          status = m.get("status", "")
+                          outcomes = m.get("outcomes", [])
+                          print(f"  market name={repr(name)} specs={repr(specs)} status={status} outcomes={len(outcomes)}")
+                          if name.lower() == "winner" and specs == "":
+                              found_winner = True
+                              print(f"  >>> WINNER MARKET FOUND <<<")
+                              for o in outcomes:
+                                  print(f"      outcome name={repr(o.get('name'))} odds={o.get('odds')} active={o.get('active')}")
+              if not found_winner:
+                  print("  No 'Winner' market with specifiers='' found")
+          EOF
