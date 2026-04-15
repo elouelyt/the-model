@@ -48,6 +48,9 @@ class PipelineState(TypedDict, total=False):
     # Top-5 safe parlays for daily compounder (populated by generate_safe_parlays_node)
     safe_parlays: list[dict]
 
+    # Stake odds: player_name → decimal_price (populated by fetch_stake_odds_node)
+    stake_odds: dict[str, float]
+
     # Retry counter for the rankings node
     rankings_retries: int
 
@@ -123,6 +126,29 @@ def fetch_sentiment_node(state: PipelineState) -> PipelineState:
     return {**state, "sentiment_map": sentiment_map}
 
 
+def fetch_stake_odds_node(state: PipelineState) -> PipelineState:
+    """Fetch pre-match Stake odds for all players in the current pipeline run.
+
+    Uses the official Stake Sports Data API (odds-data.stake.com).
+    Non-fatal — empty dict on any network failure or geo-block.
+    Runs after fetch_sentiment so all player names are available.
+    """
+    from src.agents.stake_agent import fetch_stake_odds
+
+    rows = state.get("processed_rows", [])
+    players = list({r["outcome_name"] for r in rows})
+    logger.info("[coordinator] fetch_stake_odds_node — %d players", len(players))
+
+    try:
+        stake_odds = fetch_stake_odds(players)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] fetch_stake_odds_node failed (non-fatal): %s", exc)
+        stake_odds = {}
+
+    logger.info("[coordinator] Stake odds fetched for %d / %d players", len(stake_odds), len(players))
+    return {**state, "stake_odds": stake_odds}
+
+
 def compute_predictions_node(state: PipelineState) -> PipelineState:
     """Assemble final match predictions from all upstream data."""
     import pandas as pd
@@ -134,6 +160,7 @@ def compute_predictions_node(state: PipelineState) -> PipelineState:
     rows = state.get("processed_rows", [])
     rankings = state.get("rankings", {})
     sentiment_map = state.get("sentiment_map", {})
+    stake_odds = state.get("stake_odds", {})
 
     if not rows:
         return {**state, "results": []}
@@ -184,7 +211,22 @@ def compute_predictions_node(state: PipelineState) -> PipelineState:
                 .drop_duplicates(subset=["bookmaker_title"])
                 .sort_values("price", ascending=False)
             )
-            rec["bookmakers"] = bk.to_dict("records")
+            bookmakers_list = bk.to_dict("records")
+
+            # Inject Stake odds if available — prepend so it sorts first if best price
+            stake_price = stake_odds.get(player)
+            if stake_price:
+                stake_entry = {
+                    "bookmaker_title": "Stake",
+                    "price": round(stake_price, 3),
+                    "raw_implied": round(1.0 / stake_price, 4),
+                }
+                bookmakers_list = [stake_entry] + [
+                    b for b in bookmakers_list if b["bookmaker_title"] != "Stake"
+                ]
+                rec["stake_price"] = round(stake_price, 3)
+
+            rec["bookmakers"] = bookmakers_list
             if surface_note:
                 rec["recommendation"] = rec["recommendation"] + f" · {surface_note}"
             players_data.append(rec)
@@ -352,6 +394,7 @@ def _build_graph() -> StateGraph:
     graph.add_node("fetch_odds", fetch_odds_node)
     graph.add_node("fetch_rankings", fetch_rankings_node)
     graph.add_node("fetch_sentiment", fetch_sentiment_node)
+    graph.add_node("fetch_stake_odds", fetch_stake_odds_node)
     graph.add_node("compute_predictions", compute_predictions_node)
     graph.add_node("generate_explanations", generate_explanations_node)
     graph.add_node("generate_parlays", generate_parlays_node)
@@ -369,7 +412,8 @@ def _build_graph() -> StateGraph:
         {"fetch_rankings": "fetch_rankings", "fetch_sentiment": "fetch_sentiment"},
     )
 
-    graph.add_edge("fetch_sentiment", "compute_predictions")
+    graph.add_edge("fetch_sentiment", "fetch_stake_odds")
+    graph.add_edge("fetch_stake_odds", "compute_predictions")
     graph.add_edge("compute_predictions", "generate_explanations")
     graph.add_edge("generate_explanations", "generate_parlays")
     graph.add_edge("generate_parlays", "generate_safe_parlays")
@@ -400,6 +444,7 @@ def run_pipeline() -> list[dict]:
         "processed_rows": [],
         "rankings": {},
         "sentiment_map": {},
+        "stake_odds": {},
         "results": [],
         "rankings_retries": 0,
         "abort": False,

@@ -141,17 +141,30 @@ def _prob_bar_html(model_prob: float, raw_implied: float) -> str:
         </div>"""
 
 
+def _stake_badge_html(stake_price: float) -> str:
+    """Render a highlighted Stake odds badge."""
+    return (
+        f'<div class="stake-badge">'
+        f'<span class="stake-logo">S</span>'
+        f'<span class="stake-label">Stake</span>'
+        f'<span class="stake-price">{stake_price:.2f}</span>'
+        f'</div>'
+    )
+
+
 def _player_card_html(p: dict) -> str:
     meta = _SIGNAL_META[p["signal"]]
     edge_sign = "+" if p["edge"] >= 0 else ""
     edge_color = "#10b981" if p["edge"] > 0.05 else ("#f59e0b" if p["edge"] > 0 else "#6b7280")
     sentiment_tag = _sentiment_html(p.get("sentiment", {}))
     prob_bars = _prob_bar_html(p["model_prob"], p["raw_implied"])
+    stake_html = _stake_badge_html(p["stake_price"]) if p.get("stake_price") else ""
     return f"""
         <div class="player-card" style="border-top: 2px solid {meta['border']};">
             <div class="player-name">{p['player']}{(" <span class='sentiment-sep'>·</span> " + sentiment_tag) if sentiment_tag else ""}</div>
             <div class="player-meta">Rank <strong>#{p['rank']}</strong> &nbsp;·&nbsp; {p['points']:,} pts</div>
             {prob_bars}
+            {stake_html}
             <div class="stats-grid">
                 <div class="stat">
                     <span class="stat-label">Edge</span>
@@ -381,6 +394,7 @@ def _parlays_html(parlays: list[dict]) -> str:
                         <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
                         {p['model_prob']:.0%} model &nbsp;·&nbsp;
                         {p['best_price']:.2f}
+                        {f'&nbsp;<span style="color:#00a86b;font-weight:700;">S {p["stake_price"]:.2f}</span>' if p.get("stake_price") else ""}
                         {f'&nbsp;<span style="color:{sent_color};font-size:10px;">{sent_icon}</span>' if sent_icon else ""}
                     </span>
                 </div>"""
@@ -463,6 +477,7 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
                         <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
                         {p['raw_implied']:.0%} mkt &nbsp;·&nbsp;
                         {p['best_price']:.2f}
+                        {f'&nbsp;<span style="color:#00a86b;font-weight:700;">S {p["stake_price"]:.2f}</span>' if p.get("stake_price") else ""}
                         {f'&nbsp;<span style="color:{sent_color};font-size:10px;">{sent_icon}</span>' if sent_icon else ""}
                     </span>
                 </div>"""
@@ -1186,6 +1201,43 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     line-height: 1.5;
     font-style: italic;
     padding-top: 2px;
+  }}
+
+  /* ── Stake odds badge ────────────────────────────────────── */
+  .stake-badge {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,168,107,0.10);
+    border: 1px solid rgba(0,168,107,0.30);
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin: 4px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }}
+  .stake-logo {{
+    width: 16px;
+    height: 16px;
+    background: #00a86b;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }}
+  .stake-label {{ color: #00a86b; }}
+  .stake-price {{
+    color: #fff;
+    background: #00a86b;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }}
 
   /* ── Withdrawal alert ───────────────────────────────────── */
