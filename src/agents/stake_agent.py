@@ -290,32 +290,60 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
 
     logger.info("[stake_agent] %d ATP categories to scan", len(atp_cats))
 
-    # ── Step 2: pre-match fixtures per category ───────────────────────────────
+    # ── Step 2: tournaments per category → fixtures per tournament ───────────
+    # Using category → tournament → fixture drill-down captures all active
+    # tournaments simultaneously (e.g. Montecarlo + Barcelona on the same day).
+    # /category/{cat}/fixture only returns fixtures directly under the category
+    # and misses those nested inside tournament slugs.
     candidate_fixtures: list[dict] = []
+    seen_slugs: set[str] = set()
 
-    for cat in atp_cats:
-        cat_slug = cat.get("slug", "")
-        if not cat_slug:
-            continue
-
-        fix_data = _get(f"/sport/tennis/category/{cat_slug}/fixture")
-        if not fix_data:
-            continue
-
-        fixtures = fix_data.get("fixture", []) if isinstance(fix_data, dict) else (fix_data or [])
-        for fix in fixtures:
+    def _collect_fixtures(fixtures_raw: list) -> None:
+        for fix in fixtures_raw:
             if fix.get("status") != "active":
-                continue  # skip live / ended
-            competitors: list[str] = fix.get("competitors", [])
+                continue
             slug: str = fix.get("slug", "")
-            if len(competitors) >= 2 and slug:
+            if not slug or slug in seen_slugs:
+                continue
+            competitors: list[str] = fix.get("competitors", [])
+            if len(competitors) >= 2:
+                seen_slugs.add(slug)
                 candidate_fixtures.append({
                     "slug":        slug,
                     "competitors": competitors,
                     "name":        fix.get("name", slug),
                 })
 
-    logger.info("[stake_agent] %d pre-match fixtures found across ATP categories", len(candidate_fixtures))
+    for cat in atp_cats:
+        cat_slug = cat.get("slug", "")
+        if not cat_slug:
+            continue
+
+        # 2a. List tournaments in this category
+        tour_data = _get(f"/sport/tennis/category/{cat_slug}/tournament")
+        tournaments = []
+        if tour_data and isinstance(tour_data, dict):
+            tournaments = tour_data.get("tournament", [])
+
+        if tournaments:
+            # 2b. Fetch fixtures for each tournament
+            for tour in tournaments:
+                tour_slug = tour.get("slug", "")
+                if not tour_slug:
+                    continue
+                fix_data = _get(f"/sport/tennis/category/{cat_slug}/tournament/{tour_slug}/fixture")
+                if not fix_data:
+                    continue
+                raw = fix_data.get("fixture", []) if isinstance(fix_data, dict) else (fix_data or [])
+                _collect_fixtures(raw)
+        else:
+            # Fallback: category may expose fixtures directly without tournaments
+            fix_data = _get(f"/sport/tennis/category/{cat_slug}/fixture")
+            if fix_data:
+                raw = fix_data.get("fixture", []) if isinstance(fix_data, dict) else (fix_data or [])
+                _collect_fixtures(raw)
+
+    logger.info("[stake_agent] %d pre-match fixtures found across ATP tournaments", len(candidate_fixtures))
 
     if not candidate_fixtures:
         return {}
