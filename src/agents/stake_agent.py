@@ -39,26 +39,35 @@ _ATP_FRAGMENTS: frozenset[str] = frozenset({
 })
 
 
-# ── HTTP helper ────────────────────────────────────────────────────────────────
+# ── HTTP session (shared across all requests to preserve Cloudflare cookies) ───
 
-def _headers() -> dict[str, str]:
-    h: dict[str, str] = {
+def _make_session() -> requests.Session:
+    s = requests.Session()
+    s.headers.update({
         "Accept":     "application/json",
         "User-Agent": "Mozilla/5.0 (compatible; tennis-ai-pipeline/1.0)",
         "Origin":     "https://stake.com",
         "Referer":    "https://stake.com/",
-    }
+    })
     api_key = os.getenv("STAKE_API_KEY", "")
     if api_key:
-        h["X-API-KEY"] = api_key
-    return h
+        s.headers["X-API-KEY"] = api_key
+    return s
+
+
+_SESSION: requests.Session = _make_session()
 
 
 def _get(path: str) -> dict | list | None:
-    """GET {_BASE_URL}{path}. Returns parsed JSON or None on any error."""
+    """GET {_BASE_URL}{path} using the shared session.
+
+    Using a session preserves Cloudflare cookies (e.g. __cf_bm) set on
+    the first request so subsequent requests to /odds/ are not blocked.
+    Returns parsed JSON or None on any error.
+    """
     url = f"{_BASE_URL}{path}"
     try:
-        r = requests.get(url, headers=_headers(), timeout=_TIMEOUT)
+        r = _SESSION.get(url, timeout=_TIMEOUT)
         r.raise_for_status()
         return r.json()
     except requests.HTTPError as exc:
