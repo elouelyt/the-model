@@ -33,11 +33,6 @@ _TIMEOUT    = 12
 _MAX_WORKERS = 6
 _FUZZY_CUTOFF = 0.72   # minimum similarity to accept a name match
 
-# Substrings that identify a Match Winner / moneyline market (case-insensitive)
-_WINNER_MARKET_FRAGMENTS: frozenset[str] = frozenset({
-    "match winner", "moneyline", "twoway",
-})
-
 # Substrings that identify an ATP category slug or name (case-insensitive)
 _ATP_FRAGMENTS: frozenset[str] = frozenset({
     "atp", "men's singles", "men singles", "men's tour",
@@ -205,29 +200,38 @@ def _is_atp_category(cat: dict) -> bool:
 
 # ── Odds extraction ────────────────────────────────────────────────────────────
 
-def _extract_winner_odds(fixture_response: dict) -> dict[str, float]:
-    """Parse /fixtures/{slug} response → {competitor_name: decimal_odds}.
+def _extract_winner_odds(odds_response: dict) -> dict[str, float]:
+    """Parse GET /odds/{slug} response → {player_full_name: decimal_odds}.
 
-    Looks inside fixture.groups[].markets[] for an active Match Winner market,
-    returns its outcomes keyed by competitor name.
+    Looks inside groups[].markets[] for the market where:
+      - name == "Winner"  (exact, case-insensitive)
+      - specifiers == ""  (empty string — picks the plain match-winner, not
+                           set/game handicap variants which share the same name)
+
+    Outcome names from this endpoint are full player names ("Carlos Alcaraz"),
+    so no extra normalisation is needed before fuzzy matching.
     """
-    fixture = fixture_response.get("fixture", fixture_response)
+    # /odds/{slug} returns the fixture object directly (no "fixture" wrapper)
+    fixture = odds_response.get("fixture", odds_response)
     groups  = fixture.get("groups", [])
 
     for group in groups:
         for market in group.get("markets", []):
             if market.get("status") != "active":
                 continue
-            market_name = (market.get("name") or "").lower()
-            if not any(frag in market_name for frag in _WINNER_MARKET_FRAGMENTS):
+            market_name  = (market.get("name") or "").strip()
+            market_specs = (market.get("specifiers") or "").strip()
+            if market_name.lower() != "winner" or market_specs != "":
                 continue
             outcomes = market.get("outcomes", [])
             if len(outcomes) < 2:
                 continue
             result: dict[str, float] = {}
             for outcome in outcomes:
-                if outcome.get("active") and outcome.get("odds"):
-                    result[outcome["name"]] = float(outcome["odds"])
+                name  = (outcome.get("name") or "").strip()
+                price = outcome.get("odds")
+                if outcome.get("active") and price and name:
+                    result[name] = float(price)
             if len(result) >= 2:
                 return result
 
@@ -329,7 +333,7 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
     stake_odds: dict[str, float] = {}
 
     def _fetch_odds(fix: dict) -> dict[str, float]:
-        odds_resp = _get(f"/fixtures/{fix['slug']}")
+        odds_resp = _get(f"/odds/{fix['slug']}")
         if not odds_resp:
             return {}
         winner_odds = _extract_winner_odds(odds_resp)
