@@ -21,6 +21,7 @@ Non-fatal throughout — returns {} on any network or parsing failure.
 
 import logging
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from difflib import SequenceMatcher
 
@@ -274,6 +275,16 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
     """
     if not pipeline_player_names:
         return {}
+
+    # ── Cloudflare warmup ─────────────────────────────────────────────────────
+    # Cloudflare sets __cf_bm and _cfuvid cookies on the first request to the
+    # base domain. From GitHub Actions (no browser history) those cookies are
+    # absent when /odds/ is called, causing groups=[] in the response.
+    # Hitting /sports first (a lightweight endpoint) lets Cloudflare set the
+    # cookies in the shared session before any /odds/ requests go out.
+    logger.info("[stake_agent] Cloudflare warmup request to /sports")
+    _get("/sports")
+    time.sleep(1)
 
     # ── Step 1: tennis categories ─────────────────────────────────────────────
     data = _get("/sport/tennis/category")
