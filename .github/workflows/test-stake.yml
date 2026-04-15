@@ -62,6 +62,32 @@ jobs:
           echo "--- MARKET OUTCOMES (name + odds) ---"
           python3 -c "import json; d=json.load(open('/tmp/stake_fix2.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
 
+      - name: GET /odds/46453218-r16p3-r16p4 (undocumented endpoint - raw JSON)
+        run: |
+          echo "============================================================"
+          echo "GET /odds/46453218-r16p3-r16p4  (raw - no filtering)"
+          echo "============================================================"
+          curl -s \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            -H "Referer: https://stake.com/" \
+            "https://odds-data.stake.com/odds/46453218-r16p3-r16p4" \
+            | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
+
+      - name: GET /odds/46453677-r16p1-r16p2 (undocumented endpoint - raw JSON)
+        run: |
+          echo "============================================================"
+          echo "GET /odds/46453677-r16p1-r16p2  (raw - no filtering)"
+          echo "============================================================"
+          curl -s \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            -H "Referer: https://stake.com/" \
+            "https://odds-data.stake.com/odds/46453677-r16p1-r16p2" \
+            | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
+
       - name: Test GET /sports (all sports list)
         run: |
           echo "============================================================"
