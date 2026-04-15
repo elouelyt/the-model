@@ -45,6 +45,9 @@ class PipelineState(TypedDict, total=False):
     # Top-5 rated parlays (populated by generate_parlays_node)
     parlays: list[dict]
 
+    # Top-5 safe parlays for daily compounder (populated by generate_safe_parlays_node)
+    safe_parlays: list[dict]
+
     # Retry counter for the rankings node
     rankings_retries: int
 
@@ -277,6 +280,25 @@ def generate_parlays_node(state: PipelineState) -> PipelineState:
     return {**state, "parlays": parlays}
 
 
+def generate_safe_parlays_node(state: PipelineState) -> PipelineState:
+    """Select top safe parlays for the daily compounder strategy and rate with Gemini.
+
+    Independent from generate_parlays_node — uses mkt>65% only filter, no odds
+    range constraint, 2-6 legs. Non-fatal — empty list on any failure.
+    """
+    from src.agents.safe_parlay_agent import generate_safe_parlays
+
+    results = state.get("results", [])
+    try:
+        safe_parlays = generate_safe_parlays(results)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] generate_safe_parlays_node failed (non-fatal): %s", exc)
+        safe_parlays = []
+
+    logger.info("[coordinator] generate_safe_parlays_node — %d safe parlays rated", len(safe_parlays))
+    return {**state, "safe_parlays": safe_parlays}
+
+
 # ── Conditional routing ────────────────────────────────────────────────────────
 
 
@@ -312,6 +334,7 @@ def _build_graph() -> StateGraph:
     graph.add_node("compute_predictions", compute_predictions_node)
     graph.add_node("generate_explanations", generate_explanations_node)
     graph.add_node("generate_parlays", generate_parlays_node)
+    graph.add_node("generate_safe_parlays", generate_safe_parlays_node)
 
     graph.set_entry_point("fetch_odds")
 
@@ -328,7 +351,8 @@ def _build_graph() -> StateGraph:
     graph.add_edge("fetch_sentiment", "compute_predictions")
     graph.add_edge("compute_predictions", "generate_explanations")
     graph.add_edge("generate_explanations", "generate_parlays")
-    graph.add_edge("generate_parlays", END)
+    graph.add_edge("generate_parlays", "generate_safe_parlays")
+    graph.add_edge("generate_safe_parlays", END)
 
     return graph
 
@@ -363,5 +387,9 @@ def run_pipeline() -> list[dict]:
     final_state = _GRAPH.invoke(initial_state)
     results = final_state.get("results", [])
     parlays = final_state.get("parlays", [])
-    logger.info("[coordinator] Pipeline complete — %d matches, %d parlays", len(results), len(parlays))
-    return results, parlays
+    safe_parlays = final_state.get("safe_parlays", [])
+    logger.info(
+        "[coordinator] Pipeline complete — %d matches, %d parlays, %d safe parlays",
+        len(results), len(parlays), len(safe_parlays),
+    )
+    return results, parlays, safe_parlays

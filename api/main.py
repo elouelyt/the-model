@@ -195,7 +195,7 @@ def predict(request: Request, api_key: str = Depends(_require_api_key)) -> Predi
     fetched_at = datetime.now(timezone.utc).isoformat()
 
     try:
-        raw_results = run_pipeline()
+        raw_results, _parlays, _safe_parlays = run_pipeline()
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc)
         raise HTTPException(

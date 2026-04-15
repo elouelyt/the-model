@@ -50,11 +50,12 @@ _SIGNAL_META = {
 }
 
 
-def run_pipeline() -> tuple[list[dict], list[dict]]:
+def run_pipeline() -> tuple[list[dict], list[dict], list[dict]]:
     """Run the full prediction pipeline via LangGraph coordinator.
 
     Returns:
-        (results, parlays) — match result dicts and rated parlay dicts.
+        (results, parlays, safe_parlays) — match result dicts, rated parlay dicts,
+        and rated safe (daily compounder) parlay dicts.
     """
     from src.pipeline.coordinator import run_pipeline as _coordinator_run
     return _coordinator_run()
@@ -402,19 +403,114 @@ def _parlays_html(parlays: list[dict]) -> str:
     </details>"""
 
 
+def _safe_parlays_html(safe_parlays: list[dict]) -> str:
+    """Render the collapsed Safe Parlays — Daily Compounder section."""
+    if not safe_parlays:
+        return ""
+
+    _SURFACE_COLORS = {
+        "clay": "#ea580c", "grass": "#16a34a",
+        "hard": "#2563eb", "indoor_hard": "#7c3aed",
+    }
+    _SURFACE_LABELS = {
+        "clay": "Clay", "grass": "Grass",
+        "hard": "Hard", "indoor_hard": "Indoor",
+    }
+    _RISK_META = {
+        "low":    {"color": "#10b981", "bg": "rgba(16,185,129,0.10)",  "border": "rgba(16,185,129,0.25)"},
+        "medium": {"color": "#f59e0b", "bg": "rgba(245,158,11,0.10)",  "border": "rgba(245,158,11,0.25)"},
+        "high":   {"color": "#f87171", "bg": "rgba(248,113,113,0.10)", "border": "rgba(248,113,113,0.25)"},
+    }
+
+    cards_html = ""
+    for parlay in safe_parlays:
+        risk = parlay.get("risk", "medium")
+        risk_meta = _RISK_META.get(risk, _RISK_META["medium"])
+        rating = parlay.get("rating", 5)
+        summary = parlay.get("summary", "")
+        is_today = parlay.get("today_pick", False)
+        rating_pct = rating * 10
+
+        picks_html = ""
+        for p in parlay["picks"]:
+            surf_color = _SURFACE_COLORS.get(p["surface"], "#2563eb")
+            surf_label = _SURFACE_LABELS.get(p["surface"], p["surface"].title())
+            sent = p.get("sentiment", {})
+            sent_flag = sent.get("flag", "neutral") if sent else "neutral"
+            sent_icon = "↑" if sent_flag == "positive" else ("⚠" if sent_flag == "concern" else "")
+            sent_color = "#10b981" if sent_flag == "positive" else ("#f87171" if sent_flag == "concern" else "")
+            picks_html += f"""
+                <div class="parlay-pick">
+                    <span class="parlay-pick-name">{p['player']}</span>
+                    <span class="parlay-pick-meta">
+                        #{p['rank']} &nbsp;·&nbsp;
+                        <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
+                        {p['raw_implied']:.0%} mkt &nbsp;·&nbsp;
+                        {p['best_price']:.2f}
+                        {f'&nbsp;<span style="color:{sent_color};font-size:10px;">{sent_icon}</span>' if sent_icon else ""}
+                    </span>
+                </div>"""
+
+        today_badge = (
+            '<span class="today-pick-badge">TODAY\'S BET</span>'
+            if is_today else ""
+        )
+
+        cards_html += f"""
+        <div class="parlay-card{' safe-today-pick' if is_today else ''}">
+            <div class="parlay-card-header">
+                <div class="parlay-legs">{parlay['size']}-leg parlay {today_badge}</div>
+                <div class="parlay-header-right">
+                    <span class="risk-badge" style="color:{risk_meta['color']};background:{risk_meta['bg']};border:1px solid {risk_meta['border']};">{risk.upper()}</span>
+                    <span class="parlay-odds">{parlay['total_odds']:.2f}</span>
+                </div>
+            </div>
+            <div class="parlay-picks">{picks_html}</div>
+            <div class="parlay-footer">
+                <div class="rating-row">
+                    <span class="rating-label">Gemini</span>
+                    <div class="rating-track">
+                        <div class="rating-fill" style="width:{rating_pct}%;background:{'#10b981' if rating>=7 else '#f59e0b' if rating>=5 else '#f87171'};"></div>
+                    </div>
+                    <span class="rating-val">{rating}/10</span>
+                </div>
+                <div class="parlay-cum-prob">Cumulative model prob: <strong>{parlay['cum_prob']:.1%}</strong></div>
+            </div>
+            {f'<div class="parlay-summary">{summary}</div>' if summary else ""}
+        </div>"""
+
+    return f"""
+    <details class="parlays-section safe-parlays-section">
+        <summary class="parlays-summary">
+            <span class="parlays-title">Safe Parlays &mdash; Daily Compounder</span>
+            <span class="parlays-count">({len(safe_parlays)})</span>
+            <span class="parlays-chevron">▸</span>
+        </summary>
+        <div class="safe-parlays-intro">
+            Strategy: picks with bookmaker implied &gt;65% — highest-probability legs only.
+            Reinvest daily winnings. <strong>TODAY'S BET</strong> is the top-rated combination.
+        </div>
+        <div class="parlays-grid">{cards_html}</div>
+    </details>"""
+
+
 def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
+                  safe_parlays: list[dict] | None = None,
                   error: str | None = None) -> str:
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     parlays = parlays or []
+    safe_parlays = safe_parlays or []
 
     if error:
         content = _error_html(error)
         summary_html = ""
         parlays_html = ""
+        safe_parlays_html = ""
     elif not results:
         content = _no_matches_html()
         summary_html = ""
         parlays_html = ""
+        safe_parlays_html = ""
     else:
         value_bets = sum(
             1 for m in results if "players" in m
@@ -433,6 +529,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
             <span class="summary-pills">{vb_html}{mg_html}</span>
         </div>"""
         parlays_html = _parlays_html(parlays)
+        safe_parlays_html = _safe_parlays_html(safe_parlays)
         content = "\n".join(_match_card_html(m) for m in results)
 
     return f"""<!DOCTYPE html>
@@ -1075,6 +1172,32 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     padding-top: 2px;
   }}
 
+  /* ── Safe Parlays — Daily Compounder ─────────────────────── */
+  .safe-parlays-section {{ margin-top: 8px; }}
+  .safe-parlays-intro {{
+    font-size: 11px;
+    color: var(--small);
+    padding: 8px 16px 4px;
+    line-height: 1.6;
+  }}
+  .safe-parlays-intro strong {{ color: var(--muted); }}
+  .today-pick-badge {{
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: var(--orange);
+    border-radius: 4px;
+    padding: 1px 6px;
+    vertical-align: middle;
+    margin-left: 6px;
+  }}
+  .safe-today-pick {{
+    border-color: var(--orange) !important;
+    box-shadow: 0 0 0 1px rgba(249,115,22,0.20);
+  }}
+
   /* ── Footer ──────────────────────────────────────────────── */
   footer {{
     border-top: 1px solid var(--border);
@@ -1104,6 +1227,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
 <main>
   {summary_html}
   {parlays_html}
+  {safe_parlays_html}
   {content}
 </main>
 
@@ -1126,15 +1250,16 @@ def main() -> None:
 
     results = None
     parlays: list[dict] = []
+    safe_parlays: list[dict] = []
     error = None
 
     try:
-        results, parlays = run_pipeline()
+        results, parlays, safe_parlays = run_pipeline()
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
 
-    html = generate_html(results, parlays=parlays, error=error)
+    html = generate_html(results, parlays=parlays, safe_parlays=safe_parlays, error=error)
     out = Path("index.html")
     out.write_text(html, encoding="utf-8")
     logger.info("Written %s (%d bytes)", out, len(html))
