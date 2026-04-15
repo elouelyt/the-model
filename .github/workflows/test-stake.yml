@@ -12,18 +12,18 @@ jobs:
           echo "============================================================"
           echo "GET /sport/tennis/category"
           echo "============================================================"
-          RESPONSE=$(curl -s -w "\n---HTTP_STATUS:%{http_code}---" \
+          curl -s \
             -H "Accept: application/json" \
             -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
             -H "Origin: https://stake.com" \
             -H "Referer: https://stake.com/" \
-            "https://odds-data.stake.com/sport/tennis/category")
-          echo "$RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$RESPONSE"
+            "https://odds-data.stake.com/sport/tennis/category" \
+            | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
 
-      - name: Fetch raw fixture JSON — 46453218-r16p3-r16p4
+      - name: Fetch raw fixture JSON - 46453218-r16p3-r16p4
         run: |
           echo "============================================================"
-          echo "GET /fixtures/46453218-r16p3-r16p4  (RAW — exact competitor names)"
+          echo "GET /fixtures/46453218-r16p3-r16p4  (RAW - exact competitor names)"
           echo "============================================================"
           curl -s \
             -H "Accept: application/json" \
@@ -31,34 +31,20 @@ jobs:
             -H "Origin: https://stake.com" \
             -H "Referer: https://stake.com/" \
             "https://odds-data.stake.com/fixtures/46453218-r16p3-r16p4" \
-            | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-print('=== FULL RESPONSE (pretty) ===')
-print(json.dumps(data, indent=2))
+            -o /tmp/stake_fix1.json
+          echo "--- FULL RESPONSE (pretty) ---"
+          python3 -m json.tool /tmp/stake_fix1.json 2>/dev/null || cat /tmp/stake_fix1.json
+          echo ""
+          echo "--- COMPETITORS LIST ---"
+          python3 -c "import json; d=json.load(open('/tmp/stake_fix1.json')); f=d.get('fixture',d); [print(repr(c)) for c in f.get('competitors',[])]" 2>/dev/null || echo "parse error"
+          echo ""
+          echo "--- MARKET OUTCOMES (name + odds) ---"
+          python3 -c "import json; d=json.load(open('/tmp/stake_fix1.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
 
-# Extract and print competitor/outcome names separately for easy inspection
-fix = data.get('fixture', data)
-print()
-print('=== FIXTURE NAME:', fix.get('name'), '===')
-print('=== STATUS:', fix.get('status'), '===')
-print()
-print('=== COMPETITORS LIST ===')
-for c in fix.get('competitors', []):
-    print(' ', repr(c))
-print()
-print('=== MARKET OUTCOMES (names + odds) ===')
-for group in fix.get('groups', []):
-    for market in group.get('markets', []):
-        print(f'  Market: {market.get(\"name\")} | status={market.get(\"status\")}')
-        for outcome in market.get('outcomes', []):
-            print(f'    Outcome name: {repr(outcome.get(\"name\"))} | odds={outcome.get(\"odds\")} | active={outcome.get(\"active\")}')
-" 2>/dev/null || echo "Failed to parse JSON or fixture not found"
-
-      - name: Fetch raw fixture JSON — 46453677-r16p1-r16p2
+      - name: Fetch raw fixture JSON - 46453677-r16p1-r16p2
         run: |
           echo "============================================================"
-          echo "GET /fixtures/46453677-r16p1-r16p2  (RAW — exact competitor names)"
+          echo "GET /fixtures/46453677-r16p1-r16p2  (RAW - exact competitor names)"
           echo "============================================================"
           curl -s \
             -H "Accept: application/json" \
@@ -66,28 +52,15 @@ for group in fix.get('groups', []):
             -H "Origin: https://stake.com" \
             -H "Referer: https://stake.com/" \
             "https://odds-data.stake.com/fixtures/46453677-r16p1-r16p2" \
-            | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-print('=== FULL RESPONSE (pretty) ===')
-print(json.dumps(data, indent=2))
-
-fix = data.get('fixture', data)
-print()
-print('=== FIXTURE NAME:', fix.get('name'), '===')
-print('=== STATUS:', fix.get('status'), '===')
-print()
-print('=== COMPETITORS LIST ===')
-for c in fix.get('competitors', []):
-    print(' ', repr(c))
-print()
-print('=== MARKET OUTCOMES (names + odds) ===')
-for group in fix.get('groups', []):
-    for market in group.get('markets', []):
-        print(f'  Market: {market.get(\"name\")} | status={market.get(\"status\")}')
-        for outcome in market.get('outcomes', []):
-            print(f'    Outcome name: {repr(outcome.get(\"name\"))} | odds={outcome.get(\"odds\")} | active={outcome.get(\"active\")}')
-" 2>/dev/null || echo "Failed to parse JSON or fixture not found"
+            -o /tmp/stake_fix2.json
+          echo "--- FULL RESPONSE (pretty) ---"
+          python3 -m json.tool /tmp/stake_fix2.json 2>/dev/null || cat /tmp/stake_fix2.json
+          echo ""
+          echo "--- COMPETITORS LIST ---"
+          python3 -c "import json; d=json.load(open('/tmp/stake_fix2.json')); f=d.get('fixture',d); [print(repr(c)) for c in f.get('competitors',[])]" 2>/dev/null || echo "parse error"
+          echo ""
+          echo "--- MARKET OUTCOMES (name + odds) ---"
+          python3 -c "import json; d=json.load(open('/tmp/stake_fix2.json')); f=d.get('fixture',d); [print('Market:', m.get('name'), '| status:', m.get('status'), '\n  Outcomes:', [(o.get('name'), o.get('odds')) for o in m.get('outcomes',[])]) for g in f.get('groups',[]) for m in g.get('markets',[])]" 2>/dev/null || echo "parse error"
 
       - name: Test GET /sports (all sports list)
         run: |
@@ -100,7 +73,7 @@ for group in fix.get('groups', []):
             -H "Origin: https://stake.com" \
             "https://odds-data.stake.com/sports" | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
 
-      - name: Run Python stake_agent against live API
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -117,17 +90,15 @@ for group in fix.get('groups', []):
         run: |
           python - <<'EOF'
           import logging, json, sys
-          logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(message)s")
+          logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
           sys.path.insert(0, ".")
           from src.agents.stake_agent import fetch_stake_odds, _get
 
-          # Step 1: raw category endpoint
           print("\n=== Raw /sport/tennis/category ===")
           data = _get("/sport/tennis/category")
           print(json.dumps(data, indent=2) if data else "NONE / unreachable")
 
-          # Step 2: full pipeline with realistic ATP player names
           sample_players = [
               "Carlos Alcaraz", "Holger Rune", "Alexander Zverev",
               "Jannik Sinner", "Andrey Rublev", "Casper Ruud",
