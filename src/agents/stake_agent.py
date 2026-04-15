@@ -326,10 +326,15 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
             tournaments = tour_data.get("tournament", [])
 
         if tournaments:
-            # 2b. Fetch fixtures for each tournament
+            # 2b. Fetch fixtures for each singles tournament (skip doubles)
             for tour in tournaments:
                 tour_slug = tour.get("slug", "")
                 if not tour_slug:
+                    continue
+                # Exclude doubles tournaments — pipeline only predicts singles
+                tour_text = f"{tour_slug} {tour.get('name', '')}".lower()
+                if "double" in tour_text or "dobles" in tour_text:
+                    logger.debug("[stake_agent] Skipping doubles tournament: %s", tour_slug)
                     continue
                 fix_data = _get(f"/sport/tennis/category/{cat_slug}/tournament/{tour_slug}/fixture")
                 if not fix_data:
