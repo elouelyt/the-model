@@ -1,0 +1,85 @@
+name: Test Stake API
+
+on:
+  workflow_dispatch:  # manual trigger only — run from GitHub Actions UI
+
+jobs:
+  test-stake-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test GET /sport/tennis/category
+        run: |
+          echo "============================================================"
+          echo "GET /sport/tennis/category"
+          echo "============================================================"
+          RESPONSE=$(curl -s -w "\n---HTTP_STATUS:%{http_code}---" \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            -H "Referer: https://stake.com/" \
+            "https://odds-data.stake.com/sport/tennis/category")
+          echo "$RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$RESPONSE"
+
+      - name: Test GET /sports (all sports list)
+        run: |
+          echo "============================================================"
+          echo "GET /sports"
+          echo "============================================================"
+          curl -s \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            "https://odds-data.stake.com/sports" | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
+
+      - name: Test GET /sport (paginated sports)
+        run: |
+          echo "============================================================"
+          echo "GET /sport"
+          echo "============================================================"
+          curl -s \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            "https://odds-data.stake.com/sport" | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
+
+      - name: Run Python stake_agent against live API
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run stake_agent.fetch_stake_odds with sample players
+        env:
+          STAKE_API_KEY: ${{ secrets.STAKE_API_KEY }}
+        run: |
+          python - <<'EOF'
+          import logging, json, sys
+          logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(message)s")
+
+          sys.path.insert(0, ".")
+          from src.agents.stake_agent import fetch_stake_odds, _get
+
+          # Step 1: raw category endpoint
+          print("\n=== Raw /sport/tennis/category ===")
+          data = _get("/sport/tennis/category")
+          print(json.dumps(data, indent=2) if data else "NONE / unreachable")
+
+          # Step 2: full pipeline with realistic ATP player names
+          sample_players = [
+              "Carlos Alcaraz", "Holger Rune", "Alexander Zverev",
+              "Jannik Sinner", "Andrey Rublev", "Casper Ruud",
+              "Stefanos Tsitsipas", "Taylor Fritz", "Alex de Minaur",
+              "Cameron Norris",
+          ]
+          print("\n=== fetch_stake_odds() ===")
+          odds = fetch_stake_odds(sample_players)
+          if odds:
+              print(json.dumps(odds, indent=2))
+          else:
+              print("No Stake odds returned (API unreachable or no matching fixtures)")
+          EOF
