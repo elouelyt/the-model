@@ -176,7 +176,8 @@ def compute_predictions_node(state: PipelineState) -> PipelineState:
             rec["rank"] = rankings[player]["rank"]
             rec["points"] = rankings[player]["points"]
             rec["sentiment"] = sentiment_map.get(
-                player, {"available": False, "flag": "neutral", "label": None, "headline": None}
+                player, {"available": False, "flag": "neutral", "label": None, "headline": None,
+                         "withdrawn": False, "withdrawal_headline": None}
             )
             bk = (
                 player_rows[["bookmaker_title", "price", "raw_implied"]]
@@ -189,14 +190,34 @@ def compute_predictions_node(state: PipelineState) -> PipelineState:
             players_data.append(rec)
 
         h2h = get_h2h(home, away, surface)
-        results.append({
+
+        # Detect withdrawal alert from sentiment signals
+        withdrawal_alert = None
+        for pd_rec in players_data:
+            sent = pd_rec.get("sentiment", {})
+            if sent.get("withdrawn"):
+                withdrawal_alert = {
+                    "player": pd_rec["player"],
+                    "headline": sent.get("withdrawal_headline"),
+                }
+                logger.warning(
+                    "[coordinator] Withdrawal alert: %s — %s",
+                    pd_rec["player"], sent.get("withdrawal_headline"),
+                )
+                break  # one alert per match is enough
+
+        match_dict = {
             "home": home,
             "away": away,
             "commence_time": commence_time,
             "surface": surface,
             "h2h": h2h,
             "players": players_data,
-        })
+        }
+        if withdrawal_alert:
+            match_dict["withdrawal_alert"] = withdrawal_alert
+
+        results.append(match_dict)
 
     logger.info("[coordinator] compute_predictions_node — %d matches", len(results))
     return {**state, "results": results}

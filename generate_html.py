@@ -288,13 +288,29 @@ def _match_card_html(match: dict) -> str:
     player_cols = "".join(_player_card_html(p) for p in players)
     glow_color = accent if accent != "#2a2a2a" else "transparent"
 
+    withdrawal_alert = match.get("withdrawal_alert")
+    if withdrawal_alert:
+        wd_headline = withdrawal_alert.get("headline") or ""
+        wd_text = f': &ldquo;{wd_headline}&rdquo;' if wd_headline else ""
+        withdrawal_html = (
+            f'<div class="withdrawal-alert">'
+            f'<span class="withdrawal-icon">⚠</span>'
+            f'<strong>WITHDRAWAL REPORTED</strong> &mdash; {withdrawal_alert["player"]}{wd_text}'
+            f'</div>'
+        )
+        # Override accent to red when there's a withdrawal
+        accent = "#f87171"
+        glow_color = "#f87171"
+    else:
+        withdrawal_html = ""
+
     return f"""
     <div class="match-card" style="border-left: 3px solid {accent}; --card-glow: {glow_color};">
         <div class="match-header">
             <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
             <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
         </div>
-        {h2h_html}
+        {withdrawal_html}{h2h_html}
         <div class="players-row">
             {player_cols}
         </div>
@@ -1170,6 +1186,27 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     line-height: 1.5;
     font-style: italic;
     padding-top: 2px;
+  }}
+
+  /* ── Withdrawal alert ───────────────────────────────────── */
+  .withdrawal-alert {{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.35);
+    border-radius: 6px;
+    padding: 9px 12px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #f87171;
+    line-height: 1.45;
+  }}
+  .withdrawal-alert strong {{ font-weight: 700; }}
+  .withdrawal-icon {{
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
   }}
 
   /* ── Safe Parlays — Daily Compounder ─────────────────────── */

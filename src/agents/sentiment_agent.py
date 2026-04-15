@@ -24,6 +24,21 @@ _TIMEOUT = 8
 _MAX_HEADLINES = 6
 _MAX_WORKERS = 10
 
+# High-precision withdrawal keywords — any match triggers a withdrawal alert.
+# Kept separate from _NEGATIVE to avoid false positives on career retirements,
+# match retirements already completed, or unrelated "retired" usage.
+_WITHDRAWAL_KEYWORDS: set[str] = {
+    "withdraw", "withdrawn", "withdraws", "withdrawal",
+    "pulls out", "pulled out", "pulls out of",
+    "retires from", "retired from", "retirement from",
+    "ruled out", "rules out",
+    "w/o ", " w/o",                    # walkover notation
+    "baja", "se retira", "se baja",    # Spanish
+    "forfait",                          # French
+    "injured out", "injury forces",
+    "won't play", "will not play", "unable to play",
+}
+
 # Keywords scored as negative (injury, withdrawal, controversy)
 _NEGATIVE: set[str] = {
     "injur", "withdraw", "retir", "illness", "ill ", "doubt",
@@ -52,6 +67,29 @@ def _score_headline(headline: str) -> int:
     if neg > pos:
         return -1
     return 0
+
+
+def _detect_withdrawal(headlines: list[str]) -> tuple[bool, str | None]:
+    """Check if any headline signals a player withdrawal from a tournament.
+
+    Uses a separate high-precision keyword set to avoid false positives from
+    general negative sentiment (e.g. "lost", "defeated") or career retirement
+    announcements unrelated to a current tournament.
+
+    Args:
+        headlines: List of raw headline strings.
+
+    Returns:
+        (withdrawn, headline) — withdrawn=True if a withdrawal keyword is found,
+        plus the triggering headline (or None if not withdrawn).
+    """
+    for headline in headlines:
+        lower = headline.lower()
+        for kw in _WITHDRAWAL_KEYWORDS:
+            if kw in lower:
+                logger.debug("Withdrawal keyword %r found in: %r", kw, headline)
+                return True, headline
+    return False, None
 
 
 def _fetch_headlines(player_name: str) -> list[str]:
@@ -90,12 +128,22 @@ def get_player_sentiment(player_name: str) -> dict:
             - ``flag`` (str): ``"positive"``, ``"concern"``, or ``"neutral"``.
             - ``label`` (str | None): Human-readable label, or None if neutral.
             - ``headline`` (str | None): The most signal-carrying headline, or None.
+            - ``withdrawn`` (bool): True if a withdrawal keyword was detected.
+            - ``withdrawal_headline`` (str | None): The headline that triggered it.
     """
-    _neutral = {"available": False, "flag": "neutral", "label": None, "headline": None}
+    _neutral = {
+        "available": False, "flag": "neutral", "label": None, "headline": None,
+        "withdrawn": False, "withdrawal_headline": None,
+    }
 
     headlines = _fetch_headlines(player_name)
     if not headlines:
         return _neutral
+
+    # Check withdrawal first — highest-priority signal
+    withdrawn, withdrawal_headline = _detect_withdrawal(headlines)
+    if withdrawn:
+        logger.info("Withdrawal detected for %r: %s", player_name, withdrawal_headline)
 
     scores = [_score_headline(h) for h in headlines]
     net = sum(scores)
@@ -104,12 +152,15 @@ def get_player_sentiment(player_name: str) -> dict:
     scored_pairs = sorted(zip(scores, headlines), key=lambda x: abs(x[0]), reverse=True)
     top_headline = scored_pairs[0][1] if scored_pairs[0][0] != 0 else None
 
+    base = {"withdrawn": withdrawn, "withdrawal_headline": withdrawal_headline}
+
     if net >= _POSITIVE_THRESHOLD:
         return {
             "available": True,
             "flag": "positive",
             "label": "In form",
             "headline": top_headline,
+            **base,
         }
     if net <= _CONCERN_THRESHOLD:
         return {
@@ -117,8 +168,9 @@ def get_player_sentiment(player_name: str) -> dict:
             "flag": "concern",
             "label": "Form concern",
             "headline": top_headline,
+            **base,
         }
-    return {"available": True, "flag": "neutral", "label": None, "headline": top_headline}
+    return {"available": True, "flag": "neutral", "label": None, "headline": top_headline, **base}
 
 
 def fetch_sentiment_batch(player_names: list[str]) -> dict[str, dict]:
@@ -142,7 +194,7 @@ def fetch_sentiment_batch(player_names: list[str]) -> dict[str, dict]:
                 results[name] = future.result()
             except Exception as exc:
                 logger.warning("Sentiment: unhandled error for %r: %s", name, exc)
-                results[name] = {"available": False, "flag": "neutral", "label": None, "headline": None}
+                results[name] = {"available": False, "flag": "neutral", "label": None, "headline": None, "withdrawn": False, "withdrawal_headline": None}
 
     flags = [v["flag"] for v in results.values()]
     logger.info(
