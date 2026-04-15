@@ -79,37 +79,120 @@ def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower().strip(), b.lower().strip()).ratio()
 
 
+def _is_initial(token: str) -> bool:
+    """Return True for single-letter tokens like 'C', 'C.', 'De.' etc."""
+    t = token.rstrip(".")
+    return len(t) <= 1
+
+
+def _normalize_stake_name(name: str) -> list[str]:
+    """Return all plausible normalized forms of a Stake/Betradar competitor name.
+
+    Handles the main Betradar formats:
+      "Alcaraz, Carlos"   → ["Carlos Alcaraz", "Alcaraz"]
+      "Alcaraz C."        → ["Alcaraz"]
+      "C. Alcaraz"        → ["Alcaraz"]
+      "Alcaraz"           → ["Alcaraz"]
+      "Carlos Alcaraz"    → ["Carlos Alcaraz", "Alcaraz"]
+    """
+    name = name.strip()
+    if not name:
+        return []
+
+    candidates: list[str] = []
+
+    # ── Format 1: "Lastname, Firstname" (Betradar standard) ──────────────────
+    if "," in name:
+        parts = [p.strip() for p in name.split(",", 1)]
+        last_part  = parts[0].strip()
+        first_part = parts[1].strip() if len(parts) > 1 else ""
+
+        # Strip any initials from first_part ("Carlos" stays, "C." becomes "")
+        first_tokens = [t for t in first_part.split() if not _is_initial(t)]
+        first_clean  = " ".join(first_tokens)
+
+        if first_clean:
+            # "Carlos Alcaraz" — the canonical pipeline format
+            candidates.append(f"{first_clean} {last_part}")
+        # surname alone as fallback
+        candidates.append(last_part)
+
+    else:
+        # ── Format 2 / 3 / 4: no comma — strip initials, keep real tokens ────
+        tokens     = name.split()
+        real_tokens = [t for t in tokens if not _is_initial(t)]
+        clean      = " ".join(real_tokens).strip()
+
+        if clean:
+            candidates.append(clean)
+            # Also try reversed order in case it's "Lastname Firstname" without comma
+            if len(real_tokens) == 2:
+                candidates.append(f"{real_tokens[1]} {real_tokens[0]}")
+            # Surname-only fallback (last real token)
+            candidates.append(real_tokens[-1])
+        else:
+            # All tokens were initials — keep original
+            candidates.append(name)
+
+    # Deduplicate while preserving order
+    seen: set[str] = set()
+    result: list[str] = []
+    for c in candidates:
+        cl = c.lower()
+        if cl not in seen and c:
+            seen.add(cl)
+            result.append(c)
+    return result
+
+
 def _best_match(
     stake_name: str,
     pipeline_names: list[str],
 ) -> tuple[str | None, float]:
     """Return (best_pipeline_name, score) for a Stake competitor name.
 
-    Compares both the full string and the last token (surname) since Stake
-    often uses surname-only names like "Alcaraz" or "Alcaraz C."
+    Generates multiple normalized candidate forms for the Stake name (handling
+    Betradar formats: "Lastname, Firstname", "Lastname C.", "C. Lastname",
+    "Lastname") and compares each against every pipeline name and its surname.
     """
     if not stake_name or not pipeline_names:
         return None, 0.0
 
-    # Normalise: strip initials like "C." so "Alcaraz C." → "alcaraz"
-    stake_tokens = [t for t in stake_name.split() if not (len(t) <= 2 and t.endswith("."))]
-    stake_clean = " ".join(stake_tokens).lower()
-    stake_last  = stake_tokens[-1].lower() if stake_tokens else stake_name.lower()
+    stake_candidates = _normalize_stake_name(stake_name)
+    logger.debug(
+        "[stake_agent] Stake name %r → normalized candidates: %s",
+        stake_name, stake_candidates,
+    )
 
     best_name:  str | None = None
     best_score: float      = 0.0
 
-    for name in pipeline_names:
-        pipeline_last = name.split()[-1].lower()
+    for pipeline_name in pipeline_names:
+        pipeline_last  = pipeline_name.split()[-1].lower()
+        pipeline_lower = pipeline_name.lower()
 
-        full_score = _similarity(stake_clean, name)
-        last_score = _similarity(stake_last, pipeline_last) * 0.92  # slight last-name penalty
+        for candidate in stake_candidates:
+            cand_lower = candidate.lower()
+            cand_last  = candidate.split()[-1].lower()
 
-        effective = max(full_score, last_score)
-        if effective > best_score:
-            best_score = effective
-            best_name  = name
+            # Full-string similarity
+            full_score = _similarity(cand_lower, pipeline_lower)
 
+            # Surname-only similarity (both directions, slight penalty)
+            last_score = max(
+                _similarity(cand_last, pipeline_last),
+                _similarity(cand_lower, pipeline_last),
+            ) * 0.90
+
+            effective = max(full_score, last_score)
+            if effective > best_score:
+                best_score = effective
+                best_name  = pipeline_name
+
+    logger.debug(
+        "[stake_agent] Best match for %r → %r (score=%.3f)",
+        stake_name, best_name, best_score,
+    )
     return best_name, best_score
 
 
@@ -239,6 +322,10 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
         return {}
 
     # ── Step 4: fetch full odds concurrently ──────────────────────────────────
+    logger.info(
+        "[stake_agent] Pipeline player names for matching: %s",
+        pipeline_player_names,
+    )
     stake_odds: dict[str, float] = {}
 
     def _fetch_odds(fix: dict) -> dict[str, float]:
@@ -246,13 +333,21 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
         if not odds_resp:
             return {}
         winner_odds = _extract_winner_odds(odds_resp)
+        logger.info(
+            "[stake_agent] Fixture %r — raw outcome names from Stake: %s",
+            fix["slug"], list(winner_odds.keys()),
+        )
         out: dict[str, float] = {}
         for stake_name, price in winner_odds.items():
             pipeline_name, score = _best_match(stake_name, pipeline_player_names)
+            logger.info(
+                "[stake_agent] Match attempt: Stake=%r → pipeline=%r (score=%.3f, cutoff=%.2f, pass=%s)",
+                stake_name, pipeline_name, score, _FUZZY_CUTOFF, score >= _FUZZY_CUTOFF,
+            )
             if pipeline_name and score >= _FUZZY_CUTOFF:
                 out[pipeline_name] = price
-                logger.debug(
-                    "[stake_agent] %r → %r (score=%.2f) @ %.3f",
+                logger.info(
+                    "[stake_agent] MATCHED %r → %r (score=%.3f) @ %.3f",
                     stake_name, pipeline_name, score, price,
                 )
         return out

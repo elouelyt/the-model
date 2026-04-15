@@ -20,6 +20,75 @@ jobs:
             "https://odds-data.stake.com/sport/tennis/category")
           echo "$RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$RESPONSE"
 
+      - name: Fetch raw fixture JSON — 46453218-r16p3-r16p4
+        run: |
+          echo "============================================================"
+          echo "GET /fixtures/46453218-r16p3-r16p4  (RAW — exact competitor names)"
+          echo "============================================================"
+          curl -s \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            -H "Referer: https://stake.com/" \
+            "https://odds-data.stake.com/fixtures/46453218-r16p3-r16p4" \
+            | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+print('=== FULL RESPONSE (pretty) ===')
+print(json.dumps(data, indent=2))
+
+# Extract and print competitor/outcome names separately for easy inspection
+fix = data.get('fixture', data)
+print()
+print('=== FIXTURE NAME:', fix.get('name'), '===')
+print('=== STATUS:', fix.get('status'), '===')
+print()
+print('=== COMPETITORS LIST ===')
+for c in fix.get('competitors', []):
+    print(' ', repr(c))
+print()
+print('=== MARKET OUTCOMES (names + odds) ===')
+for group in fix.get('groups', []):
+    for market in group.get('markets', []):
+        print(f'  Market: {market.get(\"name\")} | status={market.get(\"status\")}')
+        for outcome in market.get('outcomes', []):
+            print(f'    Outcome name: {repr(outcome.get(\"name\"))} | odds={outcome.get(\"odds\")} | active={outcome.get(\"active\")}')
+" 2>/dev/null || echo "Failed to parse JSON or fixture not found"
+
+      - name: Fetch raw fixture JSON — 46453677-r16p1-r16p2
+        run: |
+          echo "============================================================"
+          echo "GET /fixtures/46453677-r16p1-r16p2  (RAW — exact competitor names)"
+          echo "============================================================"
+          curl -s \
+            -H "Accept: application/json" \
+            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
+            -H "Origin: https://stake.com" \
+            -H "Referer: https://stake.com/" \
+            "https://odds-data.stake.com/fixtures/46453677-r16p1-r16p2" \
+            | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+print('=== FULL RESPONSE (pretty) ===')
+print(json.dumps(data, indent=2))
+
+fix = data.get('fixture', data)
+print()
+print('=== FIXTURE NAME:', fix.get('name'), '===')
+print('=== STATUS:', fix.get('status'), '===')
+print()
+print('=== COMPETITORS LIST ===')
+for c in fix.get('competitors', []):
+    print(' ', repr(c))
+print()
+print('=== MARKET OUTCOMES (names + odds) ===')
+for group in fix.get('groups', []):
+    for market in group.get('markets', []):
+        print(f'  Market: {market.get(\"name\")} | status={market.get(\"status\")}')
+        for outcome in market.get('outcomes', []):
+            print(f'    Outcome name: {repr(outcome.get(\"name\"))} | odds={outcome.get(\"odds\")} | active={outcome.get(\"active\")}')
+" 2>/dev/null || echo "Failed to parse JSON or fixture not found"
+
       - name: Test GET /sports (all sports list)
         run: |
           echo "============================================================"
@@ -30,17 +99,6 @@ jobs:
             -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
             -H "Origin: https://stake.com" \
             "https://odds-data.stake.com/sports" | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
-
-      - name: Test GET /sport (paginated sports)
-        run: |
-          echo "============================================================"
-          echo "GET /sport"
-          echo "============================================================"
-          curl -s \
-            -H "Accept: application/json" \
-            -H "User-Agent: Mozilla/5.0 (compatible; tennis-ai-test/1.0)" \
-            -H "Origin: https://stake.com" \
-            "https://odds-data.stake.com/sport" | python3 -m json.tool 2>/dev/null || echo "Failed or non-JSON response"
 
       - name: Run Python stake_agent against live API
         uses: actions/checkout@v4
