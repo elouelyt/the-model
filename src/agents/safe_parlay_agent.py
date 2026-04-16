@@ -38,7 +38,11 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
         if "error" in match or not match.get("players"):
             continue
         for p in match["players"]:
-            if p["raw_implied"] <= _MIN_IMPLIED:
+            stake_implied = (1.0 / p["stake_price"]) if p.get("stake_price") else None
+            eligible = p["raw_implied"] > _MIN_IMPLIED or (
+                stake_implied is not None and stake_implied > _MIN_IMPLIED
+            )
+            if not eligible:
                 continue
             bk = p.get("bookmakers", [])
             best_price = (
