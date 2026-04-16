@@ -72,7 +72,7 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
 # ── Combination builder ────────────────────────────────────────────────────────
 
 def build_safe_parlays(picks: list[dict]) -> list[dict]:
-    """All 2–6 combos (one per match), ranked by cumulative model_prob, top 5."""
+    """All 2–6 combos (one per match), ranked by cumulative market implied prob, top 5."""
     candidates: list[dict] = []
 
     for size in range(2, min(_MAX_COMBO + 1, len(picks) + 1)):
@@ -85,7 +85,13 @@ def build_safe_parlays(picks: list[dict]) -> list[dict]:
                 p["stake_price"] if p["stake_price"] is not None else p["best_price"]
                 for p in combo
             )
-            cum_prob   = math.prod(p["model_prob"] for p in combo)
+            cum_prob = math.prod(p["model_prob"] for p in combo)
+
+            # Market-implied prob per pick: prefer stake_implied, fall back to raw_implied
+            cum_implied = math.prod(
+                (1.0 / p["stake_price"]) if p["stake_price"] is not None else p["raw_implied"]
+                for p in combo
+            )
 
             # Stake combined odds — only set when every pick has a Stake price
             stake_prices = [p["stake_price"] for p in combo]
@@ -100,10 +106,11 @@ def build_safe_parlays(picks: list[dict]) -> list[dict]:
                 "total_odds":       round(total_odds, 3),
                 "stake_total_odds": stake_total_odds,
                 "cum_prob":         round(cum_prob, 4),
+                "cum_implied":      round(cum_implied, 4),
                 "size":             size,
             })
 
-    candidates.sort(key=lambda x: x["cum_prob"], reverse=True)
+    candidates.sort(key=lambda x: x["cum_implied"], reverse=True)
     return candidates[:_TOP_N]
 
 
