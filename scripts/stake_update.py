@@ -94,6 +94,17 @@ def main() -> None:
         )
         sys.exit(1)
 
+    # ── Step 5: trigger Daily Predictions workflow ────────────────────────────
+    logger.info("Triggering Daily Predictions workflow...")
+    try:
+        subprocess.run(
+            ["gh", "workflow", "run", "daily.yml", "--repo", "elouelyt/the-model"],
+            cwd=ROOT, check=True,
+        )
+        logger.info("Daily Predictions workflow triggered successfully")
+    except subprocess.CalledProcessError as exc:
+        logger.error("Failed to trigger workflow: %s", exc)
+
 
 if __name__ == "__main__":
     main()
