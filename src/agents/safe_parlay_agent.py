@@ -77,7 +77,10 @@ def build_safe_parlays(picks: list[dict]) -> list[dict]:
             if len({p["match_id"] for p in combo}) < len(combo):
                 continue
 
-            total_odds = math.prod(p["best_price"] for p in combo)
+            total_odds = math.prod(
+                p["stake_price"] if p["stake_price"] is not None else p["best_price"]
+                for p in combo
+            )
             cum_prob   = math.prod(p["model_prob"] for p in combo)
 
             # Stake combined odds — only set when every pick has a Stake price

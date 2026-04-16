@@ -141,4 +141,4 @@ Before finishing a task, ask for permission to stage changes and create a conven
 
 **Doc update protocol:** Always update relevant `.md` files **before** committing — docs and code go in the same commit. Files to consider after every task: `CLAUDE.md` (key lessons, sprint status), `SPRINT_PLANNING.md` (checkboxes), `README.md` (current status section), and any `docs/` file relevant to the work done.
 
-**IMPORTANT:** Before every commit or push, verify the active GitHub account is `mateotenis98` by running `gh auth status`. Confirm `mateotenis98` shows `Active account: true`. If it doesn't, alert the user and do not commit or push until they run `gh auth switch --user mateotenis98`.
+**IMPORTANT:** Before every commit or push, verify the active GitHub account is `elouelyt` by running `gh auth status`. Confirm `elouelyt` shows `Active account: true`. If it doesn't, alert the user and do not commit or push until they run `gh auth switch --user elouelyt`.
