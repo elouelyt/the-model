@@ -53,6 +53,7 @@ def extract_eligible_picks(results: list[dict]) -> list[dict]:
                 "h2h":          match.get("h2h", {}),
                 "sentiment":    p.get("sentiment", {}),
                 "best_price":   best_price,
+                "stake_price":  p.get("stake_price"),  # None if Stake not available
                 "confidence":   round((p["model_prob"] + p["raw_implied"]) / 2, 4),
                 # key to prevent two picks from the same match in one parlay
                 "match_id":     f"{match['home']}|{match['away']}",
@@ -81,11 +82,21 @@ def build_parlays(picks: list[dict]) -> list[dict]:
                 continue
 
             cum_prob = math.prod(p["model_prob"] for p in combo)
+
+            # Stake combined odds — only set when every pick has a Stake price
+            stake_prices = [p["stake_price"] for p in combo]
+            stake_total_odds = (
+                round(math.prod(stake_prices), 3)
+                if all(sp is not None for sp in stake_prices)
+                else None
+            )
+
             candidates.append({
-                "picks":      list(combo),
-                "total_odds": round(total_odds, 3),
-                "cum_prob":   round(cum_prob, 4),
-                "size":       size,
+                "picks":            list(combo),
+                "total_odds":       round(total_odds, 3),
+                "stake_total_odds": stake_total_odds,
+                "cum_prob":         round(cum_prob, 4),
+                "size":             size,
             })
 
     # Best cumulative probability first → top 5 go to Gemini

@@ -129,23 +129,58 @@ def fetch_sentiment_node(state: PipelineState) -> PipelineState:
 def fetch_stake_odds_node(state: PipelineState) -> PipelineState:
     """Fetch pre-match Stake odds for all players in the current pipeline run.
 
-    Uses the official Stake Sports Data API (odds-data.stake.com).
-    Non-fatal — empty dict on any network failure or geo-block.
-    Runs after fetch_sentiment so all player names are available.
+    Tries the live Stake API first. If it returns nothing (Cloudflare blocks
+    GitHub Actions), falls back to data/stake_cache.json written locally
+    with VPN via scripts/stake_update.py.
+    Non-fatal — empty dict if both live and cache are unavailable.
     """
+    import json
+    from pathlib import Path
     from src.agents.stake_agent import fetch_stake_odds
 
     rows = state.get("processed_rows", [])
     players = list({r["outcome_name"] for r in rows})
     logger.info("[coordinator] fetch_stake_odds_node — %d players", len(players))
 
+    stake_odds: dict[str, float] = {}
+    source = "none"
+
+    # ── Try live API ──────────────────────────────────────────────────────────
     try:
         stake_odds = fetch_stake_odds(players)
+        if stake_odds:
+            source = "live"
     except Exception as exc:  # noqa: BLE001
-        logger.warning("[coordinator] fetch_stake_odds_node failed (non-fatal): %s", exc)
-        stake_odds = {}
+        logger.warning("[coordinator] Stake live API failed (non-fatal): %s", exc)
 
-    logger.info("[coordinator] Stake odds fetched for %d / %d players", len(stake_odds), len(players))
+    # ── Fallback: stake_cache.json ────────────────────────────────────────────
+    if not stake_odds:
+        cache_path = Path(__file__).parent.parent.parent / "data" / "stake_cache.json"
+        if cache_path.exists():
+            try:
+                cached = json.loads(cache_path.read_text())
+                cached_odds: dict[str, float] = cached.get("odds", {})
+                stake_odds = {p: cached_odds[p] for p in players if p in cached_odds}
+                if stake_odds:
+                    source = f"cache ({cached.get('timestamp', '?')[:10]})"
+                    logger.info(
+                        "[coordinator] Stake live returned 0 — using cache from %s: %d / %d players matched",
+                        cached.get("timestamp", "?"), len(stake_odds), len(players),
+                    )
+                else:
+                    logger.info(
+                        "[coordinator] Cache exists (%s) but 0 current players matched",
+                        cached.get("timestamp", "?"),
+                    )
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("[coordinator] Failed to load stake_cache.json: %s", exc)
+        else:
+            logger.info("[coordinator] No stake_cache.json found — run scripts/stake_update.py with VPN")
+
+    logger.info(
+        "[coordinator] Stake odds source=%s, %d / %d players",
+        source, len(stake_odds), len(players),
+    )
     return {**state, "stake_odds": stake_odds}
 
 

@@ -58,6 +58,7 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
                 "h2h":         match.get("h2h", {}),
                 "sentiment":   p.get("sentiment", {}),
                 "best_price":  best_price,
+                "stake_price": p.get("stake_price"),  # None if Stake not available
                 "match_id":    f"{match['home']}|{match['away']}",
                 "opponent":    match["away"] if p["player"] == match["home"] else match["home"],
             })
@@ -79,11 +80,20 @@ def build_safe_parlays(picks: list[dict]) -> list[dict]:
             total_odds = math.prod(p["best_price"] for p in combo)
             cum_prob   = math.prod(p["model_prob"] for p in combo)
 
+            # Stake combined odds — only set when every pick has a Stake price
+            stake_prices = [p["stake_price"] for p in combo]
+            stake_total_odds = (
+                round(math.prod(stake_prices), 3)
+                if all(sp is not None for sp in stake_prices)
+                else None
+            )
+
             candidates.append({
-                "picks":      list(combo),
-                "total_odds": round(total_odds, 3),
-                "cum_prob":   round(cum_prob, 4),
-                "size":       size,
+                "picks":            list(combo),
+                "total_odds":       round(total_odds, 3),
+                "stake_total_odds": stake_total_odds,
+                "cum_prob":         round(cum_prob, 4),
+                "size":             size,
             })
 
     candidates.sort(key=lambda x: x["cum_prob"], reverse=True)

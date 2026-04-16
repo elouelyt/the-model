@@ -399,12 +399,17 @@ def _parlays_html(parlays: list[dict]) -> str:
                     </span>
                 </div>"""
 
+        stake_odds_html = ""
+        if parlay.get("stake_total_odds"):
+            stake_odds_html = f'<span class="parlay-stake-odds">S&nbsp;{parlay["stake_total_odds"]:.2f}</span>'
+
         cards_html += f"""
         <div class="parlay-card">
             <div class="parlay-card-header">
                 <div class="parlay-legs">{parlay['size']}-leg parlay</div>
                 <div class="parlay-header-right">
                     <span class="risk-badge" style="color:{risk_meta['color']};background:{risk_meta['bg']};border:1px solid {risk_meta['border']};">{risk.upper()}</span>
+                    {stake_odds_html}
                     <span class="parlay-odds">{parlay['total_odds']:.2f}</span>
                 </div>
             </div>
@@ -487,12 +492,17 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
             if is_today else ""
         )
 
+        stake_odds_html = ""
+        if parlay.get("stake_total_odds"):
+            stake_odds_html = f'<span class="parlay-stake-odds">S&nbsp;{parlay["stake_total_odds"]:.2f}</span>'
+
         cards_html += f"""
         <div class="parlay-card{' safe-today-pick' if is_today else ''}">
             <div class="parlay-card-header">
                 <div class="parlay-legs">{parlay['size']}-leg parlay {today_badge}</div>
                 <div class="parlay-header-right">
                     <span class="risk-badge" style="color:{risk_meta['color']};background:{risk_meta['bg']};border:1px solid {risk_meta['border']};">{risk.upper()}</span>
+                    {stake_odds_html}
                     <span class="parlay-odds">{parlay['total_odds']:.2f}</span>
                 </div>
             </div>
@@ -1117,6 +1127,16 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     color: var(--orange);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.5px;
+  }}
+  .parlay-stake-odds {{
+    font-size: 14px;
+    font-weight: 700;
+    color: #00a86b;
+    font-variant-numeric: tabular-nums;
+    background: rgba(0,168,107,0.12);
+    border: 1px solid rgba(0,168,107,0.30);
+    border-radius: 5px;
+    padding: 2px 6px;
   }}
   .risk-badge {{
     font-size: 9px;
