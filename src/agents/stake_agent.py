@@ -21,8 +21,6 @@ Non-fatal throughout — returns {} on any network or parsing failure.
 
 import logging
 import os
-import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from difflib import SequenceMatcher
 
 import requests
@@ -213,42 +211,24 @@ def _is_atp_category(cat: dict) -> bool:
 def _extract_winner_odds(odds_response: dict) -> dict[str, float]:
     """Parse GET /odds/{slug} response → {player_full_name: decimal_odds}.
 
-    Looks inside groups[].markets[] for the market where:
-      - name == "Winner"  (exact, case-insensitive)
-      - specifiers == ""  (empty string — picks the plain match-winner, not
-                           set/game handicap variants which share the same name)
-
-    Outcome names from this endpoint are full player names ("Carlos Alcaraz"),
-    so no extra normalisation is needed before fuzzy matching.
+    Mirrors test.py exactly: iterates data.get("groups", []) at the top level
+    (no "fixture" wrapper), then markets[][] double-array, finds market where
+    name == "Winner" and specifiers == "".
     """
-    # /odds/{slug} returns the fixture object directly (no "fixture" wrapper)
-    fixture = odds_response.get("fixture", odds_response)
-    groups  = fixture.get("groups", [])
-
-    for group in groups:
-        # markets is a list of lists: groups[].markets[][] — iterate both levels
+    for group in odds_response.get("groups", []):
         for market_list in group.get("markets", []):
             if not isinstance(market_list, list):
                 market_list = [market_list]
             for market in market_list:
-                if market.get("status") != "active":
-                    continue
-                market_name  = (market.get("name") or "").strip()
-                market_specs = (market.get("specifiers") or "").strip()
-                if market_name.lower() != "winner" or market_specs != "":
-                    continue
-                outcomes = market.get("outcomes", [])
-                if len(outcomes) < 2:
-                    continue
-                result: dict[str, float] = {}
-                for outcome in outcomes:
-                    name  = (outcome.get("name") or "").strip()
-                    price = outcome.get("odds")
-                    if outcome.get("active") and price and name:
-                        result[name] = float(price)
-                if len(result) >= 2:
-                    return result
-
+                if market.get("name") == "Winner" and market.get("specifiers") == "":
+                    outcomes = market.get("outcomes", [])
+                    result: dict[str, float] = {
+                        o["name"]: float(o["odds"])
+                        for o in outcomes
+                        if o.get("name") and o.get("odds")
+                    }
+                    if len(result) >= 2:
+                        return result
     return {}
 
 
@@ -276,155 +256,92 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
     if not pipeline_player_names:
         return {}
 
-    # ── Cloudflare warmup ─────────────────────────────────────────────────────
-    # Cloudflare sets __cf_bm and _cfuvid cookies on the first request to the
-    # base domain. From GitHub Actions (no browser history) those cookies are
-    # absent when /odds/ is called, causing groups=[] in the response.
-    # Hitting /sports first (a lightweight endpoint) lets Cloudflare set the
-    # cookies in the shared session before any /odds/ requests go out.
-    logger.info("[stake_agent] Cloudflare warmup request to /sports")
-    _get("/sports")
-    time.sleep(1)
-
-    # ── Step 1: tennis categories ─────────────────────────────────────────────
-    data = _get("/sport/tennis/category")
-    if data is None:
-        logger.warning("[stake_agent] /sport/tennis/category unreachable — skipping Stake odds")
+    # ── Step 1: ATP tournaments (mirrors test.py exactly — hardcoded "atp" slug) ─
+    # Dynamic category discovery added overhead and a different request pattern
+    # vs test.py. Using the "atp" slug directly avoids the extra roundtrip and
+    # keeps the session cookie state identical to the working test script.
+    tour_data = _SESSION.get(f"{_BASE_URL}/sport/tennis/category/atp/tournament", timeout=_TIMEOUT)
+    if not tour_data.ok:
+        logger.warning("[stake_agent] /category/atp/tournament returned %s — skipping Stake odds", tour_data.status_code)
         return {}
 
-    raw_cats = data.get("category", []) if isinstance(data, dict) else (data or [])
-    atp_cats = [c for c in raw_cats if _is_atp_category(c)]
+    try:
+        tournaments = tour_data.json().get("tournament", [])
+    except Exception:
+        logger.warning("[stake_agent] Failed to parse tournament list")
+        return {}
 
-    if not atp_cats:
-        logger.info("[stake_agent] No ATP categories found — falling back to all tennis categories (%d)", len(raw_cats))
-        atp_cats = raw_cats  # graceful fallback: use everything
+    logger.info("[stake_agent] %d ATP tournaments found", len(tournaments))
 
-    logger.info("[stake_agent] %d ATP categories to scan", len(atp_cats))
-
-    # ── Step 2: tournaments per category → fixtures per tournament ───────────
-    # Using category → tournament → fixture drill-down captures all active
-    # tournaments simultaneously (e.g. Montecarlo + Barcelona on the same day).
-    # /category/{cat}/fixture only returns fixtures directly under the category
-    # and misses those nested inside tournament slugs.
-    candidate_fixtures: list[dict] = []
+    # ── Step 2: fixtures per singles tournament ───────────────────────────────
+    all_fixtures: list[dict] = []
     seen_slugs: set[str] = set()
 
-    def _collect_fixtures(fixtures_raw: list) -> None:
-        for fix in fixtures_raw:
-            if fix.get("status") != "active":
-                continue
-            slug: str = fix.get("slug", "")
-            if not slug or slug in seen_slugs:
-                continue
-            competitors: list[str] = fix.get("competitors", [])
-            if len(competitors) >= 2:
-                seen_slugs.add(slug)
-                candidate_fixtures.append({
-                    "slug":        slug,
-                    "competitors": competitors,
-                    "name":        fix.get("name", slug),
-                })
-
-    for cat in atp_cats:
-        cat_slug = cat.get("slug", "")
-        if not cat_slug:
+    for tour in tournaments:
+        tour_slug = tour.get("slug", "")
+        tour_name = tour.get("name", tour_slug).lower()
+        if not tour_slug:
             continue
+        # Skip doubles (mirrors test.py filter)
+        if "double" in tour_slug or "double" in tour_name:
+            logger.debug("[stake_agent] Skipping doubles: %s", tour_slug)
+            continue
+        resp = _SESSION.get(
+            f"{_BASE_URL}/sport/tennis/category/atp/tournament/{tour_slug}/fixture",
+            timeout=_TIMEOUT,
+        )
+        if not resp.ok:
+            continue
+        try:
+            fixtures = resp.json().get("fixture", [])
+        except Exception:
+            continue
+        for fix in fixtures:
+            slug = fix.get("slug", "")
+            if slug and slug not in seen_slugs:
+                seen_slugs.add(slug)
+                all_fixtures.append(fix)
 
-        # 2a. List tournaments in this category
-        tour_data = _get(f"/sport/tennis/category/{cat_slug}/tournament")
-        tournaments = []
-        if tour_data and isinstance(tour_data, dict):
-            tournaments = tour_data.get("tournament", [])
+    logger.info("[stake_agent] %d pre-match fixtures across ATP singles tournaments", len(all_fixtures))
 
-        if tournaments:
-            # 2b. Fetch fixtures for each singles tournament (skip doubles)
-            for tour in tournaments:
-                tour_slug = tour.get("slug", "")
-                if not tour_slug:
-                    continue
-                # Exclude doubles tournaments — pipeline only predicts singles
-                tour_text = f"{tour_slug} {tour.get('name', '')}".lower()
-                if "double" in tour_text or "dobles" in tour_text:
-                    logger.debug("[stake_agent] Skipping doubles tournament: %s", tour_slug)
-                    continue
-                fix_data = _get(f"/sport/tennis/category/{cat_slug}/tournament/{tour_slug}/fixture")
-                if not fix_data:
-                    continue
-                raw = fix_data.get("fixture", []) if isinstance(fix_data, dict) else (fix_data or [])
-                _collect_fixtures(raw)
-        else:
-            # Fallback: category may expose fixtures directly without tournaments
-            fix_data = _get(f"/sport/tennis/category/{cat_slug}/fixture")
-            if fix_data:
-                raw = fix_data.get("fixture", []) if isinstance(fix_data, dict) else (fix_data or [])
-                _collect_fixtures(raw)
-
-    logger.info("[stake_agent] %d pre-match fixtures found across ATP tournaments", len(candidate_fixtures))
-
-    if not candidate_fixtures:
+    if not all_fixtures:
         return {}
 
-    # ── Step 3: fuzzy-filter — only fetch odds for relevant fixtures ──────────
-    relevant: list[dict] = []
-
-    for fix in candidate_fixtures:
-        hits: dict[str, str] = {}  # stake_name → pipeline_name
-        for competitor in fix["competitors"]:
-            pipeline_name, score = _best_match(competitor, pipeline_player_names)
-            if pipeline_name and score >= _FUZZY_CUTOFF:
-                hits[competitor] = pipeline_name
-        if hits:
-            fix["hits"] = hits
-            relevant.append(fix)
-
-    logger.info("[stake_agent] %d fixtures matched pipeline players (fuzzy cutoff %.2f)", len(relevant), _FUZZY_CUTOFF)
-
-    if not relevant:
-        return {}
-
-    # ── Step 4: fetch full odds concurrently ──────────────────────────────────
-    logger.info(
-        "[stake_agent] Pipeline player names for matching: %s",
-        pipeline_player_names,
-    )
+    # ── Step 3: sequential /odds/ calls + player matching (mirrors test.py) ───
+    # ThreadPoolExecutor was triggering Cloudflare rate-limiting (groups=[]).
+    # Sequential calls with the shared session reproduce the working test.py flow.
+    logger.info("[stake_agent] Pipeline players: %s", pipeline_player_names)
     stake_odds: dict[str, float] = {}
 
-    def _fetch_odds(fix: dict) -> dict[str, float]:
-        odds_resp = _get(f"/odds/{fix['slug']}")
-        if not odds_resp:
-            return {}
-        winner_odds = _extract_winner_odds(odds_resp)
-        logger.info(
-            "[stake_agent] Fixture %r — raw outcome names from Stake: %s",
-            fix["slug"], list(winner_odds.keys()),
-        )
-        out: dict[str, float] = {}
+    for fix in all_fixtures:
+        slug = fix.get("slug", "")
+        name = fix.get("name", slug)
+        if not slug:
+            continue
+
+        resp = _SESSION.get(f"{_BASE_URL}/odds/{slug}", timeout=_TIMEOUT)
+        if not resp.ok:
+            logger.debug("[stake_agent] /odds/%s → HTTP %s", slug, resp.status_code)
+            continue
+        try:
+            data = resp.json()
+        except Exception:
+            continue
+
+        winner_odds = _extract_winner_odds(data)
+        logger.info("[stake_agent] %r — Stake outcomes: %s", name, list(winner_odds.keys()))
+
         for stake_name, price in winner_odds.items():
             pipeline_name, score = _best_match(stake_name, pipeline_player_names)
-            logger.info(
-                "[stake_agent] Match attempt: Stake=%r → pipeline=%r (score=%.3f, cutoff=%.2f, pass=%s)",
-                stake_name, pipeline_name, score, _FUZZY_CUTOFF, score >= _FUZZY_CUTOFF,
-            )
             if pipeline_name and score >= _FUZZY_CUTOFF:
-                out[pipeline_name] = price
+                stake_odds[pipeline_name] = price
                 logger.info(
                     "[stake_agent] MATCHED %r → %r (score=%.3f) @ %.3f",
                     stake_name, pipeline_name, score, price,
                 )
-        return out
-
-    max_w = min(_MAX_WORKERS, len(relevant))
-    with ThreadPoolExecutor(max_workers=max_w) as executor:
-        futures = {executor.submit(_fetch_odds, fix): fix["name"] for fix in relevant}
-        for future in as_completed(futures):
-            fixture_name = futures[future]
-            try:
-                stake_odds.update(future.result())
-            except Exception as exc:
-                logger.warning("[stake_agent] Error fetching %s: %s", fixture_name, exc)
 
     logger.info(
-        "[stake_agent] Done — Stake odds available for %d / %d pipeline players",
+        "[stake_agent] Done — Stake odds for %d / %d pipeline players",
         len(stake_odds), len(pipeline_player_names),
     )
     return stake_odds
