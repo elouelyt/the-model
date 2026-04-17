@@ -1,20 +1,22 @@
 {
-  "timestamp": "2026-04-16T19:14:49.705670+00:00",
-  "player_count": 14,
+  "timestamp": "2026-04-17T06:00:16.612814+00:00",
+  "player_count": 16,
   "odds": {
-    "Hamad Medjedovic": 1.48,
-    "Nuno Borges": 2.6,
-    "Tomas Machac": 2.35,
-    "Andrey Rublev": 1.58,
-    "Cameron Norrie": 3.1,
-    "Rafael Jodar": 1.36,
-    "Flavio Cobolli": 1.41,
-    "Vit Kopriva": 2.85,
-    "Alexander Zverev": 1.41,
-    "Francisco Cerundolo": 2.85,
-    "Joao Fonseca": 1.48,
-    "Ben Shelton": 2.6,
-    "Denis Shapovalov": 1.66,
-    "Alex Molcan": 2.19
+    "Hamad Medjedovic": 1.46,
+    "Nuno Borges": 2.65,
+    "Tomas Machac": 2.28,
+    "Andrey Rublev": 1.61,
+    "Arthur Fils": 1.9,
+    "Lorenzo Musetti": 1.87,
+    "Cameron Norrie": 3.15,
+    "Rafael Jodar": 1.35,
+    "Flavio Cobolli": 1.37,
+    "Vit Kopriva": 3.0,
+    "Alexander Zverev": 1.36,
+    "Francisco Cerundolo": 3.05,
+    "Joao Fonseca": 1.49,
+    "Ben Shelton": 2.55,
+    "Denis Shapovalov": 1.78,
+    "Alex Molcan": 2.0
   }
 }
