@@ -14,7 +14,7 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)
 
-_ATP_RANKINGS_URL = "https://www.atptour.com/en/rankings/singles"
+_ATP_RANKINGS_URL = "https://www.atptour.com/en/rankings/singles?rankRange=1-300"
 _HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
