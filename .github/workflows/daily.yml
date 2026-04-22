@@ -37,7 +37,8 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           cp index.html /tmp/index_generated.html
-          git pull --rebase origin main
+          git fetch origin main
+          git reset --hard origin/main
           cp /tmp/index_generated.html index.html
           git add index.html
           git diff --cached --quiet \
