@@ -1,14 +1,26 @@
 {
-  "timestamp": "2026-04-17T18:10:52.998111+00:00",
-  "player_count": 8,
+  "timestamp": "2026-04-22T06:00:19.097129+00:00",
+  "player_count": 20,
   "odds": {
-    "Andrey Rublev": 1.6,
-    "Hamad Medjedovic": 2.3,
-    "Rafael Jodar": 2.24,
-    "Arthur Fils": 1.63,
-    "Alexander Zverev": 1.19,
-    "Flavio Cobolli": 4.5,
-    "Alex Molcan": 2.75,
-    "Ben Shelton": 1.44
+    "Zhizhen Zhang": 1.82,
+    "Vit Kopriva": 2.04,
+    "Jenson Brooksby": 2.65,
+    "Emilio Nava": 1.51,
+    "Zizou Bergs": 1.93,
+    "Marin Cilic": 1.92,
+    "Ignacio Buse": 1.15,
+    "Adrian Mannarino": 5.8,
+    "Lorenzo Sonego": 2.15,
+    "Dusan Lajovic": 1.74,
+    "Alexandre Muller": 1.66,
+    "Jan-Lennard Struff": 2.29,
+    "Dino Prizmic": 2.27,
+    "Matteo Berrettini": 1.67,
+    "Elmer Moller": 1.68,
+    "Federico Coria": 2.2,
+    "Nikoloz Basilashvili": 2.33,
+    "Sebastian Ofner": 1.61,
+    "Roberto Bautista Agut": 2.65,
+    "Thiago Agustin Tirante": 1.49
   }
 }
