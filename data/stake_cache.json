@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-04-22T13:55:14.309948+00:00",
-  "player_count": 16,
+  "timestamp": "2026-04-22T14:04:49.424683+00:00",
+  "player_count": 14,
   "odds": {
-    "Nikoloz Basilashvili": 2.35,
+    "Nikoloz Basilashvili": 2.4,
     "Sebastian Ofner": 1.55,
     "Benjamin Bonzi": 2.23,
     "Titouan Droguet": 1.69,
@@ -15,8 +15,6 @@
     "Rafael Jodar": 1.17,
     "Jesper De Jong": 5.4,
     "Yannick Hanfmann": 1.37,
-    "Marcos Giron": 3.1,
-    "Terence Atmane": 2.25,
-    "Miomir Kecmanovic": 1.65
+    "Marcos Giron": 3.1
   }
 }
