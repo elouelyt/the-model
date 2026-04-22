@@ -36,7 +36,9 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase -X theirs origin main
+          cp index.html /tmp/index_generated.html
+          git pull --rebase origin main
+          cp /tmp/index_generated.html index.html
           git add index.html
           git diff --cached --quiet \
             && echo "No changes to commit." \
