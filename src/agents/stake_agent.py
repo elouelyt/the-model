@@ -256,47 +256,78 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
     if not pipeline_player_names:
         return {}
 
-    # ── Step 1: fetch ALL ATP fixtures via offset pagination ──────────────────
-    # /sport/tennis/category/atp/fixture returns 10 per page.
-    # ?offset=N mimics the website's "Load More" button — keeps fetching until
-    # we get an empty page or a page with no new slugs.
+    # ── Step 1: discover all tennis categories dynamically ────────────────────
+    _EXCLUDE_FRAGMENTS = frozenset({"double", "women", "wta", "female", "girl"})
+
+    def _is_singles_men(slug: str, name: str) -> bool:
+        text = f"{slug} {name}".lower()
+        return not any(frag in text for frag in _EXCLUDE_FRAGMENTS)
+
+    cat_resp = _SESSION.get(f"{_BASE_URL}/sport/tennis/category", timeout=_TIMEOUT)
+    if not cat_resp.ok:
+        logger.warning("[stake_agent] /sport/tennis/category returned %s", cat_resp.status_code)
+        return {}
+
+    try:
+        categories = cat_resp.json().get("category", [])
+    except Exception:
+        logger.warning("[stake_agent] Failed to parse category list")
+        return {}
+
+    singles_cats = [
+        c for c in categories
+        if _is_singles_men(c.get("slug", ""), c.get("name", ""))
+    ]
+    logger.info(
+        "[stake_agent] %d/%d tennis categories are men's singles: %s",
+        len(singles_cats), len(categories),
+        [c.get("slug") for c in singles_cats],
+    )
+
+    # ── Step 2: fetch fixtures for each category via offset pagination ─────────
+    # Each page returns 10 fixtures. ?offset=N mimics the "Load More" button.
     all_fixtures: list[dict] = []
     seen_slugs: set[str] = set()
 
-    for offset in range(0, 500, 10):
-        resp = _SESSION.get(
-            f"{_BASE_URL}/sport/tennis/category/atp/fixture?offset={offset}",
-            timeout=_TIMEOUT,
-        )
-        if not resp.ok:
-            logger.warning("[stake_agent] /atp/fixture?offset=%d returned %s", offset, resp.status_code)
-            break
-        try:
-            fixtures = resp.json().get("fixture", [])
-        except Exception:
-            break
-        if not fixtures:
-            break
+    for cat in singles_cats:
+        cat_slug = cat.get("slug", "")
+        if not cat_slug:
+            continue
 
-        new_count = 0
-        for fix in fixtures:
-            slug = fix.get("slug", "")
-            name = fix.get("name", "").lower()
-            if not slug or slug in seen_slugs:
-                continue
-            # Skip doubles
-            if "double" in slug or "double" in name or " / " in fix.get("name", ""):
-                logger.debug("[stake_agent] Skipping doubles: %s", slug)
-                continue
-            seen_slugs.add(slug)
-            all_fixtures.append(fix)
-            new_count += 1
+        for offset in range(0, 500, 10):
+            resp = _SESSION.get(
+                f"{_BASE_URL}/sport/tennis/category/{cat_slug}/fixture?offset={offset}",
+                timeout=_TIMEOUT,
+            )
+            if not resp.ok:
+                break
+            try:
+                fixtures = resp.json().get("fixture", [])
+            except Exception:
+                break
+            if not fixtures:
+                break
 
-        logger.debug("[stake_agent] offset=%d: %d fixtures, %d new singles", offset, len(fixtures), new_count)
-        if new_count == 0:
-            break  # No new singles fixtures — done
+            new_count = 0
+            for fix in fixtures:
+                slug = fix.get("slug", "")
+                fix_name = fix.get("name", "")
+                if not slug or slug in seen_slugs:
+                    continue
+                # Skip doubles fixtures (players separated by " / ")
+                if " / " in fix_name:
+                    continue
+                fix_text = f"{slug} {fix_name}".lower()
+                if any(frag in fix_text for frag in _EXCLUDE_FRAGMENTS):
+                    continue
+                seen_slugs.add(slug)
+                all_fixtures.append(fix)
+                new_count += 1
 
-    logger.info("[stake_agent] %d pre-match singles fixtures fetched (offset pagination)", len(all_fixtures))
+            if new_count == 0:
+                break  # No new fixtures on this page — move to next category
+
+    logger.info("[stake_agent] %d pre-match men's singles fixtures across all categories", len(all_fixtures))
 
     if not all_fixtures:
         return {}
