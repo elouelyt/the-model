@@ -81,6 +81,13 @@ def build_safe_parlays(picks: list[dict]) -> list[dict]:
             if len({p["match_id"] for p in combo}) < len(combo):
                 continue
 
+            # Skip combos where any leg has a Stake price below 1.17
+            if any(
+                p["stake_price"] is not None and p["stake_price"] < 1.17
+                for p in combo
+            ):
+                continue
+
             total_odds = math.prod(
                 p["stake_price"] if p["stake_price"] is not None else p["best_price"]
                 for p in combo

@@ -19,9 +19,10 @@ from itertools import combinations
 
 logger = logging.getLogger(__name__)
 
-_MIN_ODDS = 1.65
-_MAX_ODDS = 1.85
-_TOP_N    = 5
+_MIN_ODDS        = 1.65
+_MAX_ODDS        = 1.85
+_TOP_N           = 5
+_MIN_STAKE_PRICE = 1.17   # exclude legs with Stake odds below this threshold
 
 
 # ── Pick extraction ────────────────────────────────────────────────────────────
@@ -75,6 +76,13 @@ def build_parlays(picks: list[dict]) -> list[dict]:
             # No two picks from the same match
             match_ids = [p["match_id"] for p in combo]
             if len(set(match_ids)) < len(match_ids):
+                continue
+
+            # Skip combos where any leg has a Stake price below the minimum
+            if any(
+                p["stake_price"] is not None and p["stake_price"] < _MIN_STAKE_PRICE
+                for p in combo
+            ):
                 continue
 
             total_odds = math.prod(p["best_price"] for p in combo)
