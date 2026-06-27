@@ -45,26 +45,29 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
             if not eligible:
                 continue
             bk = p.get("bookmakers", [])
-            best_price = (
-                max(b["price"] for b in bk)
-                if bk
-                else round(1.0 / p["raw_implied"], 4)
-            )
+            if bk:
+                best_bk = max(bk, key=lambda b: b["price"])
+                best_price = best_bk["price"]
+                best_bookmaker = best_bk.get("bookmaker_title", "")
+            else:
+                best_price = round(1.0 / p["raw_implied"], 4)
+                best_bookmaker = ""
             picks.append({
-                "player":      p["player"],
-                "rank":        p["rank"],
-                "points":      p["points"],
-                "model_prob":  p["model_prob"],
-                "raw_implied": p["raw_implied"],
-                "edge":        p["edge"],
-                "signal":      p["signal"],
-                "surface":     match.get("surface", "hard"),
-                "h2h":         match.get("h2h", {}),
-                "sentiment":   p.get("sentiment", {}),
-                "best_price":  best_price,
-                "stake_price": p.get("stake_price"),  # None if Stake not available
-                "match_id":    f"{match['home']}|{match['away']}",
-                "opponent":    match["away"] if p["player"] == match["home"] else match["home"],
+                "player":         p["player"],
+                "rank":           p["rank"],
+                "points":         p["points"],
+                "model_prob":     p["model_prob"],
+                "raw_implied":    p["raw_implied"],
+                "edge":           p["edge"],
+                "signal":         p["signal"],
+                "surface":        match.get("surface", "hard"),
+                "h2h":            match.get("h2h", {}),
+                "sentiment":      p.get("sentiment", {}),
+                "best_price":     best_price,
+                "best_bookmaker": best_bookmaker,
+                "stake_price":    p.get("stake_price"),
+                "match_id":       f"{match['home']}|{match['away']}",
+                "opponent":       match["away"] if p["player"] == match["home"] else match["home"],
             })
     return picks
 

@@ -386,6 +386,8 @@ def _parlays_html(parlays: list[dict]) -> str:
             sent_flag = sent.get("flag", "neutral") if sent else "neutral"
             sent_icon = "↑" if sent_flag == "positive" else ("⚠" if sent_flag == "concern" else "")
             sent_color = "#10b981" if sent_flag == "positive" else ("#f87171" if sent_flag == "concern" else "")
+            bk_name = p.get("best_bookmaker", "")
+            bk_html = f'&nbsp;<span style="color:#f97316;font-size:10px;opacity:0.8;">@ {bk_name}</span>' if bk_name and bk_name != "Stake" else ""
             picks_html += f"""
                 <div class="parlay-pick">
                     <span class="parlay-pick-name">{p['player']}</span>
@@ -393,7 +395,7 @@ def _parlays_html(parlays: list[dict]) -> str:
                         #{p['rank']} &nbsp;·&nbsp;
                         <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
                         {p['model_prob']:.0%} model &nbsp;·&nbsp;
-                        {p['best_price']:.2f}
+                        {p['best_price']:.2f}{bk_html}
                         {f'&nbsp;<span style="color:#00a86b;font-weight:700;">S {p["stake_price"]:.2f}</span>' if p.get("stake_price") else ""}
                         {f'&nbsp;<span style="color:{sent_color};font-size:10px;">{sent_icon}</span>' if sent_icon else ""}
                     </span>
@@ -474,6 +476,8 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
             sent_flag = sent.get("flag", "neutral") if sent else "neutral"
             sent_icon = "↑" if sent_flag == "positive" else ("⚠" if sent_flag == "concern" else "")
             sent_color = "#10b981" if sent_flag == "positive" else ("#f87171" if sent_flag == "concern" else "")
+            bk_name = p.get("best_bookmaker", "")
+            bk_html = f'&nbsp;<span style="color:#f97316;font-size:10px;opacity:0.8;">@ {bk_name}</span>' if bk_name and bk_name != "Stake" else ""
             picks_html += f"""
                 <div class="parlay-pick">
                     <span class="parlay-pick-name">{p['player']}</span>
@@ -481,7 +485,7 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
                         #{p['rank']} &nbsp;·&nbsp;
                         <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
                         {p['raw_implied']:.0%} mkt &nbsp;·&nbsp;
-                        {p['best_price']:.2f}
+                        {p['best_price']:.2f}{bk_html}
                         {f'&nbsp;<span style="color:#00a86b;font-weight:700;">S {p["stake_price"]:.2f}</span>' if p.get("stake_price") else ""}
                         {f'&nbsp;<span style="color:{sent_color};font-size:10px;">{sent_icon}</span>' if sent_icon else ""}
                     </span>
