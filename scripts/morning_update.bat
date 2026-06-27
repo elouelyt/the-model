@@ -28,6 +28,14 @@ if %ERRORLEVEL% neq 0 (
     echo stake_update.py OK >> "%LOG_FILE%"
 )
 
+echo Running rankings_update.py... >> "%LOG_FILE%"
+python scripts\rankings_update.py >> "%LOG_FILE%" 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo [WARN] rankings_update.py exited with code %ERRORLEVEL% >> "%LOG_FILE%"
+) else (
+    echo rankings_update.py OK >> "%LOG_FILE%"
+)
+
 echo Triggering Daily Predictions workflow... >> "%LOG_FILE%"
 gh workflow run "Daily Predictions" --repo elouelyt/the-model >> "%LOG_FILE%" 2>&1
 if %ERRORLEVEL% neq 0 (

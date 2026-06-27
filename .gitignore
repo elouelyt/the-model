@@ -20,3 +20,5 @@ venv/
 !models/*.json
 # Exception: Stake odds cache (populated locally with VPN, read by GitHub Actions)
 !data/stake_cache.json
+# Exception: ATP rankings cache (populated locally weekly, read by GitHub Actions)
+!data/rankings_cache.json
