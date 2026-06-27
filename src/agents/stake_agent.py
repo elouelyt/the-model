@@ -256,53 +256,47 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
     if not pipeline_player_names:
         return {}
 
-    # ── Step 1: ATP tournaments (mirrors test.py exactly — hardcoded "atp" slug) ─
-    # Dynamic category discovery added overhead and a different request pattern
-    # vs test.py. Using the "atp" slug directly avoids the extra roundtrip and
-    # keeps the session cookie state identical to the working test script.
-    tour_data = _SESSION.get(f"{_BASE_URL}/sport/tennis/category/atp/tournament", timeout=_TIMEOUT)
-    if not tour_data.ok:
-        logger.warning("[stake_agent] /category/atp/tournament returned %s — skipping Stake odds", tour_data.status_code)
-        return {}
-
-    try:
-        tournaments = tour_data.json().get("tournament", [])
-    except Exception:
-        logger.warning("[stake_agent] Failed to parse tournament list")
-        return {}
-
-    logger.info("[stake_agent] %d ATP tournaments found", len(tournaments))
-
-    # ── Step 2: fixtures per singles tournament ───────────────────────────────
+    # ── Step 1: fetch ALL ATP fixtures via offset pagination ──────────────────
+    # /sport/tennis/category/atp/fixture returns 10 per page.
+    # ?offset=N mimics the website's "Load More" button — keeps fetching until
+    # we get an empty page or a page with no new slugs.
     all_fixtures: list[dict] = []
     seen_slugs: set[str] = set()
 
-    for tour in tournaments:
-        tour_slug = tour.get("slug", "")
-        tour_name = tour.get("name", tour_slug).lower()
-        if not tour_slug:
-            continue
-        # Skip doubles (mirrors test.py filter)
-        if "double" in tour_slug or "double" in tour_name:
-            logger.debug("[stake_agent] Skipping doubles: %s", tour_slug)
-            continue
+    for offset in range(0, 500, 10):
         resp = _SESSION.get(
-            f"{_BASE_URL}/sport/tennis/category/atp/tournament/{tour_slug}/fixture",
+            f"{_BASE_URL}/sport/tennis/category/atp/fixture?offset={offset}",
             timeout=_TIMEOUT,
         )
         if not resp.ok:
-            continue
+            logger.warning("[stake_agent] /atp/fixture?offset=%d returned %s", offset, resp.status_code)
+            break
         try:
             fixtures = resp.json().get("fixture", [])
         except Exception:
-            continue
+            break
+        if not fixtures:
+            break
+
+        new_count = 0
         for fix in fixtures:
             slug = fix.get("slug", "")
-            if slug and slug not in seen_slugs:
-                seen_slugs.add(slug)
-                all_fixtures.append(fix)
+            name = fix.get("name", "").lower()
+            if not slug or slug in seen_slugs:
+                continue
+            # Skip doubles
+            if "double" in slug or "double" in name or " / " in fix.get("name", ""):
+                logger.debug("[stake_agent] Skipping doubles: %s", slug)
+                continue
+            seen_slugs.add(slug)
+            all_fixtures.append(fix)
+            new_count += 1
 
-    logger.info("[stake_agent] %d pre-match fixtures across ATP singles tournaments", len(all_fixtures))
+        logger.debug("[stake_agent] offset=%d: %d fixtures, %d new singles", offset, len(fixtures), new_count)
+        if new_count == 0:
+            break  # No new singles fixtures — done
+
+    logger.info("[stake_agent] %d pre-match singles fixtures fetched (offset pagination)", len(all_fixtures))
 
     if not all_fixtures:
         return {}
