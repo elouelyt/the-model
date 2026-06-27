@@ -1,8 +1,28 @@
 {
-  "timestamp": "2026-05-03T06:00:09.709961+00:00",
-  "player_count": 2,
+  "timestamp": "2026-06-27T21:11:22.572933+00:00",
+  "player_count": 22,
   "odds": {
-    "Jannik Sinner": 1.17,
-    "Alexander Zverev": 5.0
+    "Aleksandar Vukic": 2.8,
+    "Jenson Brooksby": 1.43,
+    "Shintaro Mochizuki": 1.42,
+    "Max Basing": 2.8,
+    "Rafael Jodar": 1.19,
+    "Felix Gill": 4.5,
+    "Aleksandar Kovacevic": 2.38,
+    "Botic van de Zandschulp": 1.56,
+    "Marco Trungelliti": 3.75,
+    "Martin Damm Jr.": 1.26,
+    "Denis Shapovalov": 1.28,
+    "Pablo Carreno Busta": 3.55,
+    "Dalibor Svrcina": 6.2,
+    "Learner Tien": 1.11,
+    "Luca Van Assche": 2.9,
+    "Marton Fucsovics": 1.4,
+    "Emilio Nava": 2.18,
+    "Ignacio Buse": 1.66,
+    "Andrey Rublev": 1.49,
+    "Roman Safiullin": 2.55,
+    "Zizou Bergs": 3.35,
+    "Ugo Humbert": 1.3
   }
 }
