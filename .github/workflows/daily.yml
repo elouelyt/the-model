@@ -44,4 +44,4 @@ jobs:
           git diff --cached --quiet \
             && echo "No changes to commit." \
             || git commit -m "chore: update predictions $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
-          git push
+          git push --force-with-lease
