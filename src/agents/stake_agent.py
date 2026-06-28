@@ -257,7 +257,7 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
         return {}
 
     # ── Step 1: discover all tennis categories dynamically ────────────────────
-    _EXCLUDE_FRAGMENTS = frozenset({"double", "women", "wta", "female", "girl"})
+    _EXCLUDE_FRAGMENTS = frozenset({"double", "women", "wta", "female", "girl", "simulated", "simulated-reality", "srl", "virtual"})
 
     def _is_singles_men(slug: str, name: str) -> bool:
         text = f"{slug} {name}".lower()
