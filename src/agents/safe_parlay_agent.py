@@ -37,6 +37,7 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
     for match in results:
         if "error" in match or not match.get("players"):
             continue
+        players_in_match = {q["player"]: q.get("rank") for q in match["players"]}
         for p in match["players"]:
             stake_implied = (1.0 / p["stake_price"]) if p.get("stake_price") else None
             eligible = p["raw_implied"] > _MIN_IMPLIED or (
@@ -52,6 +53,7 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
             else:
                 best_price = round(1.0 / p["raw_implied"], 4)
                 best_bookmaker = ""
+            opponent = match["away"] if p["player"] == match["home"] else match["home"]
             picks.append({
                 "player":         p["player"],
                 "rank":           p["rank"],
@@ -67,7 +69,8 @@ def extract_safe_picks(results: list[dict]) -> list[dict]:
                 "best_bookmaker": best_bookmaker,
                 "stake_price":    p.get("stake_price"),
                 "match_id":       f"{match['home']}|{match['away']}",
-                "opponent":       match["away"] if p["player"] == match["home"] else match["home"],
+                "opponent":       opponent,
+                "opponent_rank":  players_in_match.get(opponent),
             })
     return picks
 

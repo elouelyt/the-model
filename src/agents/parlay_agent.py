@@ -33,6 +33,7 @@ def extract_eligible_picks(results: list[dict]) -> list[dict]:
     for match in results:
         if "error" in match or not match.get("players"):
             continue
+        players_in_match = {q["player"]: q.get("rank") for q in match["players"]}
         for p in match["players"]:
             if p["model_prob"] <= 0.60 or p["raw_implied"] <= 0.60:
                 continue
@@ -44,6 +45,7 @@ def extract_eligible_picks(results: list[dict]) -> list[dict]:
             else:
                 best_price = round(1.0 / p["raw_implied"], 4)
                 best_bookmaker = ""
+            opponent = match["away"] if p["player"] == match["home"] else match["home"]
             picks.append({
                 "player":          p["player"],
                 "rank":            p["rank"],
@@ -60,7 +62,8 @@ def extract_eligible_picks(results: list[dict]) -> list[dict]:
                 "stake_price":     p.get("stake_price"),
                 "confidence":      round((p["model_prob"] + p["raw_implied"]) / 2, 4),
                 "match_id":        f"{match['home']}|{match['away']}",
-                "opponent":        match["away"] if p["player"] == match["home"] else match["home"],
+                "opponent":        opponent,
+                "opponent_rank":   players_in_match.get(opponent),
             })
     return picks
 
