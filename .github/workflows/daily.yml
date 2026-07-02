@@ -45,7 +45,9 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           cp /tmp/index_generated.html index.html
-          git add index.html data/predictions/ data/track_record.json || true
+          git add index.html || true
+          git add data/predictions/ || true
+          git add data/track_record.json || true
           git diff --cached --quiet \
             && echo "No changes to commit." \
             || git commit -m "chore: update predictions $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
