@@ -1,0 +1,85 @@
+{
+  "date": "2026-07-02",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Joao Fonseca",
+          "rank": 27
+        },
+        {
+          "player": "Felix Auger-Aliassime",
+          "rank": 4
+        }
+      ],
+      "stake_total_odds": 1.569,
+      "total_odds": 1.658,
+      "cum_prob": 0.6135,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Felix Auger-Aliassime",
+          "rank": 4
+        },
+        {
+          "player": "Jiri Lehecka",
+          "rank": 14
+        }
+      ],
+      "stake_total_odds": 1.546,
+      "total_odds": 1.658,
+      "cum_prob": 0.5904,
+      "rating": 5
+    },
+    {
+      "picks": [
+        {
+          "player": "Joao Fonseca",
+          "rank": 27
+        },
+        {
+          "player": "Rafael Jodar",
+          "rank": 26
+        }
+      ],
+      "stake_total_odds": 1.756,
+      "total_odds": 1.836,
+      "cum_prob": 0.5418,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Rafael Jodar",
+          "rank": 26
+        },
+        {
+          "player": "Jiri Lehecka",
+          "rank": 14
+        }
+      ],
+      "stake_total_odds": 1.729,
+      "total_odds": 1.836,
+      "cum_prob": 0.5214,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Rafael Jodar",
+          "rank": 26
+        },
+        {
+          "player": "Alejandro Davidovich Fokina",
+          "rank": 25
+        }
+      ],
+      "stake_total_odds": 1.716,
+      "total_odds": 1.796,
+      "cum_prob": 0.5269,
+      "rating": 3
+    }
+  ]
+}
