@@ -26,13 +26,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-generate.txt
 
+      - name: Check yesterday's results
+        env:
+          THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+        run: python scripts/check_results.py
+
       - name: Run prediction pipeline
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python generate_html.py
 
-      - name: Commit and push index.html
+      - name: Commit and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -40,7 +45,7 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           cp /tmp/index_generated.html index.html
-          git add index.html
+          git add index.html data/predictions/ data/track_record.json || true
           git diff --cached --quiet \
             && echo "No changes to commit." \
             || git commit -m "chore: update predictions $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"

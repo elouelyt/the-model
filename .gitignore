@@ -22,3 +22,7 @@ venv/
 !data/stake_cache.json
 # Exception: ATP rankings cache (populated locally weekly, read by GitHub Actions)
 !data/rankings_cache.json
+# Exception: daily predictions and track record (written by GitHub Actions)
+!data/track_record.json
+!data/predictions/
+!data/predictions/*.json

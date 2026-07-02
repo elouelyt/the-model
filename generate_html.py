@@ -7,6 +7,7 @@ Usage:
     python generate_html.py
 """
 
+import json
 import logging
 import os
 import sys
@@ -543,9 +544,132 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
     </details>"""
 
 
+def _track_record_html(track_record: dict) -> str:
+    """Generate monthly track record table."""
+    if not track_record or not track_record.get("months"):
+        return ""
+
+    # Current month
+    now = datetime.now(timezone.utc)
+    month_str = now.strftime("%Y-%m")
+    month_data = track_record["months"].get(month_str, {})
+    days = month_data.get("days", {})
+
+    if not days:
+        return ""
+
+    stake_per_bet = 15.0
+    rows_html = ""
+    total_won = 0
+    total_lost_eur = 0.0
+    total_won_eur = 0.0
+
+    for day_num in range(1, 32):
+        day_key = str(day_num)
+        day_data = days.get(day_key)
+        if not day_data:
+            rows_html += f'<tr class="tr-empty"><td>{day_num}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>'
+            continue
+
+        parlays_day = day_data.get("parlays", [])
+        won_count = sum(1 for p in parlays_day if p.get("won") is True)
+        lost_count = sum(1 for p in parlays_day if p.get("won") is False)
+        pending = sum(1 for p in parlays_day if p.get("won") is None)
+
+        day_won_eur = sum(
+            stake_per_bet * (p.get("stake_odds") or p.get("best_odds") or 1) - stake_per_bet
+            for p in parlays_day if p.get("won") is True
+        )
+        day_lost_eur = lost_count * stake_per_bet
+
+        total_won += won_count
+        total_won_eur += day_won_eur
+        total_lost_eur += day_lost_eur
+
+        roi_day = day_won_eur - day_lost_eur
+        roi_color = "#10b981" if roi_day >= 0 else "#f87171"
+        pending_badge = f' <span style="color:var(--muted);font-size:10px;">+{pending} pend.</span>' if pending else ""
+
+        # Dropdown with parlay detail
+        detail_rows = ""
+        for i, p in enumerate(parlays_day, 1):
+            legs = ", ".join(p.get("legs", []))
+            odds = p.get("stake_odds") or p.get("best_odds")
+            odds_str = f"{odds:.2f}" if odds else "—"
+            if p.get("won") is True:
+                result_badge = '<span style="color:#10b981;font-weight:700;">✓ WON</span>'
+            elif p.get("won") is False:
+                result_badge = '<span style="color:#f87171;font-weight:700;">✗ LOST</span>'
+            else:
+                result_badge = '<span style="color:var(--muted);">pending</span>'
+            detail_rows += f'<tr><td style="color:var(--muted);font-size:11px;">#{i}</td><td style="font-size:11px;">{legs}</td><td style="font-size:11px;">{odds_str}</td><td>{result_badge}</td></tr>'
+
+        detail_html = f"""
+        <details style="margin:0;">
+            <summary style="cursor:pointer;list-style:none;color:var(--accent);">▸ {won_count}/{len(parlays_day)}{pending_badge}</summary>
+            <table style="margin-top:6px;width:100%;font-size:11px;">
+                <thead><tr><th>#</th><th>Parlay</th><th>Cuota</th><th>Resultado</th></tr></thead>
+                <tbody>{detail_rows}</tbody>
+            </table>
+        </details>"""
+
+        rows_html += f"""<tr>
+            <td style="font-weight:600;">{day_num}</td>
+            <td>{detail_html}</td>
+            <td style="color:var(--muted);">75€</td>
+            <td style="color:#10b981;">+{total_won_eur:.2f}€</td>
+            <td style="color:#f87171;">-{total_lost_eur:.2f}€</td>
+            <td style="color:{roi_color};font-weight:700;">{roi_day:+.2f}€</td>
+        </tr>"""
+
+    net = total_won_eur - total_lost_eur
+    net_color = "#10b981" if net >= 0 else "#f87171"
+    total_apostado = sum(
+        len(days[d].get("parlays", [])) * stake_per_bet
+        for d in days if days[d].get("parlays")
+    )
+    roi_pct = (net / total_apostado * 100) if total_apostado > 0 else 0.0
+
+    month_label = now.strftime("%B %Y")
+    return f"""
+<details class="parlays-section" style="margin-top:8px;">
+  <summary class="parlays-summary">
+    <span class="parlays-title">📊 Track Record — {month_label}</span>
+    <span class="parlays-count" style="color:{net_color};">{net:+.2f}€ ROI {roi_pct:+.1f}%</span>
+    <span class="parlays-chevron">▸</span>
+  </summary>
+  <div style="padding:12px 0;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="color:var(--muted);text-align:left;border-bottom:1px solid var(--border);">
+          <th style="padding:6px 8px;">Día</th>
+          <th style="padding:6px 8px;">Ganadas</th>
+          <th style="padding:6px 8px;">Apostado</th>
+          <th style="padding:6px 8px;">Llevamos ganados</th>
+          <th style="padding:6px 8px;">Llevamos perdidos</th>
+          <th style="padding:6px 8px;">ROI día</th>
+        </tr>
+      </thead>
+      <tbody>{rows_html}</tbody>
+      <tfoot>
+        <tr style="border-top:1px solid var(--border);font-weight:700;">
+          <td style="padding:8px;">TOTAL</td>
+          <td></td>
+          <td style="color:var(--muted);">{total_apostado:.0f}€</td>
+          <td style="color:#10b981;">+{total_won_eur:.2f}€</td>
+          <td style="color:#f87171;">-{total_lost_eur:.2f}€</td>
+          <td style="color:{net_color};">{net:+.2f}€ ({roi_pct:+.1f}%)</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</details>"""
+
+
 def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
                   safe_parlays: list[dict] | None = None,
-                  error: str | None = None) -> str:
+                  error: str | None = None,
+                  track_record: dict | None = None) -> str:
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     parlays = parlays or []
     safe_parlays = safe_parlays or []
@@ -580,6 +704,8 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         parlays_html = _parlays_html(parlays)
         safe_parlays_html = _safe_parlays_html(safe_parlays)
         content = "\n".join(_match_card_html(m) for m in results)
+
+    track_record_html = _track_record_html(track_record or {})
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -1345,6 +1471,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
   {summary_html}
   {parlays_html}
   {safe_parlays_html}
+  {track_record_html}
   {content}
 </main>
 
@@ -1376,10 +1503,47 @@ def main() -> None:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
 
-    html = generate_html(results, parlays=parlays, safe_parlays=safe_parlays, error=error)
+    # Save today's predictions for track record
+    if parlays:
+        _save_predictions(parlays)
+
+    track_record = _load_track_record()
+    html = generate_html(results, parlays=parlays, safe_parlays=safe_parlays, error=error, track_record=track_record)
     out = Path("index.html")
     out.write_text(html, encoding="utf-8")
     logger.info("Written %s (%d bytes)", out, len(html))
+
+
+def _save_predictions(parlays: list[dict]) -> None:
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    preds_dir = Path("data/predictions")
+    preds_dir.mkdir(parents=True, exist_ok=True)
+    pred_file = preds_dir / f"{today}.json"
+    payload = {
+        "date": today,
+        "parlays": [
+            {
+                "picks": [{"player": p["player"], "rank": p["rank"]} for p in parl["picks"]],
+                "stake_total_odds": parl.get("stake_total_odds"),
+                "total_odds": parl.get("total_odds"),
+                "cum_prob": parl.get("cum_prob"),
+                "rating": parl.get("rating"),
+            }
+            for parl in parlays
+        ],
+    }
+    pred_file.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    logger.info("Saved predictions to %s", pred_file)
+
+
+def _load_track_record() -> dict:
+    track_file = Path("data/track_record.json")
+    if track_file.exists():
+        try:
+            return json.loads(track_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"months": {}}
 
 
 if __name__ == "__main__":
