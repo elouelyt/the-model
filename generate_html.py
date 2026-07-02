@@ -1508,6 +1508,8 @@ def main() -> None:
         _save_predictions(parlays)
 
     track_record = _load_track_record()
+    if parlays:
+        _inject_today(track_record, parlays)
     html = generate_html(results, parlays=parlays, safe_parlays=safe_parlays, error=error, track_record=track_record)
     out = Path("index.html")
     out.write_text(html, encoding="utf-8")
@@ -1544,6 +1546,34 @@ def _load_track_record() -> dict:
         except Exception:
             pass
     return {"months": {}}
+
+
+def _inject_today(track_record: dict, parlays: list[dict]) -> None:
+    """Add today's parlays as pending entries in the track record."""
+    now = datetime.now(timezone.utc)
+    month_str = now.strftime("%Y-%m")
+    day_key = str(now.day)
+
+    track_record.setdefault("months", {}).setdefault(month_str, {"days": {}})
+    month = track_record["months"][month_str]
+
+    # Only inject if not already resolved
+    existing = month["days"].get(day_key, {})
+    if existing.get("resolved"):
+        return
+
+    month["days"][day_key] = {
+        "parlays": [
+            {
+                "legs": [p["player"] for p in parl["picks"]],
+                "stake_odds": parl.get("stake_total_odds"),
+                "best_odds":  parl.get("total_odds"),
+                "won": None,
+            }
+            for parl in parlays
+        ],
+        "resolved": False,
+    }
 
 
 if __name__ == "__main__":
