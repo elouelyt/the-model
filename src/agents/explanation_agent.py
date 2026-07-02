@@ -138,6 +138,7 @@ def generate_match_explanations(
                 response_mime_type="application/json",
                 temperature=0.4,
                 max_output_tokens=300,
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
 

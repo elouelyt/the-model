@@ -196,6 +196,7 @@ def _rate_with_gemini(parlay: dict) -> dict:
                 response_mime_type="application/json",
                 temperature=0.3,
                 max_output_tokens=200,
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
         raw = response.text or ""
