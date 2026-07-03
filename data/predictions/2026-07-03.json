@@ -1,0 +1,53 @@
+{
+  "date": "2026-07-03",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Rafael Jodar",
+          "rank": 26
+        },
+        {
+          "player": "Alejandro Davidovich Fokina",
+          "rank": 25
+        }
+      ],
+      "stake_total_odds": 1.69,
+      "total_odds": 1.755,
+      "cum_prob": 0.5387,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Rafael Jodar",
+          "rank": 26
+        },
+        {
+          "player": "Jiri Lehecka",
+          "rank": 14
+        }
+      ],
+      "stake_total_odds": 1.742,
+      "total_odds": 1.836,
+      "cum_prob": 0.5203,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Jiri Lehecka",
+          "rank": 14
+        },
+        {
+          "player": "Alejandro Davidovich Fokina",
+          "rank": 25
+        }
+      ],
+      "stake_total_odds": 1.69,
+      "total_odds": 1.795,
+      "cum_prob": 0.4963,
+      "rating": 4
+    }
+  ]
+}
