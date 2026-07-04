@@ -1,0 +1,21 @@
+{
+  "date": "2026-07-04",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Taylor Fritz",
+          "rank": 7
+        },
+        {
+          "player": "Felix Auger-Aliassime",
+          "rank": 4
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 1.74,
+      "cum_prob": 0.5721,
+      "rating": 6
+    }
+  ]
+}
