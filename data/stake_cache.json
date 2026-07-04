@@ -1,24 +1,18 @@
 {
-  "timestamp": "2026-07-03T16:00:21.221546+00:00",
-  "player_count": 18,
+  "timestamp": "2026-07-04T16:00:16.646279+00:00",
+  "player_count": 12,
   "odds": {
-    "Felix Auger-Aliassime": 1.18,
-    "Michael Zheng": 5.2,
-    "Jiri Lehecka": 1.29,
-    "Jaume Munar": 3.6,
-    "Frances Tiafoe": 1.81,
-    "Alexander Bublik": 2.01,
-    "Zizou Bergs": 1.75,
-    "Arthur Fery": 2.1,
-    "Alex de Minaur": 1.17,
-    "Zachary Svajda": 5.2,
-    "Grigor Dimitrov": 2.12,
-    "Matteo Berrettini": 1.73,
-    "Marcos Giron": 9.6,
-    "Alexander Zverev": 1.06,
-    "Taylor Fritz": 1.13,
-    "Lorenzo Sonego": 6.0,
-    "Karen Khachanov": 1.66,
-    "Flavio Cobolli": 2.23
+    "Frances Tiafoe": 1.87,
+    "Alexander Bublik": 1.97,
+    "Grigor Dimitrov": 2.27,
+    "Matteo Berrettini": 1.67,
+    "Roman Safiullin": 4.7,
+    "Novak Djokovic": 1.2,
+    "Hubert Hurkacz": 1.29,
+    "Jan-Lennard Struff": 3.6,
+    "Felix Auger-Aliassime": 1.49,
+    "Alejandro Davidovich Fokina": 2.65,
+    "Jannik Sinner": 1.01,
+    "Shintaro Mochizuki": 16.0
   }
 }
