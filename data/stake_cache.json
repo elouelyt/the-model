@@ -1,18 +1,16 @@
 {
-  "timestamp": "2026-07-04T16:00:16.646279+00:00",
-  "player_count": 12,
+  "timestamp": "2026-07-05T16:00:55.941577+00:00",
+  "player_count": 10,
   "odds": {
-    "Frances Tiafoe": 1.87,
-    "Alexander Bublik": 1.97,
-    "Grigor Dimitrov": 2.27,
-    "Matteo Berrettini": 1.67,
-    "Roman Safiullin": 4.7,
-    "Novak Djokovic": 1.2,
-    "Hubert Hurkacz": 1.29,
-    "Jan-Lennard Struff": 3.6,
-    "Felix Auger-Aliassime": 1.49,
-    "Alejandro Davidovich Fokina": 2.65,
     "Jannik Sinner": 1.01,
-    "Shintaro Mochizuki": 16.0
+    "Shintaro Mochizuki": 18.0,
+    "Alex de Minaur": 1.25,
+    "Flavio Cobolli": 4.0,
+    "Grigor Dimitrov": 1.47,
+    "Arthur Fery": 2.7,
+    "Taylor Fritz": 1.46,
+    "Alexander Bublik": 2.7,
+    "Jiri Lehecka": 3.5,
+    "Alexander Zverev": 1.31
   }
 }
