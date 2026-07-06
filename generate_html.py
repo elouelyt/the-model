@@ -1600,6 +1600,40 @@ def _inject_all_predictions(track_record: dict) -> None:
             "resolved": False,
         }
 
+    # Second pass: inherit results for duplicate parlays (same legs on consecutive days due to stale API data)
+    _inherit_duplicate_results(track_record)
+
+
+def _inherit_duplicate_results(track_record: dict) -> None:
+    """If an unresolved parlay's legs match a resolved parlay from any other day, inherit its result."""
+    months = track_record.get("months", {})
+    # Build index of resolved legs → result
+    resolved_index: dict[frozenset, bool | None] = {}
+    for month_data in months.values():
+        for day_data in month_data.get("days", {}).values():
+            if not day_data.get("resolved"):
+                continue
+            for parl in day_data.get("parlays", []):
+                if parl.get("won") is not None:
+                    key = frozenset(parl["legs"])
+                    resolved_index[key] = parl["won"]
+
+    # Apply inherited results to unresolved days
+    for month_data in months.values():
+        for day_data in month_data.get("days", {}).values():
+            if day_data.get("resolved"):
+                continue
+            all_resolved = True
+            for parl in day_data.get("parlays", []):
+                if parl.get("won") is None:
+                    key = frozenset(parl["legs"])
+                    if key in resolved_index:
+                        parl["won"] = resolved_index[key]
+                if parl.get("won") is None:
+                    all_resolved = False
+            if all_resolved and day_data.get("parlays"):
+                day_data["resolved"] = True
+
 
 if __name__ == "__main__":
     main()
