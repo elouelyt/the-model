@@ -1521,6 +1521,9 @@ def _save_predictions(parlays: list[dict]) -> None:
     preds_dir = Path("data/predictions")
     preds_dir.mkdir(parents=True, exist_ok=True)
     pred_file = preds_dir / f"{today}.json"
+    if pred_file.exists():
+        logger.info("Predictions for %s already saved — skipping overwrite", today)
+        return
     payload = {
         "date": today,
         "parlays": [

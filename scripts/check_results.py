@@ -43,7 +43,24 @@ def _match_player(name: str, candidates: list[str], cutoff: float = 0.75) -> str
     return best if score >= cutoff else None
 
 
-def fetch_scores(sport_key: str, days_from: int = 1) -> list[dict]:
+def _discover_active_atp_sport_keys() -> list[str]:
+    """Return active ATP sport keys from The-Odds-API (same logic as extract_odds.py)."""
+    try:
+        r = requests.get(
+            "https://api.the-odds-api.com/v4/sports/",
+            params={"apiKey": _API_KEY, "all": "false"},
+            timeout=15,
+        )
+        r.raise_for_status()
+        keys = [s["key"] for s in r.json() if s.get("key", "").startswith("tennis_atp_")]
+        logger.info("Active ATP sport keys: %s", keys)
+        return keys
+    except Exception as exc:
+        logger.warning("Failed to discover sport keys: %s", exc)
+        return ["tennis_atp_wimbledon"]
+
+
+def fetch_scores(sport_key: str, days_from: int = 3) -> list[dict]:
     """Fetch completed scores from The-Odds-API."""
     if not _API_KEY:
         return []
@@ -51,7 +68,10 @@ def fetch_scores(sport_key: str, days_from: int = 1) -> list[dict]:
     try:
         r = requests.get(url, params={"apiKey": _API_KEY, "daysFrom": days_from}, timeout=15)
         r.raise_for_status()
-        return r.json()
+        data = r.json()
+        completed = sum(1 for m in data if m.get("completed"))
+        logger.info("Scores for %s: %d total, %d completed", sport_key, len(data), completed)
+        return data
     except Exception as exc:
         logger.warning("Failed to fetch scores for %s: %s", sport_key, exc)
         return []
@@ -59,8 +79,7 @@ def fetch_scores(sport_key: str, days_from: int = 1) -> list[dict]:
 
 def fetch_all_tennis_scores() -> dict[str, str]:
     """Return {player_name: 'won'|'lost'} for all completed tennis matches."""
-    # Try both ATP Wimbledon and generic ATP keys
-    sport_keys = ["tennis_atp_wimbledon", "tennis_atp", "tennis_wta"]
+    sport_keys = _discover_active_atp_sport_keys()
     results: dict[str, str] = {}
 
     for sport_key in sport_keys:
@@ -82,6 +101,7 @@ def fetch_all_tennis_scores() -> dict[str, str]:
             except Exception:
                 pass
             if winner:
+                logger.debug("Match result: %s beat %s", winner, home if winner == away else away)
                 for player in [home, away]:
                     results[player] = "won" if player == winner else "lost"
 
