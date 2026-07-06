@@ -1564,10 +1564,22 @@ def _inject_all_predictions(track_record: dict) -> None:
 
     Preserves won/lost outcomes already set by check_results.py.
     Skips days that are already fully resolved.
+    Deduplicates parlays: if the same leg-set appeared in a previous day, it's stale API data
+    (player already eliminated but still showing in odds) and is excluded from the new day.
     """
     preds_dir = Path("data/predictions")
     if not preds_dir.exists():
         return
+
+    # Track leg-sets already seen in earlier days to detect stale API duplicates
+    seen_leg_sets: set[frozenset] = set()
+
+    # Pre-populate seen_leg_sets from existing track_record data (before scanning new files)
+    for month_data in track_record.get("months", {}).values():
+        for day_data in month_data.get("days", {}).values():
+            for parl in day_data.get("parlays", []):
+                seen_leg_sets.add(frozenset(parl["legs"]))
+
     for pred_file in sorted(preds_dir.glob("*.json")):
         try:
             pred = json.loads(pred_file.read_text(encoding="utf-8"))
@@ -1581,58 +1593,43 @@ def _inject_all_predictions(track_record: dict) -> None:
         track_record.setdefault("months", {}).setdefault(month_str, {"days": {}})
         existing = track_record["months"][month_str]["days"].get(day_key, {})
         if existing.get("resolved"):
+            # Still register its leg-sets as seen so later days can detect duplicates
+            for parl in existing.get("parlays", []):
+                seen_leg_sets.add(frozenset(parl["legs"]))
             continue
         if existing.get("parlays"):
+            for parl in existing.get("parlays", []):
+                seen_leg_sets.add(frozenset(parl["legs"]))
             continue  # already has pending data (possibly with partial won/lost from check_results)
+
         parlays = pred.get("parlays", [])
         if not parlays:
             continue
+
+        # Filter out parlays whose exact leg-set already appeared in a previous day
+        new_parlays = []
+        for parl in parlays:
+            legs = [p["player"] for p in parl.get("picks", [])]
+            key = frozenset(legs)
+            if key in seen_leg_sets:
+                logger.info("Skipping duplicate parlay %s (same legs seen on earlier day)", legs)
+                continue
+            new_parlays.append({
+                "legs": legs,
+                "stake_odds": parl.get("stake_total_odds"),
+                "best_odds": parl.get("total_odds"),
+                "won": None,
+            })
+            seen_leg_sets.add(key)
+
+        if not new_parlays:
+            logger.info("Day %s has no unique parlays after deduplication — skipping", day_str)
+            continue
+
         track_record["months"][month_str]["days"][day_key] = {
-            "parlays": [
-                {
-                    "legs": [p["player"] for p in parl.get("picks", [])],
-                    "stake_odds": parl.get("stake_total_odds"),
-                    "best_odds":  parl.get("total_odds"),
-                    "won": None,
-                }
-                for parl in parlays
-            ],
+            "parlays": new_parlays,
             "resolved": False,
         }
-
-    # Second pass: inherit results for duplicate parlays (same legs on consecutive days due to stale API data)
-    _inherit_duplicate_results(track_record)
-
-
-def _inherit_duplicate_results(track_record: dict) -> None:
-    """If an unresolved parlay's legs match a resolved parlay from any other day, inherit its result."""
-    months = track_record.get("months", {})
-    # Build index of resolved legs → result
-    resolved_index: dict[frozenset, bool | None] = {}
-    for month_data in months.values():
-        for day_data in month_data.get("days", {}).values():
-            if not day_data.get("resolved"):
-                continue
-            for parl in day_data.get("parlays", []):
-                if parl.get("won") is not None:
-                    key = frozenset(parl["legs"])
-                    resolved_index[key] = parl["won"]
-
-    # Apply inherited results to unresolved days
-    for month_data in months.values():
-        for day_data in month_data.get("days", {}).values():
-            if day_data.get("resolved"):
-                continue
-            all_resolved = True
-            for parl in day_data.get("parlays", []):
-                if parl.get("won") is None:
-                    key = frozenset(parl["legs"])
-                    if key in resolved_index:
-                        parl["won"] = resolved_index[key]
-                if parl.get("won") is None:
-                    all_resolved = False
-            if all_resolved and day_data.get("parlays"):
-                day_data["resolved"] = True
 
 
 if __name__ == "__main__":

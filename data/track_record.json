@@ -56,24 +56,6 @@
           "parlays": [
             {
               "legs": [
-                "Rafael Jodar",
-                "Alejandro Davidovich Fokina"
-              ],
-              "stake_odds": 1.69,
-              "best_odds": 1.755,
-              "won": false
-            },
-            {
-              "legs": [
-                "Rafael Jodar",
-                "Jiri Lehecka"
-              ],
-              "stake_odds": 1.742,
-              "best_odds": 1.836,
-              "won": false
-            },
-            {
-              "legs": [
                 "Jiri Lehecka",
                 "Alejandro Davidovich Fokina"
               ],
@@ -107,20 +89,6 @@
               ],
               "stake_odds": 1.638,
               "best_odds": 1.742,
-              "won": false
-            }
-          ],
-          "resolved": true
-        },
-        "6": {
-          "parlays": [
-            {
-              "legs": [
-                "Alex de Minaur",
-                "Alexander Zverev"
-              ],
-              "stake_odds": 1.651,
-              "best_odds": 1.754,
               "won": false
             }
           ],
