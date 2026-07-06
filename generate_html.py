@@ -1503,13 +1503,13 @@ def main() -> None:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
 
-    # Save today's predictions for track record
+    # Save today's predictions for track record (skip if file already exists)
     if parlays:
         _save_predictions(parlays)
 
     track_record = _load_track_record()
-    if parlays:
-        _inject_today(track_record, parlays)
+    _inject_all_predictions(track_record)  # inject any predictions file not yet in track_record
+    _save_track_record(track_record)       # persist so check_results.py can add won/lost
     html = generate_html(results, parlays=parlays, safe_parlays=safe_parlays, error=error, track_record=track_record)
     out = Path("index.html")
     out.write_text(html, encoding="utf-8")
@@ -1551,32 +1551,52 @@ def _load_track_record() -> dict:
     return {"months": {}}
 
 
-def _inject_today(track_record: dict, parlays: list[dict]) -> None:
-    """Add today's parlays as pending entries in the track record."""
-    now = datetime.now(timezone.utc)
-    month_str = now.strftime("%Y-%m")
-    day_key = str(now.day)
+def _save_track_record(track_record: dict) -> None:
+    track_file = Path("data/track_record.json")
+    track_file.parent.mkdir(parents=True, exist_ok=True)
+    track_file.write_text(json.dumps(track_record, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    track_record.setdefault("months", {}).setdefault(month_str, {"days": {}})
-    month = track_record["months"][month_str]
 
-    # Only inject if not already resolved
-    existing = month["days"].get(day_key, {})
-    if existing.get("resolved"):
+def _inject_all_predictions(track_record: dict) -> None:
+    """Scan all data/predictions/*.json files and add any missing days as pending entries.
+
+    Preserves won/lost outcomes already set by check_results.py.
+    Skips days that are already fully resolved.
+    """
+    preds_dir = Path("data/predictions")
+    if not preds_dir.exists():
         return
-
-    month["days"][day_key] = {
-        "parlays": [
-            {
-                "legs": [p["player"] for p in parl["picks"]],
-                "stake_odds": parl.get("stake_total_odds"),
-                "best_odds":  parl.get("total_odds"),
-                "won": None,
-            }
-            for parl in parlays
-        ],
-        "resolved": False,
-    }
+    for pred_file in sorted(preds_dir.glob("*.json")):
+        try:
+            pred = json.loads(pred_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        day_str = pred.get("date")
+        if not day_str:
+            continue
+        month_str = day_str[:7]
+        day_key = str(int(day_str[8:10]))
+        track_record.setdefault("months", {}).setdefault(month_str, {"days": {}})
+        existing = track_record["months"][month_str]["days"].get(day_key, {})
+        if existing.get("resolved"):
+            continue
+        if existing.get("parlays"):
+            continue  # already has pending data (possibly with partial won/lost from check_results)
+        parlays = pred.get("parlays", [])
+        if not parlays:
+            continue
+        track_record["months"][month_str]["days"][day_key] = {
+            "parlays": [
+                {
+                    "legs": [p["player"] for p in parl.get("picks", [])],
+                    "stake_odds": parl.get("stake_total_odds"),
+                    "best_odds":  parl.get("total_odds"),
+                    "won": None,
+                }
+                for parl in parlays
+            ],
+            "resolved": False,
+        }
 
 
 if __name__ == "__main__":
