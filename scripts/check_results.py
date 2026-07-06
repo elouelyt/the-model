@@ -1,18 +1,20 @@
-"""Check parlay predictions against Jeff Sackmann ATP match results.
+"""Check parlay predictions against Wimbledon match results.
 
-Uses the JeffSackmann/tennis_atp GitHub repo (atp_matches_YYYY.csv) which is
-updated daily with completed match results — more reliable than The-Odds-API
-/scores which does not mark tennis matches as completed.
+Uses Google News RSS to determine match outcomes — searches for each predicted
+player name + "Wimbledon" and classifies win/loss from headline keywords.
+Results are filtered to articles published after the prediction date so we
+match the correct round (not a future/past one).
 
 Run daily in GitHub Actions BEFORE generate_html.py.
 """
 
-import csv
-import io
 import json
 import logging
-from datetime import datetime, timezone
+import re
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta, timezone
 from difflib import SequenceMatcher
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import requests
@@ -28,67 +30,129 @@ _PREDS_DIR     = _ROOT / "data" / "predictions"
 _TRACK_FILE    = _ROOT / "data" / "track_record.json"
 _STAKE_PER_BET = 15.0
 
-_SACKMANN_BASE = "https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master"
+_WIN_KEYWORDS  = {"beats", "beat", "defeats", "defeated", "wins", "won", "advances",
+                  "through", "victory", "victorious", "progresses", "into the"}
+_LOSS_KEYWORDS = {"loses", "lost", "exits", "exit", "eliminated", "knocked out",
+                  "beaten", "out of", "crashed out", "bows out", "departure"}
 
 
 def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower().strip(), b.lower().strip()).ratio()
 
 
-def _match_player(name: str, candidates: list[str], cutoff: float = 0.75) -> str | None:
-    best, score = None, 0.0
-    name_last = name.split()[-1].lower()
-    for c in candidates:
-        s = max(_similarity(name, c), _similarity(name_last, c.split()[-1].lower()) * 0.9)
-        if s > score:
-            score, best = s, c
-    return best if score >= cutoff else None
+def _player_in_headline(player: str, headline: str) -> bool:
+    """True if player's last name appears in the headline."""
+    last = player.split()[-1].lower()
+    return last in headline.lower()
 
 
-def fetch_sackmann_results() -> dict[str, str]:
-    """Return {player_name: 'won'|'lost'} from Sackmann ATP results CSV."""
-    year = datetime.now(timezone.utc).year
-    url = f"{_SACKMANN_BASE}/atp_matches_{year}.csv"
+def _classify_headline(player: str, headline: str) -> str | None:
+    """Return 'won' or 'lost' based on headline keywords, or None if unclear."""
+    hl = headline.lower()
+    last = player.split()[-1].lower()
+    if last not in hl:
+        return None
+
+    # Check which keyword appears and whether the player is the subject or object
+    for kw in _WIN_KEYWORDS:
+        idx = hl.find(kw)
+        if idx == -1:
+            continue
+        before = hl[:idx]
+        # If player's last name appears before the win keyword → player won
+        if last in before:
+            return "won"
+        # If player's last name appears after the win keyword → player lost (was beaten by someone)
+        after = hl[idx:]
+        if last in after:
+            return "lost"
+
+    for kw in _LOSS_KEYWORDS:
+        idx = hl.find(kw)
+        if idx == -1:
+            continue
+        before = hl[:idx]
+        if last in before:
+            return "lost"
+        after = hl[idx:]
+        if last in after:
+            return "won"
+
+    return None
+
+
+def fetch_player_result(player: str, pred_date_str: str) -> str | None:
+    """Search Google News RSS for a player's Wimbledon result on/after pred_date_str.
+
+    Returns 'won', 'lost', or None if unknown.
+    """
+    pred_date = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    # We look for results published within 3 days of the prediction date
+    cutoff_end = pred_date + timedelta(days=3)
+
+    last_name = player.split()[-1]
+    query = f"{last_name} Wimbledon"
+    url = f"https://news.google.com/rss/search?q={requests.utils.quote(query)}&hl=en&gl=US&ceid=US:en"
+
     try:
-        r = requests.get(url, timeout=20)
-        r.raise_for_status()
+        resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
     except Exception as exc:
-        logger.warning("Failed to fetch Sackmann results: %s", exc)
-        return {}
+        logger.warning("News fetch failed for %s: %s", player, exc)
+        return None
 
-    results: dict[str, str] = {}
-    reader = csv.DictReader(io.StringIO(r.text))
-    for row in reader:
-        winner = row.get("winner_name", "").strip()
-        loser  = row.get("loser_name", "").strip()
-        score  = row.get("score", "").strip()
-        # Skip walkovers / retirements with no real result
-        if not winner or not loser:
+    try:
+        root = ET.fromstring(resp.content)
+    except ET.ParseError:
+        return None
+
+    items = root.findall(".//item")
+    outcomes: dict[str, int] = {"won": 0, "lost": 0}
+
+    for item in items:
+        title_el = item.find("title")
+        pubdate_el = item.find("pubDate")
+        if title_el is None or pubdate_el is None:
             continue
-        if score in ("W/O", "", "DEF"):
+
+        headline = title_el.text or ""
+        try:
+            pub_dt = parsedate_to_datetime(pubdate_el.text).astimezone(timezone.utc)
+        except Exception:
             continue
-        results[winner] = "won"
-        results[loser]  = "lost"
 
-    logger.info("Loaded %d player results from Sackmann %d CSV", len(results), year)
-    return results
+        # Only consider articles published after the prediction date and within window
+        if pub_dt < pred_date or pub_dt > cutoff_end:
+            continue
+
+        outcome = _classify_headline(player, headline)
+        if outcome:
+            logger.debug("[%s] %s → %s (from: %s)", player, headline[:80], outcome, pub_dt.date())
+            outcomes[outcome] += 1
+
+    if outcomes["won"] > 0 and outcomes["lost"] == 0:
+        return "won"
+    if outcomes["lost"] > 0 and outcomes["won"] == 0:
+        return "lost"
+    if outcomes["won"] > 0 and outcomes["lost"] > 0:
+        # Majority vote
+        return "won" if outcomes["won"] >= outcomes["lost"] else "lost"
+
+    return None
 
 
-def check_parlay(parlay: dict, results: dict[str, str]) -> bool | None:
-    """Return True if all legs won, False if any lost, None if unknown."""
-    candidates = list(results.keys())
+def check_parlay(parlay: dict, pred_date: str) -> bool | None:
+    """Return True if all legs won, False if any lost, None if any unknown."""
+    all_won = True
     for pick in parlay.get("picks", []):
         player = pick.get("player", "")
-        matched = _match_player(player, candidates)
-        if matched is None:
-            logger.debug("No result found for %s", player)
-            return None
-        outcome = results[matched]
-        if outcome == "lost":
-            logger.info("Leg LOST: %s (matched %s)", player, matched)
+        result = fetch_player_result(player, pred_date)
+        logger.info("[check] %s → %s", player, result)
+        if result == "lost":
             return False
-        logger.debug("Leg won: %s (matched %s)", player, matched)
-    return True
+        if result is None:
+            all_won = False
+    return True if all_won else None
 
 
 def load_track_record() -> dict:
@@ -102,12 +166,14 @@ def save_track_record(tr: dict) -> None:
     _TRACK_FILE.write_text(json.dumps(tr, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def process_pending(tr: dict, results: dict[str, str]) -> int:
+def process_pending(tr: dict) -> int:
     """Check any prediction files that don't yet have results. Returns count updated."""
     if not _PREDS_DIR.exists():
         return 0
 
+    now = datetime.now(timezone.utc)
     updated = 0
+
     for pred_file in sorted(_PREDS_DIR.glob("*.json")):
         try:
             pred = json.loads(pred_file.read_text(encoding="utf-8"))
@@ -116,6 +182,12 @@ def process_pending(tr: dict, results: dict[str, str]) -> int:
 
         day_str = pred.get("date")
         if not day_str:
+            continue
+
+        # Only check predictions from at least 1 day ago (matches must be finished)
+        pred_dt = datetime.fromisoformat(day_str).replace(tzinfo=timezone.utc)
+        if (now - pred_dt).days < 1:
+            logger.info("Skipping %s — too recent to have results", day_str)
             continue
 
         month_str = day_str[:7]
@@ -130,7 +202,7 @@ def process_pending(tr: dict, results: dict[str, str]) -> int:
             continue
 
         parlays_raw = pred.get("parlays", [])
-        day_results = existing.get("parlays", [])
+        day_results = list(existing.get("parlays", []))
 
         if not day_results:
             day_results = [
@@ -145,6 +217,7 @@ def process_pending(tr: dict, results: dict[str, str]) -> int:
 
         any_updated  = False
         all_resolved = True
+
         for entry in day_results:
             if entry["won"] is not None:
                 continue
@@ -155,7 +228,7 @@ def process_pending(tr: dict, results: dict[str, str]) -> int:
             if matching is None:
                 all_resolved = False
                 continue
-            outcome = check_parlay(matching, results)
+            outcome = check_parlay(matching, day_str)
             if outcome is not None:
                 entry["won"] = outcome
                 any_updated  = True
@@ -171,15 +244,9 @@ def process_pending(tr: dict, results: dict[str, str]) -> int:
 
 
 def main() -> None:
-    logger.info("Fetching ATP results from Sackmann repo...")
-    results = fetch_sackmann_results()
-
-    if not results:
-        logger.warning("No results loaded — skipping results check")
-        return
-
+    logger.info("Checking parlay results via Google News...")
     tr = load_track_record()
-    updated = process_pending(tr, results)
+    updated = process_pending(tr)
     save_track_record(tr)
     logger.info("Updated %d day(s) in track record", updated)
 
