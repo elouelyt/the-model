@@ -613,12 +613,14 @@ def _track_record_html(track_record: dict) -> str:
             </table>
         </details>"""
 
+        day_apostado = len(parlays_day) * stake_per_bet
+        lost_display = f"-{total_lost_eur:.2f}€" if total_lost_eur > 0 else "0.00€"
         rows_html += f"""<tr>
             <td style="font-weight:600;">{day_num}</td>
             <td>{detail_html}</td>
-            <td style="color:var(--muted);">75€</td>
+            <td style="color:var(--muted);">{day_apostado:.0f}€</td>
             <td style="color:#10b981;">+{total_won_eur:.2f}€</td>
-            <td style="color:#f87171;">-{total_lost_eur:.2f}€</td>
+            <td style="color:#f87171;">{lost_display}</td>
             <td style="color:{roi_color};font-weight:700;">{roi_day:+.2f}€</td>
         </tr>"""
 
