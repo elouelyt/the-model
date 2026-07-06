@@ -1,16 +1,14 @@
 {
-  "timestamp": "2026-07-05T16:00:55.941577+00:00",
-  "player_count": 10,
+  "timestamp": "2026-07-06T16:00:29.103618+00:00",
+  "player_count": 8,
   "odds": {
-    "Jannik Sinner": 1.01,
-    "Shintaro Mochizuki": 18.0,
-    "Alex de Minaur": 1.25,
-    "Flavio Cobolli": 4.0,
-    "Grigor Dimitrov": 1.47,
-    "Arthur Fery": 2.7,
     "Taylor Fritz": 1.46,
-    "Alexander Bublik": 2.7,
-    "Jiri Lehecka": 3.5,
-    "Alexander Zverev": 1.31
+    "Alexander Bublik": 2.8,
+    "Jiri Lehecka": 3.45,
+    "Alexander Zverev": 1.33,
+    "Jannik Sinner": 1.03,
+    "Jan-Lennard Struff": 13.0,
+    "Felix Auger-Aliassime": 2.43,
+    "Novak Djokovic": 1.57
   }
 }
