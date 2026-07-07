@@ -1,14 +1,10 @@
 {
-  "timestamp": "2026-07-06T16:00:29.103618+00:00",
-  "player_count": 8,
+  "timestamp": "2026-07-07T16:00:39.577720+00:00",
+  "player_count": 4,
   "odds": {
-    "Taylor Fritz": 1.46,
-    "Alexander Bublik": 2.8,
-    "Jiri Lehecka": 3.45,
-    "Alexander Zverev": 1.33,
-    "Jannik Sinner": 1.03,
-    "Jan-Lennard Struff": 13.0,
-    "Felix Auger-Aliassime": 2.43,
-    "Novak Djokovic": 1.57
+    "Felix Auger-Aliassime": 2.4,
+    "Novak Djokovic": 1.6,
+    "Flavio Cobolli": 1.34,
+    "Arthur Fery": 3.25
   }
 }
