@@ -174,6 +174,13 @@ def process_pending(tr: dict) -> int:
     now = datetime.now(timezone.utc)
     updated = 0
 
+    # Track leg-sets already seen in earlier days to skip stale API duplicates
+    seen_leg_sets: set[frozenset] = set()
+    for month_data in tr.get("months", {}).values():
+        for day_data in month_data.get("days", {}).values():
+            for parl in day_data.get("parlays", []):
+                seen_leg_sets.add(frozenset(parl["legs"]))
+
     for pred_file in sorted(_PREDS_DIR.glob("*.json")):
         try:
             pred = json.loads(pred_file.read_text(encoding="utf-8"))
@@ -205,15 +212,23 @@ def process_pending(tr: dict) -> int:
         day_results = list(existing.get("parlays", []))
 
         if not day_results:
-            day_results = [
-                {
-                    "legs":       [p["player"] for p in parl.get("picks", [])],
+            for parl in parlays_raw:
+                legs = [p["player"] for p in parl.get("picks", [])]
+                key = frozenset(legs)
+                if key in seen_leg_sets:
+                    logger.info("Skipping duplicate parlay %s for %s (seen in earlier day)", legs, day_str)
+                    continue
+                day_results.append({
+                    "legs":       legs,
                     "stake_odds": parl.get("stake_total_odds"),
                     "best_odds":  parl.get("total_odds"),
                     "won":        None,
-                }
-                for parl in parlays_raw
-            ]
+                })
+                seen_leg_sets.add(key)
+
+        if not day_results:
+            logger.info("Day %s has no unique parlays after dedup — skipping", day_str)
+            continue
 
         any_updated  = False
         all_resolved = True
