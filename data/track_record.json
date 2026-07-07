@@ -93,6 +93,20 @@
             }
           ],
           "resolved": true
+        },
+        "6": {
+          "parlays": [
+            {
+              "legs": [
+                "Alex de Minaur",
+                "Alexander Zverev"
+              ],
+              "stake_odds": 1.651,
+              "best_odds": 1.754,
+              "won": false
+            }
+          ],
+          "resolved": true
         }
       }
     }
