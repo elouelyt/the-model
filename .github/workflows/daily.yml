@@ -41,10 +41,15 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Save pipeline outputs before resetting to avoid origin/main overwriting them
           cp index.html /tmp/index_generated.html
+          cp data/track_record.json /tmp/track_record_generated.json
+          cp -r data/predictions /tmp/predictions_generated
           git fetch origin main
           git reset --hard origin/main
           cp /tmp/index_generated.html index.html
+          cp /tmp/track_record_generated.json data/track_record.json
+          cp -r /tmp/predictions_generated/. data/predictions/
           git add index.html || true
           git add data/predictions/ || true
           git add data/track_record.json || true
