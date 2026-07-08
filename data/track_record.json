@@ -93,6 +93,20 @@
             }
           ],
           "resolved": true
+        },
+        "8": {
+          "parlays": [
+            {
+              "legs": [
+                "Jannik Sinner",
+                "Flavio Cobolli"
+              ],
+              "stake_odds": 1.644,
+              "best_odds": 1.764,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

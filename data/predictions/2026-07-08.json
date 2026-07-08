@@ -1,0 +1,21 @@
+{
+  "date": "2026-07-08",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Jannik Sinner",
+          "rank": 1
+        },
+        {
+          "player": "Flavio Cobolli",
+          "rank": 10
+        }
+      ],
+      "stake_total_odds": 1.644,
+      "total_odds": 1.764,
+      "cum_prob": 0.6143,
+      "rating": 6
+    }
+  ]
+}
