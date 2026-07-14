@@ -62,28 +62,44 @@ class PipelineState(TypedDict, total=False):
 
 
 def fetch_odds_node(state: PipelineState) -> PipelineState:
-    """Fetch live pre-match ATP odds and flatten into processed rows."""
+    """Fetch live pre-match ATP odds with two-tier fallback.
+
+    Priority:
+      1. The-Odds-API  — Grand Slams + Masters (accurate bookmaker odds)
+      2. Stake odds-data API — ALL ATP tournaments including 250s (Gstaad, Bastad, Umag…)
+    """
     from src.ingestion.extract_odds import fetch_odds
     from src.processing.transform import flatten_odds, filter_upcoming
 
-    logger.info("[coordinator] fetch_odds_node — fetching live odds")
+    logger.info("[coordinator] fetch_odds_node — tier 1: The-Odds-API")
+    raw: list[dict] = []
+    source = "the-odds-api"
+
     try:
         raw = fetch_odds()
     except Exception as exc:  # noqa: BLE001
-        logger.error("[coordinator] fetch_odds failed: %s", exc)
-        return {**state, "raw_odds": [], "processed_rows": [], "abort": True}
+        logger.warning("[coordinator] The-Odds-API failed: %s", exc)
 
     if not raw:
-        logger.warning("[coordinator] No active ATP tournaments — aborting pipeline")
+        logger.info("[coordinator] tier 2: Stake odds-data fallback (covers ATP 250s)")
+        source = "stake"
+        try:
+            from src.agents.stake_agent import fetch_all_stake_matches
+            raw = fetch_all_stake_matches()
+        except Exception as exc:  # noqa: BLE001
+            logger.error("[coordinator] Stake fallback failed: %s", exc)
+
+    if not raw:
+        logger.warning("[coordinator] All odds sources empty — aborting")
         return {**state, "raw_odds": [], "processed_rows": [], "abort": True}
 
     df = filter_upcoming(flatten_odds(raw))
 
     if df.empty:
-        logger.warning("[coordinator] All matches in-play — aborting pipeline")
+        logger.warning("[coordinator] All matches in-play (source=%s) — aborting", source)
         return {**state, "raw_odds": raw, "processed_rows": [], "abort": True}
 
-    logger.info("[coordinator] %d pre-match rows ready", len(df))
+    logger.info("[coordinator] %d pre-match rows ready (source=%s)", len(df), source)
     return {**state, "raw_odds": raw, "processed_rows": df.to_dict("records"), "abort": False}
 
 

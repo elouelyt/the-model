@@ -232,6 +232,139 @@ def _extract_winner_odds(odds_response: dict) -> dict[str, float]:
     return {}
 
 
+# ── All-matches discovery (no player list needed) ─────────────────────────────
+
+def _tournament_to_sport_key(tournament_name: str) -> str:
+    import re
+    name = re.sub(r"[,.]", "", tournament_name.lower())
+    skip = {"atp", "wta", "men", "women", "singles", "doubles", "men's", "women's"}
+    tokens = [t for t in name.split() if t not in skip and len(t) > 2]
+    return "tennis_atp_" + "_".join(tokens[:2]) if tokens else "tennis_atp_unknown"
+
+
+def fetch_all_stake_matches() -> list[dict]:
+    """Discover all upcoming men's singles ATP fixtures on Stake and return in
+    The-Odds-API event format so the pipeline can process them without changes.
+
+    Used as fallback when The-Odds-API has no active tournaments (e.g. between
+    Grand Slams when only ATP 250s are running — Gstaad, Bastad, Umag, etc.).
+    """
+    from datetime import datetime, timezone, timedelta
+
+    _EXCLUDE = frozenset({
+        "double", "women", "wta", "female", "girl",
+        "simulated", "simulated-reality", "srl", "virtual",
+    })
+
+    def _is_singles_men(slug: str, name: str) -> bool:
+        text = f"{slug} {name}".lower()
+        return not any(f in text for f in _EXCLUDE)
+
+    # Step 1: tennis categories
+    cat_resp = _SESSION.get(f"{_BASE_URL}/sport/tennis/category", timeout=_TIMEOUT)
+    if not cat_resp.ok:
+        logger.warning("[stake_agent] /sport/tennis/category → %s", cat_resp.status_code)
+        return []
+    try:
+        categories = cat_resp.json().get("category", [])
+    except Exception:
+        return []
+
+    singles_cats = [c for c in categories if _is_singles_men(c.get("slug", ""), c.get("name") or "")]
+    logger.info("[stake_agent] fetch_all_stake_matches — %d men's singles categories", len(singles_cats))
+
+    # Step 2: fixtures per category
+    all_fixtures: list[dict] = []
+    seen_slugs: set[str] = set()
+    for cat in singles_cats:
+        cat_slug = cat.get("slug", "")
+        if not cat_slug:
+            continue
+        for offset in range(0, 200, 10):
+            resp = _SESSION.get(
+                f"{_BASE_URL}/sport/tennis/category/{cat_slug}/fixture?offset={offset}",
+                timeout=_TIMEOUT,
+            )
+            if not resp.ok:
+                break
+            try:
+                fixtures = resp.json().get("fixture", [])
+            except Exception:
+                break
+            if not fixtures:
+                break
+            new = 0
+            for fix in fixtures:
+                slug = fix.get("slug", "")
+                fix_name = fix.get("name", "")
+                if not slug or slug in seen_slugs:
+                    continue
+                if " / " in fix_name:
+                    continue
+                if any(f in f"{slug} {fix_name}".lower() for f in _EXCLUDE):
+                    continue
+                seen_slugs.add(slug)
+                all_fixtures.append(fix)
+                new += 1
+            if new == 0:
+                break
+
+    logger.info("[stake_agent] %d unique fixtures found", len(all_fixtures))
+
+    # Step 3: odds per fixture → The-Odds-API format
+    now = datetime.now(timezone.utc)
+    events: list[dict] = []
+    for fix in all_fixtures:
+        slug = fix.get("slug", "")
+        # Skip live fixtures
+        if fix.get("status") == "live":
+            continue
+
+        resp = _SESSION.get(f"{_BASE_URL}/odds/{slug}", timeout=_TIMEOUT)
+        if not resp.ok:
+            continue
+        try:
+            data = resp.json()
+        except Exception:
+            continue
+
+        winner_odds = _extract_winner_odds(data)
+        if len(winner_odds) < 2:
+            continue
+
+        # startTime is Unix ms
+        start_ms = fix.get("startTime")
+        if start_ms and start_ms > 0:
+            commence = datetime.fromtimestamp(start_ms / 1000, tz=timezone.utc).isoformat()
+        else:
+            commence = (now + timedelta(hours=20)).isoformat()
+
+        tournament = fix.get("tournament", "")
+        competitors = fix.get("competitors", [])
+        home = competitors[0] if len(competitors) > 0 else list(winner_odds.keys())[0]
+        away = competitors[1] if len(competitors) > 1 else list(winner_odds.keys())[1]
+
+        events.append({
+            "id": slug,
+            "sport_key": _tournament_to_sport_key(tournament),
+            "sport_title": tournament,
+            "commence_time": commence,
+            "home_team": home,
+            "away_team": away,
+            "bookmakers": [{
+                "key": "stake",
+                "title": "Stake",
+                "markets": [{"key": "h2h", "outcomes": [
+                    {"name": n, "price": p} for n, p in winner_odds.items()
+                ]}],
+            }],
+        })
+        logger.info("[stake_agent] %s vs %s (%s)", home, away, tournament)
+
+    logger.info("[stake_agent] fetch_all_stake_matches — %d events ready", len(events))
+    return events
+
+
 # ── Public interface ───────────────────────────────────────────────────────────
 
 def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
