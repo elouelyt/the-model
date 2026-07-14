@@ -107,6 +107,56 @@
             }
           ],
           "resolved": true
+        },
+        "14": {
+          "parlays": [
+            {
+              "legs": [
+                "Arthur Rinderknech",
+                "Arthur Gea"
+              ],
+              "stake_odds": 1.764,
+              "best_odds": 1.764,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Tabilo",
+                "Fabian Marozsan"
+              ],
+              "stake_odds": 1.664,
+              "best_odds": 1.664,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Davidovich Fokina",
+                "Fabian Marozsan"
+              ],
+              "stake_odds": 1.664,
+              "best_odds": 1.664,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Davidovich Fokina",
+                "Liam Draxl"
+              ],
+              "stake_odds": 1.651,
+              "best_odds": 1.651,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Tabilo",
+                "Liam Draxl"
+              ],
+              "stake_odds": 1.651,
+              "best_odds": 1.651,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

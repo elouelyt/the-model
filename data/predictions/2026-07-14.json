@@ -1,0 +1,85 @@
+{
+  "date": "2026-07-14",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Arthur Rinderknech",
+          "rank": 28
+        },
+        {
+          "player": "Arthur Gea",
+          "rank": 132
+        }
+      ],
+      "stake_total_odds": 1.764,
+      "total_odds": 1.764,
+      "cum_prob": 0.5389,
+      "rating": 5
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Tabilo",
+          "rank": 33
+        },
+        {
+          "player": "Fabian Marozsan",
+          "rank": 62
+        }
+      ],
+      "stake_total_odds": 1.664,
+      "total_odds": 1.664,
+      "cum_prob": 0.5238,
+      "rating": 5
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Davidovich Fokina",
+          "rank": 25
+        },
+        {
+          "player": "Fabian Marozsan",
+          "rank": 62
+        }
+      ],
+      "stake_total_odds": 1.664,
+      "total_odds": 1.664,
+      "cum_prob": 0.4977,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Davidovich Fokina",
+          "rank": 25
+        },
+        {
+          "player": "Liam Draxl",
+          "rank": 158
+        }
+      ],
+      "stake_total_odds": 1.651,
+      "total_odds": 1.651,
+      "cum_prob": 0.4892,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Tabilo",
+          "rank": 33
+        },
+        {
+          "player": "Liam Draxl",
+          "rank": 158
+        }
+      ],
+      "stake_total_odds": 1.651,
+      "total_odds": 1.651,
+      "cum_prob": 0.5148,
+      "rating": 3
+    }
+  ]
+}
