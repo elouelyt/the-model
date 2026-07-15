@@ -157,6 +157,56 @@
             }
           ],
           "resolved": false
+        },
+        "15": {
+          "parlays": [
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Arthur Rinderknech"
+              ],
+              "stake_odds": 1.829,
+              "best_odds": 1.829,
+              "won": null
+            },
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Flavio Cobolli"
+              ],
+              "stake_odds": 1.727,
+              "best_odds": 1.727,
+              "won": null
+            },
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Alexander Bublik"
+              ],
+              "stake_odds": 1.715,
+              "best_odds": 1.715,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Tabilo",
+                "Arthur Rinderknech"
+              ],
+              "stake_odds": 1.829,
+              "best_odds": 1.829,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Tabilo",
+                "Flavio Cobolli"
+              ],
+              "stake_odds": 1.727,
+              "best_odds": 1.727,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

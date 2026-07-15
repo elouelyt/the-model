@@ -1,0 +1,85 @@
+{
+  "date": "2026-07-15",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Andrey Rublev",
+          "rank": 13
+        },
+        {
+          "player": "Arthur Rinderknech",
+          "rank": 28
+        }
+      ],
+      "stake_total_odds": 1.829,
+      "total_odds": 1.829,
+      "cum_prob": 0.5766,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Andrey Rublev",
+          "rank": 13
+        },
+        {
+          "player": "Flavio Cobolli",
+          "rank": 10
+        }
+      ],
+      "stake_total_odds": 1.727,
+      "total_odds": 1.727,
+      "cum_prob": 0.576,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Andrey Rublev",
+          "rank": 13
+        },
+        {
+          "player": "Alexander Bublik",
+          "rank": 11
+        }
+      ],
+      "stake_total_odds": 1.715,
+      "total_odds": 1.715,
+      "cum_prob": 0.5746,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Tabilo",
+          "rank": 33
+        },
+        {
+          "player": "Arthur Rinderknech",
+          "rank": 28
+        }
+      ],
+      "stake_total_odds": 1.829,
+      "total_odds": 1.829,
+      "cum_prob": 0.5683,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Tabilo",
+          "rank": 33
+        },
+        {
+          "player": "Flavio Cobolli",
+          "rank": 10
+        }
+      ],
+      "stake_total_odds": 1.727,
+      "total_odds": 1.727,
+      "cum_prob": 0.5677,
+      "rating": 6
+    }
+  ]
+}
