@@ -1,0 +1,85 @@
+{
+  "date": "2026-07-16",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alejandro Tabilo",
+          "rank": 33
+        },
+        {
+          "player": "Alexander Bublik",
+          "rank": 11
+        }
+      ],
+      "stake_total_odds": 1.83,
+      "total_odds": 1.83,
+      "cum_prob": 0.5567,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Alejandro Tabilo",
+          "rank": 33
+        },
+        {
+          "player": "Andrey Rublev",
+          "rank": 13
+        }
+      ],
+      "stake_total_odds": 1.69,
+      "total_odds": 1.69,
+      "cum_prob": 0.5815,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Casper Ruud",
+          "rank": 12
+        },
+        {
+          "player": "Alexander Bublik",
+          "rank": 11
+        }
+      ],
+      "stake_total_odds": 1.73,
+      "total_odds": 1.73,
+      "cum_prob": 0.5675,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Casper Ruud",
+          "rank": 12
+        },
+        {
+          "player": "August Holmgren",
+          "rank": 141
+        }
+      ],
+      "stake_total_odds": 1.718,
+      "total_odds": 1.718,
+      "cum_prob": 0.4968,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Adolfo Daniel Vallejo",
+          "rank": 73
+        },
+        {
+          "player": "Casper Ruud",
+          "rank": 12
+        }
+      ],
+      "stake_total_odds": 1.658,
+      "total_odds": 1.658,
+      "cum_prob": 0.4929,
+      "rating": 4
+    }
+  ]
+}

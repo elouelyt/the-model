@@ -207,6 +207,56 @@
             }
           ],
           "resolved": false
+        },
+        "16": {
+          "parlays": [
+            {
+              "legs": [
+                "Alejandro Tabilo",
+                "Alexander Bublik"
+              ],
+              "stake_odds": 1.83,
+              "best_odds": 1.83,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alejandro Tabilo",
+                "Andrey Rublev"
+              ],
+              "stake_odds": 1.69,
+              "best_odds": 1.69,
+              "won": null
+            },
+            {
+              "legs": [
+                "Casper Ruud",
+                "Alexander Bublik"
+              ],
+              "stake_odds": 1.73,
+              "best_odds": 1.73,
+              "won": null
+            },
+            {
+              "legs": [
+                "Casper Ruud",
+                "August Holmgren"
+              ],
+              "stake_odds": 1.718,
+              "best_odds": 1.718,
+              "won": null
+            },
+            {
+              "legs": [
+                "Adolfo Daniel Vallejo",
+                "Casper Ruud"
+              ],
+              "stake_odds": 1.658,
+              "best_odds": 1.658,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
