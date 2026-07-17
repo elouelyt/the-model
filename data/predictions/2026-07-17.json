@@ -1,0 +1,37 @@
+{
+  "date": "2026-07-17",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Casper Ruud",
+          "rank": 12
+        },
+        {
+          "player": "August Holmgren",
+          "rank": 141
+        }
+      ],
+      "stake_total_odds": 1.846,
+      "total_odds": 1.846,
+      "cum_prob": 0.449,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Casper Ruud",
+          "rank": 12
+        },
+        {
+          "player": "Mark Lajal",
+          "rank": 167
+        }
+      ],
+      "stake_total_odds": 1.742,
+      "total_odds": 1.742,
+      "cum_prob": 0.4259,
+      "rating": 3
+    }
+  ]
+}

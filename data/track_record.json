@@ -257,6 +257,20 @@
             }
           ],
           "resolved": false
+        },
+        "17": {
+          "parlays": [
+            {
+              "legs": [
+                "Casper Ruud",
+                "Mark Lajal"
+              ],
+              "stake_odds": 1.742,
+              "best_odds": 1.742,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
