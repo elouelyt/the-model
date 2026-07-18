@@ -64,6 +64,7 @@ def extract_eligible_picks(results: list[dict]) -> list[dict]:
                 "match_id":        f"{match['home']}|{match['away']}",
                 "opponent":        opponent,
                 "opponent_rank":   players_in_match.get(opponent),
+                "sport_title":     match.get("sport_title", ""),
             })
     return picks
 

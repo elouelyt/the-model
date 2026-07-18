@@ -81,17 +81,19 @@ def _classify_headline(player: str, headline: str) -> str | None:
     return None
 
 
-def fetch_player_result(player: str, pred_date_str: str) -> str | None:
-    """Search Google News RSS for a player's Wimbledon result on/after pred_date_str.
+def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP tennis") -> str | None:
+    """Search Google News RSS for a player's ATP result on/after pred_date_str.
 
     Returns 'won', 'lost', or None if unknown.
     """
     pred_date = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
-    # We look for results published within 3 days of the prediction date
-    cutoff_end = pred_date + timedelta(days=3)
+    # Search window: up to 5 days after prediction date
+    cutoff_end = pred_date + timedelta(days=5)
 
     last_name = player.split()[-1]
-    query = f"{last_name} Wimbledon"
+    # Use first word of tournament for specificity (e.g. "Gstaad", "Bastad", "Wimbledon")
+    tournament_word = tournament.split()[0] if tournament else "tennis"
+    query = f"{last_name} {tournament_word}"
     url = f"https://news.google.com/rss/search?q={requests.utils.quote(query)}&hl=en&gl=US&ceid=US:en"
 
     try:
@@ -146,7 +148,8 @@ def check_parlay(parlay: dict, pred_date: str) -> bool | None:
     all_won = True
     for pick in parlay.get("picks", []):
         player = pick.get("player", "")
-        result = fetch_player_result(player, pred_date)
+        tournament = pick.get("tournament", "ATP tennis")
+        result = fetch_player_result(player, pred_date, tournament=tournament)
         logger.info("[check] %s → %s", player, result)
         if result == "lost":
             return False

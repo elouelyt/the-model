@@ -1530,7 +1530,7 @@ def _save_predictions(parlays: list[dict]) -> None:
         "date": today,
         "parlays": [
             {
-                "picks": [{"player": p["player"], "rank": p["rank"]} for p in parl["picks"]],
+                "picks": [{"player": p["player"], "rank": p["rank"], "tournament": p.get("sport_title", "")} for p in parl["picks"]],
                 "stake_total_odds": parl.get("stake_total_odds"),
                 "total_odds": parl.get("total_odds"),
                 "cum_prob": parl.get("cum_prob"),
