@@ -241,7 +241,7 @@ def process_pending(tr: dict) -> int:
 
 
 def main() -> None:
-    logger.info("Checking parlay results via Google News...")
+    logger.info("Checking parlay results via ESPN ATP scoreboard...")
     tr = load_track_record()
     updated = process_pending(tr)
     save_track_record(tr)
