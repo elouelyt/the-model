@@ -244,7 +244,7 @@
               ],
               "stake_odds": 1.718,
               "best_odds": 1.718,
-              "won": false
+              "won": null
             },
             {
               "legs": [
@@ -253,10 +253,10 @@
               ],
               "stake_odds": 1.658,
               "best_odds": 1.658,
-              "won": false
+              "won": true
             }
           ],
-          "resolved": true
+          "resolved": false
         },
         "17": {
           "parlays": [
@@ -299,7 +299,7 @@
               ],
               "stake_odds": 1.674,
               "best_odds": 1.674,
-              "won": null
+              "won": true
             },
             {
               "legs": [

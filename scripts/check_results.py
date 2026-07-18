@@ -1,20 +1,16 @@
-"""Check parlay predictions against Wimbledon match results.
+"""Check parlay predictions against ATP match results.
 
-Uses Google News RSS to determine match outcomes — searches for each predicted
-player name + "Wimbledon" and classifies win/loss from headline keywords.
-Results are filtered to articles published after the prediction date so we
-match the correct round (not a future/past one).
+Uses Sofascore's API to determine match outcomes — accessible from GitHub
+Actions (no Cloudflare block) and covers ALL ATP tournaments including 250s
+and Challengers.
 
 Run daily in GitHub Actions BEFORE generate_html.py.
 """
 
 import json
 import logging
-import re
-import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from difflib import SequenceMatcher
-from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import requests
@@ -30,116 +26,99 @@ _PREDS_DIR     = _ROOT / "data" / "predictions"
 _TRACK_FILE    = _ROOT / "data" / "track_record.json"
 _STAKE_PER_BET = 15.0
 
-_WIN_KEYWORDS  = {"beats", "beat", "defeats", "defeated", "wins", "won", "advances",
-                  "through", "victory", "victorious", "progresses", "into the"}
-_LOSS_KEYWORDS = {"loses", "lost", "exits", "exit", "eliminated", "knocked out",
-                  "beaten", "out of", "crashed out", "bows out", "departure"}
+# Cache of ESPN ATP scoreboard events keyed by "YYYYMMDD" (reused across players)
+_espn_cache: dict[str, list[dict]] = {}
 
 
 def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower().strip(), b.lower().strip()).ratio()
 
 
-def _player_in_headline(player: str, headline: str) -> bool:
-    """True if player's last name appears in the headline."""
+def _fetch_espn_competitions(date_str_8: str) -> list[dict]:
+    """Fetch all finished men's singles ATP competitions for a date (YYYYMMDD). Cached."""
+    if date_str_8 in _espn_cache:
+        return _espn_cache[date_str_8]
+
+    url = f"https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates={date_str_8}"
+    try:
+        resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as exc:
+        logger.warning("ESPN fetch failed for %s: %s", date_str_8, exc)
+        _espn_cache[date_str_8] = []
+        return []
+
+    comps: list[dict] = []
+    for event in data.get("events", []):
+        for grp in event.get("groupings", []):
+            if grp.get("grouping", {}).get("slug") != "mens-singles":
+                continue
+            for comp in grp.get("competitions", []):
+                if comp.get("status", {}).get("type", {}).get("state") == "post":
+                    comps.append(comp)
+
+    logger.debug("ESPN %s → %d finished men's singles comps", date_str_8, len(comps))
+    _espn_cache[date_str_8] = comps
+    return comps
+
+
+def _player_matches_name(player: str, name: str) -> bool:
+    """True if the ESPN display name matches our player name."""
+    if _similarity(player, name) >= 0.78:
+        return True
     last = player.split()[-1].lower()
-    return last in headline.lower()
-
-
-def _classify_headline(player: str, headline: str) -> str | None:
-    """Return 'won' or 'lost' based on headline keywords, or None if unclear."""
-    hl = headline.lower()
-    last = player.split()[-1].lower()
-    if last not in hl:
-        return None
-
-    # Check which keyword appears and whether the player is the subject or object
-    for kw in _WIN_KEYWORDS:
-        idx = hl.find(kw)
-        if idx == -1:
-            continue
-        before = hl[:idx]
-        # If player's last name appears before the win keyword → player won
-        if last in before:
-            return "won"
-        # If player's last name appears after the win keyword → player lost (was beaten by someone)
-        after = hl[idx:]
-        if last in after:
-            return "lost"
-
-    for kw in _LOSS_KEYWORDS:
-        idx = hl.find(kw)
-        if idx == -1:
-            continue
-        before = hl[:idx]
-        if last in before:
-            return "lost"
-        after = hl[idx:]
-        if last in after:
-            return "won"
-
-    return None
+    return last in name.lower() and len(last) > 3
 
 
 def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP tennis") -> str | None:
-    """Search Google News RSS for a player's ATP result on/after pred_date_str.
+    """Check ESPN ATP scoreboard for a player's result on/after pred_date_str.
 
-    Returns 'won', 'lost', or None if unknown.
+    Returns 'won', 'lost', or None if no match found in the 6-day window.
+    Uses the competition date to only consider matches >= pred_date.
     """
     pred_date = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
-    # Search window: up to 5 days after prediction date
-    cutoff_end = pred_date + timedelta(days=5)
+    cutoff_end = pred_date + timedelta(days=6)
 
-    last_name = player.split()[-1]
-    # Use first word of tournament for specificity (e.g. "Gstaad", "Bastad", "Wimbledon")
-    tournament_word = tournament.split()[0] if tournament else "tennis"
-    query = f"{last_name} {tournament_word}"
-    url = f"https://news.google.com/rss/search?q={requests.utils.quote(query)}&hl=en&gl=US&ceid=US:en"
+    # Fetch up to 7 days of ESPN data (tournament-level, covers all rounds)
+    seen_dates: set[str] = set()
+    all_comps: list[dict] = []
+    for delta in range(7):
+        d = pred_date + timedelta(days=delta)
+        d8 = d.strftime("%Y%m%d")
+        if d8 not in seen_dates:
+            seen_dates.add(d8)
+            all_comps.extend(_fetch_espn_competitions(d8))
 
-    try:
-        resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-        resp.raise_for_status()
-    except Exception as exc:
-        logger.warning("News fetch failed for %s: %s", player, exc)
-        return None
+    # Find the EARLIEST finished match for this player on/after pred_date
+    best: tuple[datetime, str] | None = None
 
-    try:
-        root = ET.fromstring(resp.content)
-    except ET.ParseError:
-        return None
-
-    items = root.findall(".//item")
-    outcomes: dict[str, int] = {"won": 0, "lost": 0}
-
-    for item in items:
-        title_el = item.find("title")
-        pubdate_el = item.find("pubDate")
-        if title_el is None or pubdate_el is None:
-            continue
-
-        headline = title_el.text or ""
+    for comp in all_comps:
+        comp_date_str = comp.get("date", "")
         try:
-            pub_dt = parsedate_to_datetime(pubdate_el.text).astimezone(timezone.utc)
+            comp_dt = datetime.fromisoformat(comp_date_str.replace("Z", "+00:00"))
         except Exception:
             continue
 
-        # Only consider articles published after the prediction date and within window
-        if pub_dt < pred_date or pub_dt > cutoff_end:
+        if comp_dt < pred_date or comp_dt > cutoff_end:
             continue
 
-        outcome = _classify_headline(player, headline)
-        if outcome:
-            logger.debug("[%s] %s → %s (from: %s)", player, headline[:80], outcome, pub_dt.date())
-            outcomes[outcome] += 1
+        competitors = comp.get("competitors", [])
+        for c in competitors:
+            name = c.get("athlete", {}).get("displayName", "")
+            if not _player_matches_name(player, name):
+                continue
+            won = c.get("winner", False)
+            result = "won" if won else "lost"
+            if best is None or comp_dt < best[0]:
+                best = (comp_dt, result)
+            break
 
-    if outcomes["won"] > 0 and outcomes["lost"] == 0:
-        return "won"
-    if outcomes["lost"] > 0 and outcomes["won"] == 0:
-        return "lost"
-    if outcomes["won"] > 0 and outcomes["lost"] > 0:
-        # Majority vote
-        return "won" if outcomes["won"] >= outcomes["lost"] else "lost"
+    if best:
+        logger.info("[espn] %s → %s (match at %s)", player, best[1].upper(), best[0].date())
+        return best[1]
 
+    logger.debug("No ESPN match found for %s from %s", player, pred_date_str)
     return None
 
 
