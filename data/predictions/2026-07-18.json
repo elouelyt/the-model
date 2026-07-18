@@ -1,0 +1,85 @@
+{
+  "date": "2026-07-18",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16
+        },
+        {
+          "player": "Stefanos Tsitsipas",
+          "rank": 88
+        }
+      ],
+      "stake_total_odds": 1.724,
+      "total_odds": 1.724,
+      "cum_prob": 0.4514,
+      "rating": 3
+    },
+    {
+      "picks": [
+        {
+          "player": "Andrey Rublev",
+          "rank": 13
+        },
+        {
+          "player": "Stefanos Tsitsipas",
+          "rank": 88
+        }
+      ],
+      "stake_total_odds": 1.711,
+      "total_odds": 1.711,
+      "cum_prob": 0.4158,
+      "rating": 3
+    },
+    {
+      "picks": [
+        {
+          "player": "Stefanos Tsitsipas",
+          "rank": 88
+        },
+        {
+          "player": "Hugo Dellien",
+          "rank": 165
+        }
+      ],
+      "stake_total_odds": 1.674,
+      "total_odds": 1.674,
+      "cum_prob": 0.4044,
+      "rating": 3
+    },
+    {
+      "picks": [
+        {
+          "player": "Stefanos Tsitsipas",
+          "rank": 88
+        },
+        {
+          "player": "Alcala Gurri, Max",
+          "rank": 234
+        }
+      ],
+      "stake_total_odds": 1.662,
+      "total_odds": 1.662,
+      "cum_prob": 0.4033,
+      "rating": 3
+    },
+    {
+      "picks": [
+        {
+          "player": "Andrey Rublev",
+          "rank": 13
+        },
+        {
+          "player": "Alcala Gurri, Max",
+          "rank": 234
+        }
+      ],
+      "stake_total_odds": 1.849,
+      "total_odds": 1.849,
+      "cum_prob": 0.3948,
+      "rating": 3
+    }
+  ]
+}
