@@ -167,7 +167,7 @@
               ],
               "stake_odds": 1.829,
               "best_odds": 1.829,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -194,7 +194,7 @@
               ],
               "stake_odds": 1.829,
               "best_odds": 1.829,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -226,7 +226,7 @@
               ],
               "stake_odds": 1.69,
               "best_odds": 1.69,
-              "won": null
+              "won": true
             },
             {
               "legs": [
