@@ -176,7 +176,7 @@
               ],
               "stake_odds": 1.727,
               "best_odds": 1.727,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -185,7 +185,7 @@
               ],
               "stake_odds": 1.715,
               "best_odds": 1.715,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -203,10 +203,10 @@
               ],
               "stake_odds": 1.727,
               "best_odds": 1.727,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "16": {
           "parlays": [
@@ -217,7 +217,7 @@
               ],
               "stake_odds": 1.83,
               "best_odds": 1.83,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -235,7 +235,7 @@
               ],
               "stake_odds": 1.73,
               "best_odds": 1.73,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -244,7 +244,7 @@
               ],
               "stake_odds": 1.718,
               "best_odds": 1.718,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -253,10 +253,10 @@
               ],
               "stake_odds": 1.658,
               "best_odds": 1.658,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "17": {
           "parlays": [
@@ -267,10 +267,10 @@
               ],
               "stake_odds": 1.742,
               "best_odds": 1.742,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "18": {
           "parlays": [
@@ -281,7 +281,7 @@
               ],
               "stake_odds": 1.724,
               "best_odds": 1.724,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -290,7 +290,7 @@
               ],
               "stake_odds": 1.711,
               "best_odds": 1.711,
-              "won": null
+              "won": true
             },
             {
               "legs": [
