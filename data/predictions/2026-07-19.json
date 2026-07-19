@@ -1,0 +1,41 @@
+{
+  "date": "2026-07-19",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Ignacio Buse",
+          "rank": 34,
+          "tournament": ""
+        },
+        {
+          "player": "Luca Van Assche",
+          "rank": 82,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.69,
+      "total_odds": 1.69,
+      "cum_prob": 0.4629,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Yannick Hanfmann",
+          "rank": 55,
+          "tournament": ""
+        },
+        {
+          "player": "Pablo Carreno-Busta",
+          "rank": 71,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.85,
+      "total_odds": 1.85,
+      "cum_prob": 0.431,
+      "rating": 3
+    }
+  ]
+}

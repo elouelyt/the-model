@@ -321,6 +321,29 @@
             }
           ],
           "resolved": true
+        },
+        "19": {
+          "parlays": [
+            {
+              "legs": [
+                "Ignacio Buse",
+                "Luca Van Assche"
+              ],
+              "stake_odds": 1.69,
+              "best_odds": 1.69,
+              "won": null
+            },
+            {
+              "legs": [
+                "Yannick Hanfmann",
+                "Pablo Carreno-Busta"
+              ],
+              "stake_odds": 1.85,
+              "best_odds": 1.85,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
