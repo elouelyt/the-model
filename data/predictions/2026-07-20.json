@@ -1,0 +1,95 @@
+{
+  "date": "2026-07-20",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luca Van Assche",
+          "rank": 82,
+          "tournament": ""
+        },
+        {
+          "player": "Daniel Merida",
+          "rank": 85,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.656,
+      "total_odds": 1.656,
+      "cum_prob": 0.5265,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Luca Van Assche",
+          "rank": 82,
+          "tournament": ""
+        },
+        {
+          "player": "Nicolai Budkov Kjaer",
+          "rank": 121,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.668,
+      "total_odds": 1.668,
+      "cum_prob": 0.4902,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Shintaro Mochizuki",
+          "rank": 150,
+          "tournament": ""
+        },
+        {
+          "player": "Daniel Merida",
+          "rank": 85,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.711,
+      "total_odds": 1.711,
+      "cum_prob": 0.4868,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Alex Michelsen",
+          "rank": 42,
+          "tournament": ""
+        },
+        {
+          "player": "Daniel Merida",
+          "rank": 85,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.822,
+      "total_odds": 1.822,
+      "cum_prob": 0.4795,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Otto Virtanen",
+          "rank": 137,
+          "tournament": ""
+        },
+        {
+          "player": "Daniel Merida",
+          "rank": 85,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.697,
+      "total_odds": 1.697,
+      "cum_prob": 0.4868,
+      "rating": 3
+    }
+  ]
+}

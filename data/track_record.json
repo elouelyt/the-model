@@ -344,6 +344,56 @@
             }
           ],
           "resolved": false
+        },
+        "20": {
+          "parlays": [
+            {
+              "legs": [
+                "Luca Van Assche",
+                "Daniel Merida"
+              ],
+              "stake_odds": 1.656,
+              "best_odds": 1.656,
+              "won": null
+            },
+            {
+              "legs": [
+                "Luca Van Assche",
+                "Nicolai Budkov Kjaer"
+              ],
+              "stake_odds": 1.668,
+              "best_odds": 1.668,
+              "won": null
+            },
+            {
+              "legs": [
+                "Shintaro Mochizuki",
+                "Daniel Merida"
+              ],
+              "stake_odds": 1.711,
+              "best_odds": 1.711,
+              "won": null
+            },
+            {
+              "legs": [
+                "Alex Michelsen",
+                "Daniel Merida"
+              ],
+              "stake_odds": 1.822,
+              "best_odds": 1.822,
+              "won": null
+            },
+            {
+              "legs": [
+                "Otto Virtanen",
+                "Daniel Merida"
+              ],
+              "stake_odds": 1.697,
+              "best_odds": 1.697,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
