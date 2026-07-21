@@ -340,10 +340,10 @@
               ],
               "stake_odds": 1.85,
               "best_odds": 1.85,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "20": {
           "parlays": [
@@ -354,7 +354,7 @@
               ],
               "stake_odds": 1.656,
               "best_odds": 1.656,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -372,7 +372,7 @@
               ],
               "stake_odds": 1.711,
               "best_odds": 1.711,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -381,7 +381,7 @@
               ],
               "stake_odds": 1.822,
               "best_odds": 1.822,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -390,7 +390,7 @@
               ],
               "stake_odds": 1.697,
               "best_odds": 1.697,
-              "won": null
+              "won": false
             }
           ],
           "resolved": false
