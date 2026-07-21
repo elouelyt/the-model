@@ -1,0 +1,95 @@
+{
+  "date": "2026-07-21",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Tomas Martin Etcheverry",
+          "rank": 32,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.825,
+      "total_odds": 1.825,
+      "cum_prob": 0.5418,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Alex Michelsen",
+          "rank": 42,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.65,
+      "total_odds": 1.65,
+      "cum_prob": 0.5327,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Nicolai Budkov Kjaer",
+          "rank": 121,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.737,
+      "total_odds": 1.737,
+      "cum_prob": 0.509,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Pablo Carreno-Busta",
+          "rank": 71,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.688,
+      "total_odds": 1.688,
+      "cum_prob": 0.4983,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Tomas Martin Etcheverry",
+          "rank": 32,
+          "tournament": ""
+        },
+        {
+          "player": "August Holmgren",
+          "rank": 141,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.84,
+      "total_odds": 1.84,
+      "cum_prob": 0.4846,
+      "rating": 4
+    }
+  ]
+}

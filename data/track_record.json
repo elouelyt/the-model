@@ -331,7 +331,7 @@
               ],
               "stake_odds": 1.69,
               "best_odds": 1.69,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -390,6 +390,56 @@
               ],
               "stake_odds": 1.697,
               "best_odds": 1.697,
+              "won": null
+            }
+          ],
+          "resolved": false
+        },
+        "21": {
+          "parlays": [
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Tomas Martin Etcheverry"
+              ],
+              "stake_odds": 1.825,
+              "best_odds": 1.825,
+              "won": null
+            },
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Alex Michelsen"
+              ],
+              "stake_odds": 1.65,
+              "best_odds": 1.65,
+              "won": null
+            },
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Nicolai Budkov Kjaer"
+              ],
+              "stake_odds": 1.737,
+              "best_odds": 1.737,
+              "won": null
+            },
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Pablo Carreno-Busta"
+              ],
+              "stake_odds": 1.688,
+              "best_odds": 1.688,
+              "won": null
+            },
+            {
+              "legs": [
+                "Tomas Martin Etcheverry",
+                "August Holmgren"
+              ],
+              "stake_odds": 1.84,
+              "best_odds": 1.84,
               "won": null
             }
           ],
