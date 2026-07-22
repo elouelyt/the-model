@@ -444,6 +444,38 @@
             }
           ],
           "resolved": false
+        },
+        "22": {
+          "parlays": [
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Alexander Bublik"
+              ],
+              "stake_odds": 1.843,
+              "best_odds": 1.843,
+              "won": null
+            },
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Alexander Blockx"
+              ],
+              "stake_odds": 1.83,
+              "best_odds": 1.83,
+              "won": null
+            },
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Clement Chidekh"
+              ],
+              "stake_odds": 1.664,
+              "best_odds": 1.664,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

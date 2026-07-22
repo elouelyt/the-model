@@ -1,0 +1,59 @@
+{
+  "date": "2026-07-22",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Alexander Bublik",
+          "rank": 11,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.843,
+      "total_odds": 1.843,
+      "cum_prob": 0.5746,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Alexander Blockx",
+          "rank": 37,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.83,
+      "total_odds": 1.83,
+      "cum_prob": 0.5226,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Clement Chidekh",
+          "rank": 205,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.664,
+      "total_odds": 1.664,
+      "cum_prob": 0.4919,
+      "rating": 4
+    }
+  ]
+}
