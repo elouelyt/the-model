@@ -1,0 +1,77 @@
+{
+  "date": "2026-07-23",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alexander Bublik",
+          "rank": 11,
+          "tournament": ""
+        },
+        {
+          "player": "Samuel, Toby",
+          "rank": 449,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 1.81,
+      "cum_prob": 0.5064,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Clement Chidekh",
+          "rank": 205,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.651,
+      "total_odds": 1.651,
+      "cum_prob": 0.4986,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Borna Gojo",
+          "rank": 181,
+          "tournament": ""
+        },
+        {
+          "player": "Alex Michelsen",
+          "rank": 42,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.84,
+      "total_odds": 1.84,
+      "cum_prob": 0.4535,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Borna Gojo",
+          "rank": 181,
+          "tournament": ""
+        },
+        {
+          "player": "Samuel, Toby",
+          "rank": 449,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 1.694,
+      "cum_prob": 0.4319,
+      "rating": 3
+    }
+  ]
+}

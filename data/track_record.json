@@ -476,6 +476,38 @@
             }
           ],
           "resolved": false
+        },
+        "23": {
+          "parlays": [
+            {
+              "legs": [
+                "Alexander Bublik",
+                "Samuel, Toby"
+              ],
+              "stake_odds": null,
+              "best_odds": 1.81,
+              "won": null
+            },
+            {
+              "legs": [
+                "Borna Gojo",
+                "Alex Michelsen"
+              ],
+              "stake_odds": 1.84,
+              "best_odds": 1.84,
+              "won": null
+            },
+            {
+              "legs": [
+                "Borna Gojo",
+                "Samuel, Toby"
+              ],
+              "stake_odds": null,
+              "best_odds": 1.694,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
