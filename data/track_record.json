@@ -404,7 +404,7 @@
               ],
               "stake_odds": 1.825,
               "best_odds": 1.825,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -431,7 +431,7 @@
               ],
               "stake_odds": 1.688,
               "best_odds": 1.688,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -454,7 +454,7 @@
               ],
               "stake_odds": 1.843,
               "best_odds": 1.843,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -463,7 +463,7 @@
               ],
               "stake_odds": 1.83,
               "best_odds": 1.83,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -504,6 +504,20 @@
               ],
               "stake_odds": null,
               "best_odds": 1.694,
+              "won": null
+            }
+          ],
+          "resolved": false
+        },
+        "24": {
+          "parlays": [
+            {
+              "legs": [
+                "Luciano Darderi",
+                "Samuel, Toby"
+              ],
+              "stake_odds": null,
+              "best_odds": 1.656,
               "won": null
             }
           ],

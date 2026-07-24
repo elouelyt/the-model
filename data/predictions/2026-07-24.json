@@ -1,0 +1,41 @@
+{
+  "date": "2026-07-24",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 16,
+          "tournament": ""
+        },
+        {
+          "player": "Samuel, Toby",
+          "rank": 449,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 1.656,
+      "cum_prob": 0.5,
+      "rating": 4
+    },
+    {
+      "picks": [
+        {
+          "player": "Alexander Bublik",
+          "rank": 11,
+          "tournament": ""
+        },
+        {
+          "player": "Samuel, Toby",
+          "rank": 449,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 1.736,
+      "cum_prob": 0.438,
+      "rating": 3
+    }
+  ]
+}
