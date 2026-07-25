@@ -363,7 +363,7 @@
               ],
               "stake_odds": 1.668,
               "best_odds": 1.668,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -393,7 +393,7 @@
               "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "21": {
           "parlays": [
@@ -413,7 +413,7 @@
               ],
               "stake_odds": 1.65,
               "best_odds": 1.65,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -422,7 +422,7 @@
               ],
               "stake_odds": 1.737,
               "best_odds": 1.737,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -440,10 +440,10 @@
               ],
               "stake_odds": 1.84,
               "best_odds": 1.84,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "22": {
           "parlays": [
@@ -472,10 +472,10 @@
               ],
               "stake_odds": 1.664,
               "best_odds": 1.664,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "23": {
           "parlays": [
@@ -486,7 +486,7 @@
               ],
               "stake_odds": null,
               "best_odds": 1.81,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -495,7 +495,7 @@
               ],
               "stake_odds": 1.84,
               "best_odds": 1.84,
-              "won": null
+              "won": true
             },
             {
               "legs": [
@@ -504,10 +504,10 @@
               ],
               "stake_odds": null,
               "best_odds": 1.694,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "24": {
           "parlays": [
@@ -518,10 +518,10 @@
               ],
               "stake_odds": null,
               "best_odds": 1.656,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
