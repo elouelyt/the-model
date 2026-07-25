@@ -1,12 +1,13 @@
 """Check parlay predictions against ATP match results.
 
-Uses Sofascore's API to determine match outcomes — accessible from GitHub
-Actions (no Cloudflare block) and covers ALL ATP tournaments including 250s
-and Challengers.
+Primary source:  ESPN ATP scoreboard API  (covers ATP 250/500/1000 + some Challengers)
+Fallback source: JeffSackmann/tennis_atp CSV on GitHub (covers ALL ATP + Challengers)
 
 Run daily in GitHub Actions BEFORE generate_html.py.
 """
 
+import csv
+import io
 import json
 import logging
 from datetime import datetime, timedelta, timezone
@@ -28,6 +29,12 @@ _STAKE_PER_BET = 15.0
 
 # Cache of ESPN ATP scoreboard events keyed by "YYYYMMDD" (reused across players)
 _espn_cache: dict[str, list[dict]] = {}
+
+# Cache of Sackmann CSV rows keyed by year
+_sackmann_cache: dict[int, list[dict]] = {}
+
+# Round ordering for finding the earliest match in Sackmann data
+_ROUND_ORDER = {"R128": 0, "R64": 1, "R32": 2, "R16": 3, "QF": 4, "SF": 5, "F": 6, "RR": 2, "BR": 5}
 
 
 def _similarity(a: str, b: str) -> float:
@@ -69,6 +76,87 @@ def _player_matches_name(player: str, name: str) -> bool:
         return True
     last = player.split()[-1].lower()
     return last in name.lower() and len(last) > 3
+
+
+def _fetch_sackmann_matches(year: int) -> list[dict]:
+    """Download JeffSackmann/tennis_atp atp_matches_{year}.csv. Cached per process.
+
+    Covers ALL ATP Tour + Challenger matches. Updated by Sackmann within ~48h of play.
+    tourney_date column = tournament start date (Monday), NOT individual match date.
+    """
+    if year in _sackmann_cache:
+        return _sackmann_cache[year]
+    url = (
+        f"https://raw.githubusercontent.com/JeffSackmann/tennis_atp/master/"
+        f"atp_matches_{year}.csv"
+    )
+    try:
+        resp = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        rows = list(csv.DictReader(io.StringIO(resp.text)))
+        _sackmann_cache[year] = rows
+        logger.info("[sackmann] loaded %d matches for %d", len(rows), year)
+    except Exception as exc:
+        logger.warning("[sackmann] fetch failed for %d: %s", year, exc)
+        _sackmann_cache[year] = []
+    return _sackmann_cache[year]
+
+
+def _fetch_sackmann_result(player: str, pred_date_str: str) -> str | None:
+    """Fallback to Sackmann CSV for players missed by ESPN (e.g. smaller Challengers).
+
+    Since Sackmann only stores tourney_date (week start), we search tournaments that
+    started within 8 days before pred_date or during the 6-day window, then take the
+    earliest-round match found for the player.
+    """
+    pred_date = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end = pred_date + timedelta(days=6)
+    window_start = pred_date - timedelta(days=8)  # catch ongoing multi-week events
+
+    years: set[int] = {pred_date.year, cutoff_end.year}
+    all_rows: list[dict] = []
+    for y in years:
+        all_rows.extend(_fetch_sackmann_matches(y))
+
+    candidates: list[tuple[int, str]] = []  # (round_order, result)
+
+    for row in all_rows:
+        date_str = row.get("tourney_date", "")
+        if len(date_str) != 8:
+            continue
+        try:
+            tourney_dt = datetime(
+                int(date_str[:4]), int(date_str[4:6]), int(date_str[6:8]),
+                tzinfo=timezone.utc,
+            )
+        except Exception:
+            continue
+
+        if tourney_dt < window_start or tourney_dt > cutoff_end:
+            continue
+
+        winner = row.get("winner_name", "")
+        loser  = row.get("loser_name", "")
+
+        if _player_matches_name(player, winner):
+            result = "won"
+        elif _player_matches_name(player, loser):
+            result = "lost"
+        else:
+            continue
+
+        round_key = _ROUND_ORDER.get(row.get("round", ""), 99)
+        candidates.append((round_key, result))
+
+    if not candidates:
+        logger.debug("[sackmann] no match for %s from %s", player, pred_date_str)
+        return None
+
+    # Earliest round = most likely the first match on/after pred_date
+    candidates.sort(key=lambda x: x[0])
+    result = candidates[0][1]
+    logger.info("[sackmann] %s → %s (round order %d)", player, result.upper(), candidates[0][0])
+    return result
 
 
 def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP tennis") -> str | None:
@@ -118,8 +206,8 @@ def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP 
         logger.info("[espn] %s → %s (match at %s)", player, best[1].upper(), best[0].date())
         return best[1]
 
-    logger.debug("No ESPN match found for %s from %s", player, pred_date_str)
-    return None
+    # ESPN didn't find it — try Sackmann CSV (covers all Challengers)
+    return _fetch_sackmann_result(player, pred_date_str)
 
 
 def check_parlay(parlay: dict, pred_date: str) -> bool | None:

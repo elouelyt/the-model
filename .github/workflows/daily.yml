@@ -5,6 +5,10 @@ on:
     - cron: "0 8 * * *"   # 08:00 UTC every day
   workflow_dispatch:        # allow manual runs from the Actions tab
 
+concurrency:
+  group: daily-predictions  # only one run at a time — prevents Pages deployment collisions
+  cancel-in-progress: false # queue new runs rather than cancel in-progress ones
+
 permissions:
   contents: write           # needed to commit index.html back to the repo
 
