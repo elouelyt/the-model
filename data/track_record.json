@@ -522,6 +522,20 @@
             }
           ],
           "resolved": true
+        },
+        "26": {
+          "parlays": [
+            {
+              "legs": [
+                "Alexsandar Vukic",
+                "Hayato Matsuoka"
+              ],
+              "stake_odds": null,
+              "best_odds": 1.843,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

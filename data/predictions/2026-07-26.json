@@ -1,0 +1,23 @@
+{
+  "date": "2026-07-26",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alexsandar Vukic",
+          "rank": 103,
+          "tournament": ""
+        },
+        {
+          "player": "Hayato Matsuoka",
+          "rank": 347,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 1.843,
+      "cum_prob": 0.3652,
+      "rating": 3
+    }
+  ]
+}
