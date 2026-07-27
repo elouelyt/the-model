@@ -536,6 +536,47 @@
             }
           ],
           "resolved": false
+        },
+        "27": {
+          "parlays": [
+            {
+              "legs": [
+                "Jakub Mensik",
+                "Ben Shelton"
+              ],
+              "stake_odds": 1.673,
+              "best_odds": 1.787,
+              "won": null
+            },
+            {
+              "legs": [
+                "Ben Shelton",
+                "Ugo Humbert"
+              ],
+              "stake_odds": 1.632,
+              "best_odds": 1.787,
+              "won": null
+            },
+            {
+              "legs": [
+                "Ben Shelton",
+                "Taylor Fritz"
+              ],
+              "stake_odds": 1.659,
+              "best_odds": 1.816,
+              "won": null
+            },
+            {
+              "legs": [
+                "Learner Tien",
+                "Jakub Mensik"
+              ],
+              "stake_odds": 1.55,
+              "best_odds": 1.663,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

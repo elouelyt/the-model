@@ -1,0 +1,95 @@
+{
+  "date": "2026-07-27",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Jakub Mensik",
+          "rank": 17,
+          "tournament": ""
+        },
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.673,
+      "total_odds": 1.787,
+      "cum_prob": 0.6534,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        },
+        {
+          "player": "Ugo Humbert",
+          "rank": 30,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.632,
+      "total_odds": 1.787,
+      "cum_prob": 0.6408,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        },
+        {
+          "player": "Ugo Humbert",
+          "rank": 30,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.632,
+      "total_odds": 1.73,
+      "cum_prob": 0.6338,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        },
+        {
+          "player": "Taylor Fritz",
+          "rank": 7,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.659,
+      "total_odds": 1.816,
+      "cum_prob": 0.6136,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Learner Tien",
+          "rank": 18,
+          "tournament": ""
+        },
+        {
+          "player": "Jakub Mensik",
+          "rank": 17,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.55,
+      "total_odds": 1.663,
+      "cum_prob": 0.585,
+      "rating": 6
+    }
+  ]
+}
