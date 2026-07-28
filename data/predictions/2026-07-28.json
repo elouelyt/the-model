@@ -1,0 +1,95 @@
+{
+  "date": "2026-07-28",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Jakub Mensik",
+          "rank": 17,
+          "tournament": ""
+        },
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.675,
+      "total_odds": 1.78,
+      "cum_prob": 0.6517,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        },
+        {
+          "player": "Ugo Humbert",
+          "rank": 30,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.648,
+      "total_odds": 1.725,
+      "cum_prob": 0.6268,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Learner Tien",
+          "rank": 18,
+          "tournament": ""
+        },
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.635,
+      "total_odds": 1.725,
+      "cum_prob": 0.571,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Tommy Paul",
+          "rank": 24,
+          "tournament": ""
+        },
+        {
+          "player": "Jakub Mensik",
+          "rank": 17,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.575,
+      "total_odds": 1.664,
+      "cum_prob": 0.5789,
+      "rating": 5
+    },
+    {
+      "picks": [
+        {
+          "player": "Tommy Paul",
+          "rank": 24,
+          "tournament": ""
+        },
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.688,
+      "total_odds": 1.78,
+      "cum_prob": 0.5517,
+      "rating": 5
+    }
+  ]
+}

@@ -577,6 +577,38 @@
             }
           ],
           "resolved": false
+        },
+        "28": {
+          "parlays": [
+            {
+              "legs": [
+                "Learner Tien",
+                "Ben Shelton"
+              ],
+              "stake_odds": 1.635,
+              "best_odds": 1.725,
+              "won": null
+            },
+            {
+              "legs": [
+                "Tommy Paul",
+                "Jakub Mensik"
+              ],
+              "stake_odds": 1.575,
+              "best_odds": 1.664,
+              "won": null
+            },
+            {
+              "legs": [
+                "Tommy Paul",
+                "Ben Shelton"
+              ],
+              "stake_odds": 1.688,
+              "best_odds": 1.78,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
