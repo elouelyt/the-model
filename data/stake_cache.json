@@ -1,22 +1,16 @@
 {
-  "timestamp": "2026-07-29T16:00:30.385237+00:00",
-  "player_count": 16,
+  "timestamp": "2026-07-30T16:00:24.632105+00:00",
+  "player_count": 10,
   "odds": {
-    "Alex de Minaur": 1.68,
-    "Stefanos Tsitsipas": 2.15,
-    "Aleksandar Vukic": 3.05,
-    "Lorenzo Musetti": 1.37,
-    "Taylor Fritz": 1.28,
-    "Kamil Majchrzak": 3.55,
-    "Alex Michelsen": 1.29,
-    "Adrian Mannarino": 3.5,
-    "Rafael Jodar": 1.18,
-    "Kei Nishikori": 4.7,
-    "Brandon Nakashima": 2.1,
-    "Jakub Mensik": 1.71,
+    "Alex de Minaur": 1.07,
+    "Cruz Hewitt": 7.8,
+    "Terence Atmane": 1.81,
+    "Alejandro Tabilo": 1.97,
     "Ugo Humbert": 2.47,
     "Ben Shelton": 1.53,
-    "Terence Atmane": 1.81,
-    "Alejandro Tabilo": 1.97
+    "Taylor Fritz": 1.44,
+    "Alex Michelsen": 2.75,
+    "Rafael Jodar": 1.48,
+    "Lorenzo Musetti": 2.6
   }
 }
