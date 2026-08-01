@@ -611,6 +611,24 @@
           "resolved": true
         }
       }
+    },
+    "2026-08": {
+      "days": {
+        "1": {
+          "parlays": [
+            {
+              "legs": [
+                "Rafael Jodar",
+                "Benjamin Bonzi"
+              ],
+              "stake_odds": 1.67,
+              "best_odds": 1.783,
+              "won": null
+            }
+          ],
+          "resolved": false
+        }
+      }
     }
   }
 }

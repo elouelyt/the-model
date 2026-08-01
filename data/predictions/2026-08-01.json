@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-01",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Rafael Jodar",
+          "rank": 26,
+          "tournament": ""
+        },
+        {
+          "player": "Benjamin Bonzi",
+          "rank": 93,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.67,
+      "total_odds": 1.783,
+      "cum_prob": 0.4292,
+      "rating": 3
+    }
+  ]
+}
