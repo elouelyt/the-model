@@ -544,57 +544,46 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
     </details>"""
 
 
-def _track_record_html(track_record: dict) -> str:
-    """Generate monthly track record table."""
-    if not track_record or not track_record.get("months"):
-        return ""
-
-    # Current month
-    now = datetime.now(timezone.utc)
-    month_str = now.strftime("%Y-%m")
-    month_data = track_record["months"].get(month_str, {})
-    days = month_data.get("days", {})
-
-    if not days:
-        return ""
-
-    stake_per_bet = 15.0
+def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
+    """Render the day-by-day table for one month."""
     rows_html = ""
-    total_won = 0
-    total_lost_eur = 0.0
     total_won_eur = 0.0
+    total_lost_eur = 0.0
 
     for day_num in range(1, 32):
         day_key = str(day_num)
         day_data = days.get(day_key)
         if not day_data:
-            rows_html += f'<tr class="tr-empty"><td>{day_num}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>'
+            rows_html += (
+                f'<tr class="tr-empty"><td>{day_num}</td>'
+                '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>'
+            )
             continue
 
         parlays_day = day_data.get("parlays", [])
-        won_count = sum(1 for p in parlays_day if p.get("won") is True)
+        won_count  = sum(1 for p in parlays_day if p.get("won") is True)
         lost_count = sum(1 for p in parlays_day if p.get("won") is False)
-        pending = sum(1 for p in parlays_day if p.get("won") is None)
+        pending    = sum(1 for p in parlays_day if p.get("won") is None)
 
-        day_won_eur = sum(
+        day_won_eur  = sum(
             stake_per_bet * (p.get("stake_odds") or p.get("best_odds") or 1) - stake_per_bet
             for p in parlays_day if p.get("won") is True
         )
         day_lost_eur = lost_count * stake_per_bet
-
-        total_won += won_count
-        total_won_eur += day_won_eur
+        total_won_eur  += day_won_eur
         total_lost_eur += day_lost_eur
 
-        roi_day = day_won_eur - day_lost_eur
+        roi_day   = day_won_eur - day_lost_eur
         roi_color = "#10b981" if roi_day >= 0 else "#f87171"
-        pending_badge = f' <span style="color:var(--muted);font-size:10px;">+{pending} pend.</span>' if pending else ""
+        pending_badge = (
+            f' <span style="color:var(--muted);font-size:10px;">+{pending} pend.</span>'
+            if pending else ""
+        )
 
-        # Dropdown with parlay detail
         detail_rows = ""
         for i, p in enumerate(parlays_day, 1):
-            legs = ", ".join(p.get("legs", []))
-            odds = p.get("stake_odds") or p.get("best_odds")
+            legs     = ", ".join(p.get("legs", []))
+            odds     = p.get("stake_odds") or p.get("best_odds")
             odds_str = f"{odds:.2f}" if odds else "—"
             if p.get("won") is True:
                 result_badge = '<span style="color:#10b981;font-weight:700;">✓ WON</span>'
@@ -602,10 +591,14 @@ def _track_record_html(track_record: dict) -> str:
                 result_badge = '<span style="color:#f87171;font-weight:700;">✗ LOST</span>'
             else:
                 result_badge = '<span style="color:var(--muted);">pending</span>'
-            detail_rows += f'<tr><td style="color:var(--muted);font-size:11px;">#{i}</td><td style="font-size:11px;">{legs}</td><td style="font-size:11px;">{odds_str}</td><td>{result_badge}</td></tr>'
+            detail_rows += (
+                f'<tr><td style="color:var(--muted);font-size:11px;">#{i}</td>'
+                f'<td style="font-size:11px;">{legs}</td>'
+                f'<td style="font-size:11px;">{odds_str}</td>'
+                f'<td>{result_badge}</td></tr>'
+            )
 
-        detail_html = f"""
-        <details style="margin:0;">
+        detail_html = f"""<details style="margin:0;">
             <summary style="cursor:pointer;list-style:none;color:var(--accent);">▸ {won_count}/{len(parlays_day)}{pending_badge}</summary>
             <table style="margin-top:6px;width:100%;font-size:11px;">
                 <thead><tr><th>#</th><th>Parlay</th><th>Cuota</th><th>Resultado</th></tr></thead>
@@ -613,8 +606,8 @@ def _track_record_html(track_record: dict) -> str:
             </table>
         </details>"""
 
-        day_apostado = len(parlays_day) * stake_per_bet
-        lost_display = f"-{total_lost_eur:.2f}€" if total_lost_eur > 0 else "0.00€"
+        day_apostado  = len(parlays_day) * stake_per_bet
+        lost_display  = f"-{total_lost_eur:.2f}€" if total_lost_eur > 0 else "0.00€"
         rows_html += f"""<tr>
             <td style="font-weight:600;">{day_num}</td>
             <td>{detail_html}</td>
@@ -624,7 +617,7 @@ def _track_record_html(track_record: dict) -> str:
             <td style="color:{roi_color};font-weight:700;">{roi_day:+.2f}€</td>
         </tr>"""
 
-    net = total_won_eur - total_lost_eur
+    net       = total_won_eur - total_lost_eur
     net_color = "#10b981" if net >= 0 else "#f87171"
     total_apostado = sum(
         len(days[d].get("parlays", [])) * stake_per_bet
@@ -632,15 +625,7 @@ def _track_record_html(track_record: dict) -> str:
     )
     roi_pct = (net / total_apostado * 100) if total_apostado > 0 else 0.0
 
-    month_label = now.strftime("%B %Y")
     return f"""
-<details class="parlays-section" style="margin-top:8px;">
-  <summary class="parlays-summary">
-    <span class="parlays-title">📊 Track Record — {month_label}</span>
-    <span class="parlays-count" style="color:{net_color};">{net:+.2f}€ ROI {roi_pct:+.1f}%</span>
-    <span class="parlays-chevron">▸</span>
-  </summary>
-  <div style="padding:12px 0;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <thead>
         <tr style="color:var(--muted);text-align:left;border-bottom:1px solid var(--border);">
@@ -663,9 +648,125 @@ def _track_record_html(track_record: dict) -> str:
           <td style="color:{net_color};">{net:+.2f}€ ({roi_pct:+.1f}%)</td>
         </tr>
       </tfoot>
-    </table>
+    </table>""", net, total_apostado, roi_pct
+
+
+def _track_record_html(track_record: dict) -> str:
+    """Generate multi-month track record with tab selector."""
+    if not track_record or not track_record.get("months"):
+        return ""
+
+    months_data = track_record["months"]
+    # Sort months chronologically, most recent last (tabs left→right = oldest→newest)
+    sorted_months = sorted(months_data.keys())
+    if not sorted_months:
+        return ""
+
+    now        = datetime.now(timezone.utc)
+    cur_month  = now.strftime("%Y-%m")
+    # Default to the most recent month that has data
+    active_month = sorted_months[-1]
+
+    _MONTH_NAMES_ES = {
+        "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
+        "05": "Mayo",  "06": "Junio",   "07": "Julio", "08": "Agosto",
+        "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre",
+    }
+
+    def month_label(m: str) -> str:
+        parts = m.split("-")
+        return f"{_MONTH_NAMES_ES.get(parts[1], parts[1])} {parts[0]}" if len(parts) == 2 else m
+
+    # Build tab buttons
+    tab_buttons = ""
+    for m in sorted_months:
+        days = months_data[m].get("days", {})
+        if not days:
+            continue
+        active_cls = "tr-active" if m == active_month else ""
+        tab_buttons += (
+            f'<button class="month-tab {active_cls}" '
+            f'onclick="switchMonth(\'{m}\')" id="tab-{m}">'
+            f'{month_label(m)}</button>'
+        )
+
+    # Build month panels
+    panels_html = ""
+    all_months_net = 0.0
+    all_months_apostado = 0.0
+
+    for m in sorted_months:
+        days = months_data[m].get("days", {})
+        if not days:
+            continue
+        table_html, net, apostado, roi_pct = _month_table_html(days)
+        all_months_net      += net
+        all_months_apostado += apostado
+        net_color = "#10b981" if net >= 0 else "#f87171"
+        display = "block" if m == active_month else "none"
+        panels_html += f"""
+<div class="month-panel" id="panel-{m}" style="display:{display};">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span style="font-size:12px;color:var(--muted);">{month_label(m)}</span>
+    <span style="font-size:13px;font-weight:700;color:{net_color};">{net:+.2f}€ &nbsp; ROI {roi_pct:+.1f}%</span>
   </div>
-</details>"""
+  {table_html}
+</div>"""
+
+    # Cumulative summary across all months
+    all_roi_pct   = (all_months_net / all_months_apostado * 100) if all_months_apostado > 0 else 0.0
+    all_net_color = "#10b981" if all_months_net >= 0 else "#f87171"
+    cumulative_badge = (
+        f'<span style="font-size:12px;color:var(--muted);margin-left:12px;">'
+        f'Total acumulado: <strong style="color:{all_net_color};">'
+        f'{all_months_net:+.2f}€ ({all_roi_pct:+.1f}%)</strong></span>'
+        if len(sorted_months) > 1 else ""
+    )
+
+    return f"""
+<details class="parlays-section" style="margin-top:8px;" open>
+  <summary class="parlays-summary">
+    <span class="parlays-title">📊 Track Record</span>
+    <span class="parlays-count" style="color:{all_net_color};">{all_months_net:+.2f}€ total</span>
+    <span class="parlays-chevron">▸</span>
+  </summary>
+  <div style="padding:12px 0;">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+      {tab_buttons}
+      {cumulative_badge}
+    </div>
+    {panels_html}
+  </div>
+</details>
+<style>
+.month-tab {{
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}}
+.month-tab:hover {{ background: var(--surface-3); }}
+.month-tab.tr-active {{
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}}
+</style>
+<script>
+function switchMonth(m) {{
+  document.querySelectorAll('.month-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.month-tab').forEach(b => b.classList.remove('tr-active'));
+  var panel = document.getElementById('panel-' + m);
+  var tab   = document.getElementById('tab-'   + m);
+  if (panel) panel.style.display = 'block';
+  if (tab)   tab.classList.add('tr-active');
+}}
+</script>"""
 
 
 def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
