@@ -623,6 +623,20 @@
               ],
               "stake_odds": 1.67,
               "best_odds": 1.783,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "2": {
+          "parlays": [
+            {
+              "legs": [
+                "Cameron Norrie",
+                "Martin Landaluce"
+              ],
+              "stake_odds": 1.724,
+              "best_odds": 1.75,
               "won": null
             }
           ],
