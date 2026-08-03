@@ -641,6 +641,56 @@
             }
           ],
           "resolved": false
+        },
+        "3": {
+          "parlays": [
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Kamil Majchrzak"
+              ],
+              "stake_odds": 1.573,
+              "best_odds": 1.662,
+              "won": null
+            },
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Thiago Agustin Tirante"
+              ],
+              "stake_odds": 1.597,
+              "best_odds": 1.662,
+              "won": null
+            },
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Martin Landaluce"
+              ],
+              "stake_odds": null,
+              "best_odds": 1.786,
+              "won": null
+            },
+            {
+              "legs": [
+                "Thiago Agustin Tirante",
+                "Kamil Majchrzak"
+              ],
+              "stake_odds": 1.716,
+              "best_odds": 1.796,
+              "won": null
+            },
+            {
+              "legs": [
+                "Cameron Norrie",
+                "Kamil Majchrzak"
+              ],
+              "stake_odds": 1.625,
+              "best_odds": 1.675,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
