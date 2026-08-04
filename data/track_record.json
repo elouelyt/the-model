@@ -637,10 +637,10 @@
               ],
               "stake_odds": 1.724,
               "best_odds": 1.75,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "3": {
           "parlays": [
@@ -651,7 +651,7 @@
               ],
               "stake_odds": 1.573,
               "best_odds": 1.662,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -669,7 +669,7 @@
               ],
               "stake_odds": null,
               "best_odds": 1.786,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -678,7 +678,7 @@
               ],
               "stake_odds": 1.716,
               "best_odds": 1.796,
-              "won": null
+              "won": false
             },
             {
               "legs": [
@@ -687,6 +687,47 @@
               ],
               "stake_odds": 1.625,
               "best_odds": 1.675,
+              "won": false
+            }
+          ],
+          "resolved": false
+        },
+        "4": {
+          "parlays": [
+            {
+              "legs": [
+                "Felix Auger-Aliassime",
+                "Learner Tien"
+              ],
+              "stake_odds": 1.609,
+              "best_odds": 1.686,
+              "won": null
+            },
+            {
+              "legs": [
+                "Andrey Rublev",
+                "Learner Tien"
+              ],
+              "stake_odds": 1.676,
+              "best_odds": 1.768,
+              "won": null
+            },
+            {
+              "legs": [
+                "Learner Tien",
+                "Thiago Agustin Tirante"
+              ],
+              "stake_odds": 1.756,
+              "best_odds": 1.836,
+              "won": null
+            },
+            {
+              "legs": [
+                "Felix Auger-Aliassime",
+                "Thiago Agustin Tirante"
+              ],
+              "stake_odds": 1.597,
+              "best_odds": 1.674,
               "won": null
             }
           ],
