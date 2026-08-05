@@ -1,0 +1,95 @@
+{
+  "date": "2026-08-05",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Felix Auger-Aliassime",
+          "rank": 4,
+          "tournament": ""
+        },
+        {
+          "player": "Learner Tien",
+          "rank": 18,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.621,
+      "total_odds": 1.737,
+      "cum_prob": 0.6578,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Felix Auger-Aliassime",
+          "rank": 4,
+          "tournament": ""
+        },
+        {
+          "player": "Jakub Mensik",
+          "rank": 17,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.694,
+      "total_odds": 1.8,
+      "cum_prob": 0.6303,
+      "rating": 7
+    },
+    {
+      "picks": [
+        {
+          "player": "Felix Auger-Aliassime",
+          "rank": 4,
+          "tournament": ""
+        },
+        {
+          "player": "Ben Shelton",
+          "rank": 5,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.597,
+      "total_odds": 1.688,
+      "cum_prob": 0.6339,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Tommy Paul",
+          "rank": 24,
+          "tournament": ""
+        },
+        {
+          "player": "Learner Tien",
+          "rank": 18,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.595,
+      "total_odds": 1.696,
+      "cum_prob": 0.6097,
+      "rating": 6
+    },
+    {
+      "picks": [
+        {
+          "player": "Daniil Medvedev",
+          "rank": 9,
+          "tournament": ""
+        },
+        {
+          "player": "Learner Tien",
+          "rank": 18,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.702,
+      "total_odds": 1.807,
+      "cum_prob": 0.6073,
+      "rating": 6
+    }
+  ]
+}

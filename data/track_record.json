@@ -732,6 +732,47 @@
             }
           ],
           "resolved": false
+        },
+        "5": {
+          "parlays": [
+            {
+              "legs": [
+                "Felix Auger-Aliassime",
+                "Jakub Mensik"
+              ],
+              "stake_odds": 1.694,
+              "best_odds": 1.8,
+              "won": null
+            },
+            {
+              "legs": [
+                "Felix Auger-Aliassime",
+                "Ben Shelton"
+              ],
+              "stake_odds": 1.597,
+              "best_odds": 1.688,
+              "won": null
+            },
+            {
+              "legs": [
+                "Tommy Paul",
+                "Learner Tien"
+              ],
+              "stake_odds": 1.595,
+              "best_odds": 1.696,
+              "won": null
+            },
+            {
+              "legs": [
+                "Daniil Medvedev",
+                "Learner Tien"
+              ],
+              "stake_odds": 1.702,
+              "best_odds": 1.807,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
