@@ -660,7 +660,7 @@
               ],
               "stake_odds": 1.597,
               "best_odds": 1.662,
-              "won": false
+              "won": null
             },
             {
               "legs": [
@@ -690,7 +690,7 @@
               "won": false
             }
           ],
-          "resolved": true
+          "resolved": false
         },
         "4": {
           "parlays": [
@@ -710,7 +710,7 @@
               ],
               "stake_odds": 1.676,
               "best_odds": 1.768,
-              "won": false
+              "won": null
             },
             {
               "legs": [
