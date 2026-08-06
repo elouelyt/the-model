@@ -773,6 +773,20 @@
             }
           ],
           "resolved": false
+        },
+        "6": {
+          "parlays": [
+            {
+              "legs": [
+                "Brandon Nakashima",
+                "Arthur Fils"
+              ],
+              "stake_odds": 1.729,
+              "best_odds": 1.822,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
