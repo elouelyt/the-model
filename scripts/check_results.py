@@ -22,12 +22,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s — %(levelname)s — %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)
 
 _ROOT          = Path(__file__).resolve().parents[1]
 _PREDS_DIR     = _ROOT / "data" / "predictions"
 _TRACK_FILE    = _ROOT / "data" / "track_record.json"
+_SCORES_CACHE  = _ROOT / "data" / "scores_cache.json"
 _STAKE_PER_BET = 15.0
 
 # Cache of The Odds API scores keyed by sport key
@@ -86,13 +87,6 @@ def _fetch_odds_result(player: str, pred_date_str: str) -> str | None:
 
     for sport_key in sport_keys:
         events = _fetch_odds_scores(sport_key)
-        # Debug: dump all player names in completed events (remove after diagnosis)
-        players_seen = sorted({
-            t for ev in events
-            for t in [ev.get("home_team",""), ev.get("away_team","")]
-            if t
-        })
-        logger.debug("[odds-scores] players in %s: %s", sport_key, players_seen)
         for ev in events:
             # Parse event start time
             start_str = ev.get("commence_time", "")
@@ -384,6 +378,11 @@ def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP 
     if result is not None:
         return result
 
+    # --- Source 1b: Persistent scores cache (Odds API data from previous days) ---
+    result = _search_scores_cache(player, pred_date_str)
+    if result is not None:
+        return result
+
     # --- Source 2: Sofascore (full ATP history, typically not blocked) ---
     result = _fetch_sofascore_result(player, pred_date_str)
     if result is not None:
@@ -546,8 +545,87 @@ def process_pending(tr: dict) -> int:
     return updated
 
 
+def load_scores_cache() -> list[dict]:
+    """Load the persistent Odds API scores cache from disk."""
+    if _SCORES_CACHE.exists():
+        try:
+            return json.loads(_SCORES_CACHE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+
+def save_scores_cache(events: list[dict]) -> None:
+    """Merge new events into the persistent cache and save."""
+    existing = load_scores_cache()
+    existing_ids = {e.get("id") for e in existing if e.get("id")}
+    for ev in events:
+        if ev.get("id") and ev["id"] not in existing_ids:
+            existing.append(ev)
+            existing_ids.add(ev["id"])
+    _SCORES_CACHE.parent.mkdir(parents=True, exist_ok=True)
+    _SCORES_CACHE.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
+    logger.info("[scores-cache] saved %d total events", len(existing))
+
+
+def _search_scores_cache(player: str, pred_date_str: str) -> str | None:
+    """Check persistent scores cache for a player result near pred_date."""
+    pred_date   = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end  = pred_date + timedelta(days=6)
+    window_start = pred_date - timedelta(days=1)
+
+    cached = load_scores_cache()
+    for ev in cached:
+        if not ev.get("completed"):
+            continue
+        start_str = ev.get("commence_time", "")
+        try:
+            ev_dt = datetime.fromisoformat(start_str.replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if ev_dt < window_start or ev_dt > cutoff_end:
+            continue
+
+        home   = ev.get("home_team", "")
+        away   = ev.get("away_team", "")
+        scores = ev.get("scores") or []
+
+        player_side: str | None = None
+        if _player_matches_name(player, home):
+            player_side = "home"
+        elif _player_matches_name(player, away):
+            player_side = "away"
+        if player_side is None:
+            continue
+
+        for s in scores:
+            if _player_matches_name(player, s.get("name", "")):
+                try:
+                    my_score = float(s.get("score", 0))
+                except Exception:
+                    my_score = 0
+                other_scores = [
+                    float(x.get("score", 0))
+                    for x in scores
+                    if not _player_matches_name(player, x.get("name", ""))
+                ]
+                if other_scores:
+                    result = "won" if my_score > max(other_scores) else "lost"
+                    logger.info("[scores-cache] %s → %s (cached, event %s)", player, result.upper(), ev_dt.date())
+                    return result
+    return None
+
+
 def main() -> None:
-    logger.info("Checking parlay results via ESPN ATP scoreboard...")
+    logger.info("Checking parlay results — fetching fresh scores from The Odds API...")
+    # Fetch and persist today's Odds API scores before checking results
+    sport_keys = _get_active_atp_sport_keys()
+    all_fresh: list[dict] = []
+    for key in sport_keys:
+        all_fresh.extend(_fetch_odds_scores(key))
+    if all_fresh:
+        save_scores_cache(all_fresh)
+
     tr = load_track_record()
     updated = process_pending(tr)
     save_track_record(tr)
