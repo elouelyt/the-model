@@ -172,6 +172,77 @@ def _get_active_atp_sport_keys() -> list[str]:
     return _atp_sport_keys_cache
 
 
+def _fetch_sofascore_result(player: str, pred_date_str: str) -> str | None:
+    """Check Sofascore unofficial API for a player result in the 6-day window.
+
+    Sofascore has full ATP history and is not blocked from GitHub Actions.
+    Endpoint: /api/v1/sport/tennis/scheduled-events/YYYY-MM-DD
+    """
+    pred_date  = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end = pred_date + timedelta(days=6)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+        "Referer": "https://www.sofascore.com/",
+        "Accept": "application/json",
+    }
+
+    best: tuple[int, str] | None = None  # (timestamp, result)
+
+    for delta in range(7):
+        day = pred_date + timedelta(days=delta)
+        if day > cutoff_end:
+            break
+        date_str = day.strftime("%Y-%m-%d")
+        url = f"https://api.sofascore.com/api/v1/sport/tennis/scheduled-events/{date_str}"
+        try:
+            resp = requests.get(url, headers=headers, timeout=15)
+            if resp.status_code != 200:
+                continue
+            events = resp.json().get("events", [])
+        except Exception:
+            continue
+
+        for ev in events:
+            # Only ATP men's singles
+            cat = ev.get("tournament", {}).get("category", {}).get("name", "")
+            if "ATP" not in cat and "atp" not in cat.lower():
+                continue
+            status = ev.get("status", {}).get("type", "")
+            if status != "finished":
+                continue
+
+            home = ev.get("homeTeam", {}).get("name", "")
+            away = ev.get("awayTeam", {}).get("name", "")
+
+            player_side: str | None = None
+            if _player_matches_name(player, home):
+                player_side = "home"
+            elif _player_matches_name(player, away):
+                player_side = "away"
+
+            if player_side is None:
+                continue
+
+            winner_code = ev.get("winnerCode")  # 1 = home, 2 = away
+            if winner_code is None:
+                continue
+
+            ts = ev.get("startTimestamp", 0)
+            if player_side == "home":
+                result = "won" if winner_code == 1 else "lost"
+            else:
+                result = "won" if winner_code == 2 else "lost"
+
+            if best is None or ts < best[0]:
+                best = (ts, result)
+
+    if best:
+        logger.info("[sofascore] %s → %s", player, best[1].upper())
+        return best[1]
+    return None
+
+
 def _fetch_espn_competitions(date_str_8: str) -> list[dict]:
     """Fetch all finished men's singles ATP competitions for a date (YYYYMMDD). Cached."""
     if date_str_8 in _espn_cache:
@@ -291,17 +362,23 @@ def _fetch_sackmann_result(player: str, pred_date_str: str) -> str | None:
 
 
 def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP tennis") -> str | None:
-    """Return 'won', 'lost', or None. Tries three sources in priority order:
+    """Return 'won', 'lost', or None. Tries sources in priority order:
       1. The Odds API scores  (our API key, ≤3 days, reliable)
-      2. ESPN ATP scoreboard  (free, sometimes blocked by GitHub Actions IPs)
-      3. Sackmann CSV         (all history, past years only — 404 for current year)
+      2. Sofascore            (unofficial API, full ATP history, typically not blocked)
+      3. ESPN ATP scoreboard  (free, sometimes blocked by GitHub Actions IPs)
+      4. Sackmann CSV         (all history, past years only — 404 for current year)
     """
     # --- Source 1: The Odds API scores ---
     result = _fetch_odds_result(player, pred_date_str)
     if result is not None:
         return result
 
-    # --- Source 2: ESPN ATP scoreboard ---
+    # --- Source 2: Sofascore (full ATP history, typically not blocked) ---
+    result = _fetch_sofascore_result(player, pred_date_str)
+    if result is not None:
+        return result
+
+    # --- Source 4: ESPN ATP scoreboard ---
     pred_date  = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
     cutoff_end = pred_date + timedelta(days=6)
     seen_dates: set[str] = set()
@@ -336,7 +413,7 @@ def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP 
         logger.info("[espn] %s → %s (match at %s)", player, best[1].upper(), best[0].date())
         return best[1]
 
-    # --- Source 3: Sackmann CSV (past years; current year gives 404) ---
+    # --- Source 5: Sackmann CSV (past years; current year gives 404) ---
     return _fetch_sackmann_result(player, pred_date_str)
 
 
