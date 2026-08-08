@@ -1,7 +1,9 @@
 """Check parlay predictions against ATP match results.
 
-Primary source:  ESPN ATP scoreboard API  (covers ATP 250/500/1000 + some Challengers)
-Fallback source: JeffSackmann/tennis_atp CSV on GitHub (covers ALL ATP + Challengers)
+Source priority:
+  1. The Odds API /v4/sports/{sport}/scores  — our own API key, recent ATP results (≤3 days)
+  2. ESPN ATP scoreboard API                 — covers ATP 250/500/1000 (sometimes blocked)
+  3. JeffSackmann/tennis_atp CSV             — covers ALL ATP + Challengers (past years only)
 
 Run daily in GitHub Actions BEFORE generate_html.py.
 """
@@ -10,6 +12,7 @@ import csv
 import io
 import json
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -27,6 +30,9 @@ _PREDS_DIR     = _ROOT / "data" / "predictions"
 _TRACK_FILE    = _ROOT / "data" / "track_record.json"
 _STAKE_PER_BET = 15.0
 
+# Cache of The Odds API scores keyed by sport key
+_odds_scores_cache: dict[str, list[dict]] = {}
+
 # Cache of ESPN ATP scoreboard events keyed by "YYYYMMDD" (reused across players)
 _espn_cache: dict[str, list[dict]] = {}
 
@@ -39,6 +45,131 @@ _ROUND_ORDER = {"R128": 0, "R64": 1, "R32": 2, "R16": 3, "QF": 4, "SF": 5, "F": 
 
 def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower().strip(), b.lower().strip()).ratio()
+
+
+def _fetch_odds_scores(sport_key: str) -> list[dict]:
+    """Fetch completed match scores from The Odds API (up to 3 days lookback). Cached."""
+    if sport_key in _odds_scores_cache:
+        return _odds_scores_cache[sport_key]
+
+    api_key = os.environ.get("THE_ODDS_API_KEY", "")
+    if not api_key:
+        logger.warning("[odds-scores] THE_ODDS_API_KEY not set — skipping")
+        _odds_scores_cache[sport_key] = []
+        return []
+
+    url = f"https://api.the-odds-api.com/v4/sports/{sport_key}/scores"
+    params = {"apiKey": api_key, "daysFrom": 3, "dateFormat": "iso"}
+    try:
+        resp = requests.get(url, params=params, timeout=15)
+        resp.raise_for_status()
+        events = resp.json()
+        _odds_scores_cache[sport_key] = [e for e in events if e.get("completed")]
+        logger.info("[odds-scores] %s → %d completed events", sport_key, len(_odds_scores_cache[sport_key]))
+    except Exception as exc:
+        logger.warning("[odds-scores] fetch failed for %s: %s", sport_key, exc)
+        _odds_scores_cache[sport_key] = []
+    return _odds_scores_cache[sport_key]
+
+
+def _fetch_odds_result(player: str, pred_date_str: str) -> str | None:
+    """Check The Odds API scores for a player's result near pred_date.
+
+    Tries all active tennis_atp_* sport keys. Returns 'won', 'lost', or None.
+    """
+    pred_date   = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end  = pred_date + timedelta(days=6)
+    window_start = pred_date - timedelta(days=1)  # slight tolerance for timezone drift
+
+    # Discover all active ATP sport keys (cached for the process lifetime)
+    sport_keys = _get_active_atp_sport_keys()
+
+    for sport_key in sport_keys:
+        events = _fetch_odds_scores(sport_key)
+        for ev in events:
+            # Parse event start time
+            start_str = ev.get("commence_time", "")
+            try:
+                ev_dt = datetime.fromisoformat(start_str.replace("Z", "+00:00"))
+            except Exception:
+                continue
+            if ev_dt < window_start or ev_dt > cutoff_end:
+                continue
+
+            scores = ev.get("scores") or []
+            # scores is a list of {name: str, score: str} — winner has the higher score
+            # For tennis the score field is a string like "6-4, 7-5"
+            # We only need to know which player appears and who won
+            home = ev.get("home_team", "")
+            away = ev.get("away_team", "")
+            winner = ev.get("scores", [{}])[0].get("name", "") if scores else ""
+
+            # Find which side our player is on
+            player_side: str | None = None
+            if _player_matches_name(player, home):
+                player_side = home
+            elif _player_matches_name(player, away):
+                player_side = away
+
+            if player_side is None:
+                continue
+
+            # Determine winner from scores list: the entry with higher numeric score
+            # For tennis, The Odds API uses score = number of sets won
+            result = None
+            for s in scores:
+                if _player_matches_name(player, s.get("name", "")):
+                    try:
+                        my_score = float(s.get("score", 0))
+                    except Exception:
+                        my_score = 0
+                    other_scores = [
+                        float(x.get("score", 0))
+                        for x in scores
+                        if not _player_matches_name(player, x.get("name", ""))
+                    ]
+                    if other_scores:
+                        result = "won" if my_score > max(other_scores) else "lost"
+                    break
+
+            if result is not None:
+                logger.info("[odds-scores] %s → %s (event %s)", player, result.upper(), ev_dt.date())
+                return result
+
+    return None
+
+
+_atp_sport_keys_cache: list[str] | None = None
+
+
+def _get_active_atp_sport_keys() -> list[str]:
+    """Return cached list of active tennis_atp_* sport keys from The Odds API."""
+    global _atp_sport_keys_cache
+    if _atp_sport_keys_cache is not None:
+        return _atp_sport_keys_cache
+
+    api_key = os.environ.get("THE_ODDS_API_KEY", "")
+    if not api_key:
+        _atp_sport_keys_cache = []
+        return []
+
+    try:
+        resp = requests.get(
+            "https://api.the-odds-api.com/v4/sports",
+            params={"apiKey": api_key},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        keys = [
+            s["key"] for s in resp.json()
+            if s.get("key", "").startswith("tennis_atp") and s.get("active")
+        ]
+        _atp_sport_keys_cache = keys or ["tennis_atp"]
+        logger.info("[odds-scores] active ATP keys: %s", _atp_sport_keys_cache)
+    except Exception as exc:
+        logger.warning("[odds-scores] sport keys fetch failed: %s", exc)
+        _atp_sport_keys_cache = ["tennis_atp"]
+    return _atp_sport_keys_cache
 
 
 def _fetch_espn_competitions(date_str_8: str) -> list[dict]:
@@ -160,53 +291,52 @@ def _fetch_sackmann_result(player: str, pred_date_str: str) -> str | None:
 
 
 def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP tennis") -> str | None:
-    """Check ESPN ATP scoreboard for a player's result on/after pred_date_str.
-
-    Returns 'won', 'lost', or None if no match found in the 6-day window.
-    Uses the competition date to only consider matches >= pred_date.
+    """Return 'won', 'lost', or None. Tries three sources in priority order:
+      1. The Odds API scores  (our API key, ≤3 days, reliable)
+      2. ESPN ATP scoreboard  (free, sometimes blocked by GitHub Actions IPs)
+      3. Sackmann CSV         (all history, past years only — 404 for current year)
     """
-    pred_date = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
-    cutoff_end = pred_date + timedelta(days=6)
+    # --- Source 1: The Odds API scores ---
+    result = _fetch_odds_result(player, pred_date_str)
+    if result is not None:
+        return result
 
-    # Fetch up to 7 days of ESPN data (tournament-level, covers all rounds)
+    # --- Source 2: ESPN ATP scoreboard ---
+    pred_date  = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end = pred_date + timedelta(days=6)
     seen_dates: set[str] = set()
     all_comps: list[dict] = []
     for delta in range(7):
-        d = pred_date + timedelta(days=delta)
+        d  = pred_date + timedelta(days=delta)
         d8 = d.strftime("%Y%m%d")
         if d8 not in seen_dates:
             seen_dates.add(d8)
             all_comps.extend(_fetch_espn_competitions(d8))
 
-    # Find the EARLIEST finished match for this player on/after pred_date
     best: tuple[datetime, str] | None = None
-
     for comp in all_comps:
         comp_date_str = comp.get("date", "")
         try:
             comp_dt = datetime.fromisoformat(comp_date_str.replace("Z", "+00:00"))
         except Exception:
             continue
-
         if comp_dt < pred_date or comp_dt > cutoff_end:
             continue
-
-        competitors = comp.get("competitors", [])
-        for c in competitors:
+        for c in comp.get("competitors", []):
             name = c.get("athlete", {}).get("displayName", "")
             if not _player_matches_name(player, name):
                 continue
             won = c.get("winner", False)
-            result = "won" if won else "lost"
+            r   = "won" if won else "lost"
             if best is None or comp_dt < best[0]:
-                best = (comp_dt, result)
+                best = (comp_dt, r)
             break
 
     if best:
         logger.info("[espn] %s → %s (match at %s)", player, best[1].upper(), best[0].date())
         return best[1]
 
-    # ESPN didn't find it — try Sackmann CSV (covers all Challengers)
+    # --- Source 3: Sackmann CSV (past years; current year gives 404) ---
     return _fetch_sackmann_result(player, pred_date_str)
 
 
