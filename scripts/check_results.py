@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s — %(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)
 
 _ROOT          = Path(__file__).resolve().parents[1]
@@ -182,12 +182,14 @@ def _fetch_sofascore_result(player: str, pred_date_str: str) -> str | None:
     cutoff_end = pred_date + timedelta(days=6)
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0",
         "Referer": "https://www.sofascore.com/",
-        "Accept": "application/json",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
     }
 
     best: tuple[int, str] | None = None  # (timestamp, result)
+    _logged_dates: set[str] = set()
 
     for delta in range(7):
         day = pred_date + timedelta(days=delta)
@@ -198,18 +200,21 @@ def _fetch_sofascore_result(player: str, pred_date_str: str) -> str | None:
         try:
             resp = requests.get(url, headers=headers, timeout=15)
             if resp.status_code != 200:
+                logger.warning("[sofascore] HTTP %d for %s", resp.status_code, date_str)
                 continue
             events = resp.json().get("events", [])
-        except Exception:
+            if date_str not in _logged_dates:
+                logger.debug("[sofascore] %s → %d tennis events", date_str, len(events))
+                _logged_dates.add(date_str)
+        except Exception as exc:
+            logger.warning("[sofascore] fetch error for %s: %s", date_str, exc)
             continue
 
         for ev in events:
-            # Only ATP men's singles
-            cat = ev.get("tournament", {}).get("category", {}).get("name", "")
-            if "ATP" not in cat and "atp" not in cat.lower():
-                continue
-            status = ev.get("status", {}).get("type", "")
-            if status != "finished":
+            # Skip non-finished events — Sofascore uses status.type or status.description
+            status_type = ev.get("status", {}).get("type", "")
+            status_desc = ev.get("status", {}).get("description", "")
+            if status_type not in ("finished",) and "ended" not in status_desc.lower() and "finished" not in status_desc.lower():
                 continue
 
             home = ev.get("homeTeam", {}).get("name", "")
@@ -229,10 +234,9 @@ def _fetch_sofascore_result(player: str, pred_date_str: str) -> str | None:
                 continue
 
             ts = ev.get("startTimestamp", 0)
-            if player_side == "home":
-                result = "won" if winner_code == 1 else "lost"
-            else:
-                result = "won" if winner_code == 2 else "lost"
+            result = "won" if (player_side == "home" and winner_code == 1) or (player_side == "away" and winner_code == 2) else "lost"
+            tourney = ev.get("tournament", {}).get("name", "?")
+            logger.info("[sofascore] found %s in '%s' (%s vs %s)", player, tourney, home, away)
 
             if best is None or ts < best[0]:
                 best = (ts, result)
