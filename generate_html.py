@@ -773,7 +773,9 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
                   safe_parlays: list[dict] | None = None,
                   error: str | None = None,
                   track_record: dict | None = None) -> str:
-    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    _now = datetime.now(timezone.utc)
+    now_utc     = _now.strftime("%Y-%m-%d %H:%M UTC")
+    now_iso     = _now.strftime("%Y-%m-%dT%H:%M:%SZ")  # for JS staleness check
     parlays = parlays or []
     safe_parlays = safe_parlays or []
 
@@ -1566,7 +1568,8 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
   </div>
   <div class="header-right">
     <span class="header-tag">ATP · Pre-match</span>
-    <span class="updated">Updated {now_utc}</span>
+    <span class="updated" id="last-updated-label">Updated {now_utc}</span>
+    <span id="stale-badge" style="display:none;margin-left:8px;background:#f87171;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.03em;">⚠ DESACTUALIZADA</span>
   </div>
 </header>
 
@@ -1584,6 +1587,19 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
   Not financial or betting advice &nbsp;·&nbsp;
   <a href="https://github.com/elouelyt/the-model" target="_blank">Source ↗</a>
 </footer>
+
+<script>
+(function() {{
+  var generated = new Date("{now_iso}");
+  var ageH = (Date.now() - generated.getTime()) / 3600000;
+  if (ageH > 26) {{
+    var badge = document.getElementById('stale-badge');
+    if (badge) badge.style.display = 'inline-block';
+    var lbl = document.getElementById('last-updated-label');
+    if (lbl) lbl.style.color = '#f87171';
+  }}
+}})();
+</script>
 
 </body>
 </html>
