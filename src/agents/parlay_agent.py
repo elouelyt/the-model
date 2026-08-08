@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 _MIN_ODDS        = 1.65
 _MAX_ODDS        = 1.85
-_TOP_N           = 5
+_TOP_N           = 1   # one parlay/day — reduces catastrophic multi-loss days
 _MIN_STAKE_PRICE = 1.17   # exclude legs with Stake odds below this threshold
 
 

@@ -42,11 +42,14 @@ class PipelineState(TypedDict, total=False):
     # Final match result dicts (what generate_html.py consumes)
     results: list[dict]
 
-    # Top-5 rated parlays (populated by generate_parlays_node)
+    # Top-rated parlays (populated by generate_parlays_node)
     parlays: list[dict]
 
     # Top-5 safe parlays for daily compounder (populated by generate_safe_parlays_node)
     safe_parlays: list[dict]
+
+    # Single best value bet of the day (populated by generate_daily_pick_node)
+    daily_pick: dict
 
     # Stake odds: player_name → decimal_price (populated by fetch_stake_odds_node)
     stake_odds: dict[str, float]
@@ -394,6 +397,28 @@ def generate_parlays_node(state: PipelineState) -> PipelineState:
     return {**state, "parlays": parlays}
 
 
+def generate_daily_pick_node(state: PipelineState) -> PipelineState:
+    """Select the single best value bet for today using the single_bet_agent.
+
+    Runs after compute_predictions so it has access to blended model probabilities
+    and bookmaker edges. Non-fatal — None if no qualifying pick exists.
+    """
+    from src.agents.single_bet_agent import select_daily_pick
+
+    results = state.get("results", [])
+    try:
+        daily_pick = select_daily_pick(results)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] generate_daily_pick_node failed (non-fatal): %s", exc)
+        daily_pick = None
+
+    logger.info(
+        "[coordinator] generate_daily_pick_node — pick: %s",
+        daily_pick["player"] if daily_pick else "none",
+    )
+    return {**state, "daily_pick": daily_pick}
+
+
 def generate_safe_parlays_node(state: PipelineState) -> PipelineState:
     """Select top safe parlays for the daily compounder strategy and rate with Gemini.
 
@@ -448,6 +473,7 @@ def _build_graph() -> StateGraph:
     graph.add_node("fetch_stake_odds", fetch_stake_odds_node)
     graph.add_node("compute_predictions", compute_predictions_node)
     graph.add_node("generate_explanations", generate_explanations_node)
+    graph.add_node("generate_daily_pick", generate_daily_pick_node)
     graph.add_node("generate_parlays", generate_parlays_node)
     graph.add_node("generate_safe_parlays", generate_safe_parlays_node)
 
@@ -466,7 +492,8 @@ def _build_graph() -> StateGraph:
     graph.add_edge("fetch_sentiment", "fetch_stake_odds")
     graph.add_edge("fetch_stake_odds", "compute_predictions")
     graph.add_edge("compute_predictions", "generate_explanations")
-    graph.add_edge("generate_explanations", "generate_parlays")
+    graph.add_edge("generate_explanations", "generate_daily_pick")
+    graph.add_edge("generate_daily_pick", "generate_parlays")
     graph.add_edge("generate_parlays", "generate_safe_parlays")
     graph.add_edge("generate_safe_parlays", END)
 
@@ -505,8 +532,10 @@ def run_pipeline() -> list[dict]:
     results = final_state.get("results", [])
     parlays = final_state.get("parlays", [])
     safe_parlays = final_state.get("safe_parlays", [])
+    daily_pick = final_state.get("daily_pick")
     logger.info(
-        "[coordinator] Pipeline complete — %d matches, %d parlays, %d safe parlays",
+        "[coordinator] Pipeline complete — %d matches, %d parlays, %d safe parlays, daily_pick=%s",
         len(results), len(parlays), len(safe_parlays),
+        daily_pick["player"] if daily_pick else "none",
     )
-    return results, parlays, safe_parlays
+    return results, parlays, safe_parlays, daily_pick

@@ -51,12 +51,11 @@ _SIGNAL_META = {
 }
 
 
-def run_pipeline() -> tuple[list[dict], list[dict], list[dict]]:
+def run_pipeline() -> tuple[list[dict], list[dict], list[dict], dict | None]:
     """Run the full prediction pipeline via LangGraph coordinator.
 
     Returns:
-        (results, parlays, safe_parlays) — match result dicts, rated parlay dicts,
-        and rated safe (daily compounder) parlay dicts.
+        (results, parlays, safe_parlays, daily_pick)
     """
     from src.pipeline.coordinator import run_pipeline as _coordinator_run
     return _coordinator_run()
@@ -347,6 +346,257 @@ def _error_html(message: str) -> str:
         <div class="empty-title" style="color:#ef4444;">Pipeline error</div>
         <div class="empty-body">{message}</div>
     </div>"""
+
+
+def _daily_pick_html(pick: dict | None) -> str:
+    """Render the prominent 'Apuesta del Día' hero card for the single best value bet."""
+    if not pick:
+        return ""
+
+    _SURFACE_COLORS = {
+        "clay": "#ea580c", "grass": "#16a34a",
+        "hard": "#2563eb", "indoor_hard": "#7c3aed",
+    }
+    _SURFACE_LABELS = {
+        "clay": "Clay", "grass": "Grass",
+        "hard": "Hard", "indoor_hard": "Indoor Hard",
+    }
+
+    surf_color = _SURFACE_COLORS.get(pick["surface"], "#2563eb")
+    surf_label = _SURFACE_LABELS.get(pick["surface"], pick["surface"].title())
+
+    edge_pct = pick["edge"] * 100
+    model_pct = pick["model_prob"] * 100
+    mkt_pct = pick["raw_implied"] * 100
+
+    stake_html = ""
+    if pick.get("stake_price"):
+        stake_html = (
+            f'<div class="dp-stake">'
+            f'<span class="dp-stake-logo">S</span>'
+            f'<span class="dp-stake-label">Stake</span>'
+            f'<span class="dp-stake-price">{pick["stake_price"]:.2f}</span>'
+            f'</div>'
+        )
+
+    sentiment_html = ""
+    sent = pick.get("sentiment", {}) or {}
+    if sent.get("flag") in ("positive", "concern"):
+        sent_icon = "↑" if sent["flag"] == "positive" else "⚠"
+        sent_color = "#10b981" if sent["flag"] == "positive" else "#f87171"
+        sent_label = sent.get("label", "")
+        if sent_label:
+            sentiment_html = (
+                f'<span class="dp-sent" style="color:{sent_color};">{sent_icon} {sent_label}</span>'
+            )
+
+    struggling_banner = ""
+    if pick.get("is_struggling"):
+        struggling_banner = (
+            '<div class="dp-warn">⚠ Este jugador tiene rachas de pérdidas recientes — '
+            'considera reducir el stake</div>'
+        )
+
+    opp_rank_str = f"#{pick['opponent_rank']}" if pick.get("opponent_rank") else ""
+    bk_label = pick.get("best_bookmaker", "")
+    bk_html = f'<span class="dp-bk">@ {bk_label}</span>' if bk_label else ""
+
+    return f"""
+<div class="daily-pick-card">
+    <div class="dp-eyebrow">APUESTA DEL DÍA</div>
+    <div class="dp-main">
+        <div class="dp-player">
+            <div class="dp-player-name">{pick["player"]}</div>
+            <div class="dp-player-meta">
+                Rank <strong>#{pick["rank"]}</strong>
+                &nbsp;·&nbsp; vs {pick["opponent"]} {opp_rank_str}
+                &nbsp;·&nbsp; <span style="color:{surf_color};font-weight:600;">{surf_label}</span>
+                {("&nbsp;·&nbsp;" + sentiment_html) if sentiment_html else ""}
+            </div>
+        </div>
+        <div class="dp-odds-block">
+            <div class="dp-odds-value">{pick["best_price"]:.2f}</div>
+            <div class="dp-odds-label">mejor cuota {bk_html}</div>
+            {stake_html}
+        </div>
+    </div>
+    <div class="dp-bars">
+        <div class="dp-bar-row">
+            <span class="dp-bar-label">Modelo</span>
+            <div class="dp-bar-track">
+                <div class="dp-bar-fill dp-model-fill" style="width:{model_pct:.1f}%;"></div>
+            </div>
+            <span class="dp-bar-val">{model_pct:.1f}%</span>
+        </div>
+        <div class="dp-bar-row">
+            <span class="dp-bar-label">Mercado</span>
+            <div class="dp-bar-track">
+                <div class="dp-bar-fill dp-mkt-fill" style="width:{mkt_pct:.1f}%;"></div>
+            </div>
+            <span class="dp-bar-val">{mkt_pct:.1f}%</span>
+        </div>
+    </div>
+    <div class="dp-edge-row">
+        <span class="dp-edge-label">Edge sobre mercado</span>
+        <span class="dp-edge-val">+{edge_pct:.1f} pp</span>
+    </div>
+    {struggling_banner}
+</div>
+<style>
+.daily-pick-card {{
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-left: 4px solid var(--green);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}}
+.dp-eyebrow {{
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 12px;
+}}
+.dp-main {{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}}
+.dp-player-name {{
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+}}
+.dp-player-meta {{
+    font-size: 12px;
+    color: var(--muted);
+}}
+.dp-player-meta strong {{ color: var(--text); }}
+.dp-odds-block {{
+    text-align: right;
+    flex-shrink: 0;
+}}
+.dp-odds-value {{
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}}
+.dp-odds-label {{
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+}}
+.dp-bk {{
+    color: var(--orange);
+    font-size: 10px;
+}}
+.dp-stake {{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    background: rgba(0,168,107,0.12);
+    border: 1px solid rgba(0,168,107,0.3);
+    border-radius: 4px;
+    padding: 2px 8px;
+}}
+.dp-stake-logo {{
+    font-size: 10px;
+    font-weight: 800;
+    color: #00a86b;
+}}
+.dp-stake-label {{
+    font-size: 10px;
+    color: var(--muted);
+}}
+.dp-stake-price {{
+    font-size: 13px;
+    font-weight: 700;
+    color: #00a86b;
+    font-variant-numeric: tabular-nums;
+}}
+.dp-bars {{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}}
+.dp-bar-row {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}}
+.dp-bar-label {{
+    font-size: 10px;
+    color: var(--muted);
+    width: 52px;
+    flex-shrink: 0;
+}}
+.dp-bar-track {{
+    flex: 1;
+    height: 5px;
+    background: var(--surface-3);
+    border-radius: 3px;
+    overflow: hidden;
+}}
+.dp-bar-fill {{
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}}
+.dp-model-fill {{ background: var(--orange); }}
+.dp-mkt-fill {{ background: var(--muted); }}
+.dp-bar-val {{
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+}}
+.dp-edge-row {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.18);
+    border-radius: 5px;
+}}
+.dp-edge-label {{
+    font-size: 11px;
+    color: var(--muted);
+}}
+.dp-edge-val {{
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+}}
+.dp-sent {{
+    font-size: 11px;
+    font-weight: 500;
+}}
+.dp-warn {{
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--amber);
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 4px;
+    padding: 6px 10px;
+}}
+</style>"""
 
 
 def _parlays_html(parlays: list[dict]) -> str:
@@ -772,7 +1022,8 @@ function switchMonth(m) {{
 def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
                   safe_parlays: list[dict] | None = None,
                   error: str | None = None,
-                  track_record: dict | None = None) -> str:
+                  track_record: dict | None = None,
+                  daily_pick: dict | None = None) -> str:
     _now = datetime.now(timezone.utc)
     now_utc     = _now.strftime("%Y-%m-%d %H:%M UTC")
     now_iso     = _now.strftime("%Y-%m-%dT%H:%M:%SZ")  # for JS staleness check
@@ -784,11 +1035,13 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         summary_html = ""
         parlays_html = ""
         safe_parlays_html = ""
+        daily_pick_html = ""
     elif not results:
         content = _no_matches_html()
         summary_html = ""
         parlays_html = ""
         safe_parlays_html = ""
+        daily_pick_html = ""
     else:
         value_bets = sum(
             1 for m in results if "players" in m
@@ -806,6 +1059,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
             <span class="summary-matches"><strong>{total_matches}</strong> match{'es' if total_matches != 1 else ''}</span>
             <span class="summary-pills">{vb_html}{mg_html}</span>
         </div>"""
+        daily_pick_html = _daily_pick_html(daily_pick)
         parlays_html = _parlays_html(parlays)
         safe_parlays_html = _safe_parlays_html(safe_parlays)
         content = "\n".join(_match_card_html(m) for m in results)
@@ -1575,6 +1829,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
 
 <main>
   {summary_html}
+  {daily_pick_html}
   {parlays_html}
   {safe_parlays_html}
   {track_record_html}
@@ -1614,10 +1869,11 @@ def main() -> None:
     results = None
     parlays: list[dict] = []
     safe_parlays: list[dict] = []
+    daily_pick = None
     error = None
 
     try:
-        results, parlays, safe_parlays = run_pipeline()
+        results, parlays, safe_parlays, daily_pick = run_pipeline()
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
@@ -1629,7 +1885,10 @@ def main() -> None:
     track_record = _load_track_record()
     _inject_all_predictions(track_record)  # inject any predictions file not yet in track_record
     _save_track_record(track_record)       # persist so check_results.py can add won/lost
-    html = generate_html(results, parlays=parlays, safe_parlays=safe_parlays, error=error, track_record=track_record)
+    html = generate_html(
+        results, parlays=parlays, safe_parlays=safe_parlays,
+        error=error, track_record=track_record, daily_pick=daily_pick,
+    )
     out = Path("index.html")
     out.write_text(html, encoding="utf-8")
     logger.info("Written %s (%d bytes)", out, len(html))
