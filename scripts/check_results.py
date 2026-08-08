@@ -86,6 +86,13 @@ def _fetch_odds_result(player: str, pred_date_str: str) -> str | None:
 
     for sport_key in sport_keys:
         events = _fetch_odds_scores(sport_key)
+        # Debug: dump all player names in completed events (remove after diagnosis)
+        players_seen = sorted({
+            t for ev in events
+            for t in [ev.get("home_team",""), ev.get("away_team","")]
+            if t
+        })
+        logger.debug("[odds-scores] players in %s: %s", sport_key, players_seen)
         for ev in events:
             # Parse event start time
             start_str = ev.get("commence_time", "")
