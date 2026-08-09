@@ -1,22 +1,18 @@
 {
-  "timestamp": "2026-08-08T16:00:16.629641+00:00",
-  "player_count": 16,
+  "timestamp": "2026-08-09T16:00:23.183213+00:00",
+  "player_count": 12,
   "odds": {
-    "Nuno Borges": 1.56,
-    "Luciano Darderi": 2.5,
-    "Arthur Rinderknech": 2.85,
-    "Brandon Nakashima": 1.45,
-    "Jiri Lehecka": 1.99,
-    "Rafael Jodar": 1.82,
-    "Arthur Fils": 1.4,
-    "Cameron Norrie": 3.0,
-    "Learner Tien": 1.39,
-    "Thiago Agustin Tirante": 2.95,
-    "Joao Fonseca": 1.98,
-    "Ben Shelton": 1.81,
-    "Botic van de Zandschulp": 3.1,
-    "Jakub Mensik": 1.35,
-    "Tallon Griekspoor": 1.78,
-    "Daniel Merida Aguilar": 2.01
+    "Tallon Griekspoor": 1.81,
+    "Daniel Merida Aguilar": 2.05,
+    "Learner Tien": 1.42,
+    "Thiago Agustin Tirante": 3.0,
+    "Joao Fonseca": 2.02,
+    "Ben Shelton": 1.8,
+    "Botic van de Zandschulp": 3.15,
+    "Jakub Mensik": 1.36,
+    "Luciano Darderi": 2.95,
+    "Brandon Nakashima": 1.39,
+    "Rafael Jodar": 1.89,
+    "Arthur Fils": 1.88
   }
 }
