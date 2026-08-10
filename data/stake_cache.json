@@ -1,18 +1,14 @@
 {
-  "timestamp": "2026-08-09T16:00:23.183213+00:00",
-  "player_count": 12,
+  "timestamp": "2026-08-10T16:00:27.061174+00:00",
+  "player_count": 8,
   "odds": {
-    "Tallon Griekspoor": 1.81,
-    "Daniel Merida Aguilar": 2.05,
-    "Learner Tien": 1.42,
-    "Thiago Agustin Tirante": 3.0,
-    "Joao Fonseca": 2.02,
-    "Ben Shelton": 1.8,
-    "Botic van de Zandschulp": 3.15,
-    "Jakub Mensik": 1.36,
+    "Rafael Jodar": 1.76,
+    "Arthur Fils": 2.08,
     "Luciano Darderi": 2.95,
-    "Brandon Nakashima": 1.39,
-    "Rafael Jodar": 1.89,
-    "Arthur Fils": 1.88
+    "Brandon Nakashima": 1.4,
+    "Jakub Mensik": 2.06,
+    "Ben Shelton": 1.74,
+    "Daniel Merida Aguilar": 2.65,
+    "Learner Tien": 1.46
   }
 }
