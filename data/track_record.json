@@ -787,6 +787,19 @@
             }
           ],
           "resolved": true
+        },
+        "9": {
+          "parlays": [
+            {
+              "legs": [
+                "Ben Shelton"
+              ],
+              "stake_odds": 1.81,
+              "best_odds": 1.81,
+              "won": true
+            }
+          ],
+          "resolved": true
         }
       }
     }
