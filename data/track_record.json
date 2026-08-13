@@ -828,6 +828,20 @@
             }
           ],
           "resolved": false
+        },
+        "13": {
+          "parlays": [
+            {
+              "legs": [
+                "Alex Michelsen",
+                "Ben Shelton"
+              ],
+              "stake_odds": 1.752,
+              "best_odds": 1.848,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
