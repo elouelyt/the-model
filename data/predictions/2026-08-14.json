@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-14",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Novak Djokovic",
+          "rank": 8,
+          "tournament": ""
+        },
+        {
+          "player": "Alexander Zverev",
+          "rank": 3,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.55,
+      "total_odds": 1.69,
+      "cum_prob": 0.6093,
+      "rating": 6
+    }
+  ]
+}
