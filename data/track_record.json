@@ -838,10 +838,10 @@
               ],
               "stake_odds": 1.752,
               "best_odds": 1.848,
-              "won": true
+              "won": null
             }
           ],
-          "resolved": true
+          "resolved": false
         },
         "14": {
           "parlays": [
