@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-16",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Learner Tien",
+          "rank": 18,
+          "tournament": ""
+        },
+        {
+          "player": "Alex de Minaur",
+          "rank": 6,
+          "tournament": ""
+        }
+      ],
+      "stake_total_odds": 1.561,
+      "total_odds": 1.661,
+      "cum_prob": 0.5811,
+      "rating": 5
+    }
+  ]
+}

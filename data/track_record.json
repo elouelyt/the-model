@@ -852,6 +852,20 @@
               ],
               "stake_odds": 1.55,
               "best_odds": 1.69,
+              "won": false
+            }
+          ],
+          "resolved": true
+        },
+        "16": {
+          "parlays": [
+            {
+              "legs": [
+                "Learner Tien",
+                "Alex de Minaur"
+              ],
+              "stake_odds": 1.561,
+              "best_odds": 1.661,
               "won": null
             }
           ],
