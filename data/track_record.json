@@ -866,6 +866,20 @@
               ],
               "stake_odds": 1.561,
               "best_odds": 1.661,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "17": {
+          "parlays": [
+            {
+              "legs": [
+                "Jakub Mensik",
+                "Alex de Minaur"
+              ],
+              "stake_odds": 1.525,
+              "best_odds": 1.65,
               "won": null
             }
           ],
