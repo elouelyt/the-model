@@ -880,6 +880,20 @@
               ],
               "stake_odds": 1.525,
               "best_odds": 1.65,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "18": {
+          "parlays": [
+            {
+              "legs": [
+                "Taylor Fritz",
+                "Alexander Zverev"
+              ],
+              "stake_odds": 1.759,
+              "best_odds": 1.841,
               "won": null
             }
           ],
