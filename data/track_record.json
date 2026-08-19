@@ -894,10 +894,10 @@
               ],
               "stake_odds": 1.759,
               "best_odds": 1.841,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
