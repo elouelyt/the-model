@@ -65,11 +65,12 @@ class PipelineState(TypedDict, total=False):
 
 
 def fetch_odds_node(state: PipelineState) -> PipelineState:
-    """Fetch live pre-match ATP odds with two-tier fallback.
+    """Fetch live pre-match ATP odds with three-tier fallback.
 
     Priority:
       1. The-Odds-API  — Grand Slams + Masters (accurate bookmaker odds)
-      2. Stake odds-data API — ALL ATP tournaments including 250s (Gstaad, Bastad, Umag…)
+      2. Stake odds-data API — ALL ATP tournaments including 250s
+      3. data/manual_odds.json — manually added matches (via scripts/add_match.py)
     """
     from src.ingestion.extract_odds import fetch_odds
     from src.processing.transform import flatten_odds, filter_upcoming
@@ -83,24 +84,47 @@ def fetch_odds_node(state: PipelineState) -> PipelineState:
     except Exception as exc:  # noqa: BLE001
         logger.warning("[coordinator] The-Odds-API failed: %s", exc)
 
-    if not raw:
-        logger.info("[coordinator] tier 2: Stake odds-data fallback (covers ATP 250s)")
+    # Tier 2: Stake covers ATP 250s and qualifying — activate when The Odds API
+    # has no events at all OR all returned events are already in-play/completed.
+    df_tier1 = filter_upcoming(flatten_odds(raw)) if raw else None
+    if not raw or (df_tier1 is not None and df_tier1.empty):
+        logger.info("[coordinator] tier 2: Stake odds-data fallback (covers ATP 250s + qualifying)")
         source = "stake"
         try:
             from src.agents.stake_agent import fetch_all_stake_matches
-            raw = fetch_all_stake_matches()
+            stake_raw = fetch_all_stake_matches()
+            if stake_raw:
+                raw = stake_raw
         except Exception as exc:  # noqa: BLE001
             logger.error("[coordinator] Stake fallback failed: %s", exc)
 
-    if not raw:
-        logger.warning("[coordinator] All odds sources empty — aborting")
+    df = filter_upcoming(flatten_odds(raw)) if raw else None
+
+    # Tier 3: manual odds — data/manual_odds.json added via scripts/add_match.py
+    if df is None or df.empty:
+        import json
+        from pathlib import Path
+        from datetime import datetime, timezone
+
+        manual_path = Path(__file__).parent.parent.parent / "data" / "manual_odds.json"
+        if manual_path.exists():
+            try:
+                manual = json.loads(manual_path.read_text(encoding="utf-8"))
+                today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                if manual.get("date") == today and manual.get("matches"):
+                    logger.info(
+                        "[coordinator] tier 3: manual_odds.json — %d match(es) for %s",
+                        len(manual["matches"]), today,
+                    )
+                    raw = manual["matches"]
+                    source = "manual"
+                    df = filter_upcoming(flatten_odds(raw))
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("[coordinator] manual_odds.json load failed: %s", exc)
+
+    if df is None or df.empty:
+        logger.warning("[coordinator] All odds sources empty or in-play — aborting")
         return {**state, "raw_odds": [], "processed_rows": [], "abort": True}
-
-    df = filter_upcoming(flatten_odds(raw))
-
-    if df.empty:
-        logger.warning("[coordinator] All matches in-play (source=%s) — aborting", source)
-        return {**state, "raw_odds": raw, "processed_rows": [], "abort": True}
 
     logger.info("[coordinator] %d pre-match rows ready (source=%s)", len(df), source)
     return {**state, "raw_odds": raw, "processed_rows": df.to_dict("records"), "abort": False}

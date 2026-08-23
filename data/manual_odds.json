@@ -1,0 +1,150 @@
+{
+  "date": "2026-08-24",
+  "matches": [
+    {
+      "id": "manual_lorenzo_sonego_vit_kopriva",
+      "sport_key": "tennis_atp_manual",
+      "sport_title": "Winston-Salem Open",
+      "commence_time": "2026-08-24T14:00:00Z",
+      "home_team": "Lorenzo Sonego",
+      "away_team": "Vit Kopriva",
+      "bookmakers": [
+        {
+          "key": "stake",
+          "title": "Stake",
+          "markets": [
+            {
+              "key": "h2h",
+              "outcomes": [
+                {
+                  "name": "Lorenzo Sonego",
+                  "price": 1.63
+                },
+                {
+                  "name": "Vit Kopriva",
+                  "price": 2.2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual_oliver_crawford_lukas_neumayer",
+      "sport_key": "tennis_atp_manual",
+      "sport_title": "US Open Qualifying",
+      "commence_time": "2026-08-24T14:00:00Z",
+      "home_team": "Oliver Crawford",
+      "away_team": "Lukas Neumayer",
+      "bookmakers": [
+        {
+          "key": "stake",
+          "title": "Stake",
+          "markets": [
+            {
+              "key": "h2h",
+              "outcomes": [
+                {
+                  "name": "Oliver Crawford",
+                  "price": 1.64
+                },
+                {
+                  "name": "Lukas Neumayer",
+                  "price": 2.16
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual_rinky_hijikata_darwin_blanch",
+      "sport_key": "tennis_atp_manual",
+      "sport_title": "Winston-Salem Open",
+      "commence_time": "2026-08-24T14:00:00Z",
+      "home_team": "Rinky Hijikata",
+      "away_team": "Darwin Blanch",
+      "bookmakers": [
+        {
+          "key": "stake",
+          "title": "Stake",
+          "markets": [
+            {
+              "key": "h2h",
+              "outcomes": [
+                {
+                  "name": "Rinky Hijikata",
+                  "price": 1.44
+                },
+                {
+                  "name": "Darwin Blanch",
+                  "price": 2.7
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual_kamil_majchrzak_benjamin_bonzi",
+      "sport_key": "tennis_atp_manual",
+      "sport_title": "Winston-Salem Open",
+      "commence_time": "2026-08-24T14:00:00Z",
+      "home_team": "Kamil Majchrzak",
+      "away_team": "Benjamin Bonzi",
+      "bookmakers": [
+        {
+          "key": "stake",
+          "title": "Stake",
+          "markets": [
+            {
+              "key": "h2h",
+              "outcomes": [
+                {
+                  "name": "Kamil Majchrzak",
+                  "price": 1.58
+                },
+                {
+                  "name": "Benjamin Bonzi",
+                  "price": 2.28
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual_adam_walton_jesper_de_jong",
+      "sport_key": "tennis_atp_manual",
+      "sport_title": "Winston-Salem Open",
+      "commence_time": "2026-08-24T14:00:00Z",
+      "home_team": "Adam Walton",
+      "away_team": "Jesper de Jong",
+      "bookmakers": [
+        {
+          "key": "stake",
+          "title": "Stake",
+          "markets": [
+            {
+              "key": "h2h",
+              "outcomes": [
+                {
+                  "name": "Adam Walton",
+                  "price": 1.52
+                },
+                {
+                  "name": "Jesper de Jong",
+                  "price": 2.44
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
