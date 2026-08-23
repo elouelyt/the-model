@@ -898,6 +898,20 @@
             }
           ],
           "resolved": true
+        },
+        "23": {
+          "parlays": [
+            {
+              "legs": [
+                "Rinky Hijikata",
+                "Andaloro, Fabrizio"
+              ],
+              "stake_odds": null,
+              "best_odds": 1.704,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
