@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-27T20:44:13.430644+00:00",
+  "timestamp": "2026-08-23T20:47:38.241830+00:00",
   "player_count": 500,
   "rankings": {
     "Jannik Sinner": {
@@ -8,1999 +8,1999 @@
     },
     "Carlos Alcaraz": {
       "rank": 2,
-      "points": 9460
+      "points": 8160
     },
     "Alexander Zverev": {
       "rank": 3,
-      "points": 7190
+      "points": 8090
     },
     "Felix Auger Aliassime": {
       "rank": 4,
-      "points": 4440
-    },
-    "Ben Shelton": {
-      "rank": 5,
-      "points": 4160
-    },
-    "Alex De Minaur": {
-      "rank": 6,
-      "points": 4110
-    },
-    "Taylor Fritz": {
-      "rank": 7,
-      "points": 3915
+      "points": 4740
     },
     "Novak Djokovic": {
-      "rank": 8,
+      "rank": 5,
       "points": 3760
     },
+    "Ben Shelton": {
+      "rank": 6,
+      "points": 3670
+    },
     "Daniil Medvedev": {
-      "rank": 9,
+      "rank": 7,
       "points": 3580
+    },
+    "Alex De Minaur": {
+      "rank": 8,
+      "points": 3560
+    },
+    "Taylor Fritz": {
+      "rank": 9,
+      "points": 3375
     },
     "Flavio Cobolli": {
       "rank": 10,
-      "points": 3460
+      "points": 3330
+    },
+    "Rafael Jodar": {
+      "rank": 11,
+      "points": 2621
+    },
+    "Learner Tien": {
+      "rank": 12,
+      "points": 2545
     },
     "Alexander Bublik": {
-      "rank": 11,
-      "points": 2620
-    },
-    "Casper Ruud": {
-      "rank": 12,
-      "points": 2425
-    },
-    "Andrey Rublev": {
       "rank": 13,
-      "points": 2420
+      "points": 2525
     },
     "Jiri Lehecka": {
       "rank": 14,
-      "points": 2360
+      "points": 2470
     },
     "Lorenzo Musetti": {
       "rank": 15,
-      "points": 2325
-    },
-    "Luciano Darderi": {
-      "rank": 16,
-      "points": 2300
+      "points": 2415
     },
     "Jakub Mensik": {
+      "rank": 16,
+      "points": 2395
+    },
+    "Casper Ruud": {
       "rank": 17,
-      "points": 2295
+      "points": 2385
     },
-    "Learner Tien": {
+    "Andrey Rublev": {
       "rank": 18,
-      "points": 2290
-    },
-    "Frances Tiafoe": {
-      "rank": 19,
-      "points": 2180
+      "points": 2230
     },
     "Valentin Vacherot": {
+      "rank": 19,
+      "points": 2186
+    },
+    "Luciano Darderi": {
       "rank": 20,
-      "points": 2138
-    },
-    "Francisco Cerundolo": {
-      "rank": 21,
-      "points": 2110
-    },
-    "Karen Khachanov": {
-      "rank": 22,
-      "points": 2080
+      "points": 2175
     },
     "Arthur Fils": {
+      "rank": 21,
+      "points": 2140
+    },
+    "Brandon Nakashima": {
+      "rank": 22,
+      "points": 2135
+    },
+    "Frances Tiafoe": {
       "rank": 23,
-      "points": 1940
+      "points": 2130
     },
     "Tommy Paul": {
       "rank": 24,
-      "points": 1925
+      "points": 2075
     },
-    "Alejandro Davidovich Fokina": {
+    "Francisco Cerundolo": {
       "rank": 25,
-      "points": 1910
-    },
-    "Rafael Jodar": {
-      "rank": 26,
-      "points": 1849
+      "points": 1970
     },
     "Joao Fonseca": {
+      "rank": 26,
+      "points": 1800
+    },
+    "Alejandro Davidovich Fokina": {
       "rank": 27,
-      "points": 1735
+      "points": 1780
     },
     "Arthur Rinderknech": {
       "rank": 28,
-      "points": 1688
+      "points": 1723
     },
-    "Cameron Norrie": {
+    "Alejandro Tabilo": {
       "rank": 29,
-      "points": 1595
+      "points": 1688
     },
     "Ugo Humbert": {
       "rank": 30,
-      "points": 1510
-    },
-    "Brandon Nakashima": {
-      "rank": 31,
-      "points": 1485
+      "points": 1585
     },
     "Tomas Martin Etcheverry": {
-      "rank": 32,
-      "points": 1460
-    },
-    "Alejandro Tabilo": {
-      "rank": 33,
-      "points": 1428
-    },
-    "Ignacio Buse": {
-      "rank": 34,
-      "points": 1360
-    },
-    "Matteo Arnaldi": {
-      "rank": 35,
-      "points": 1336
-    },
-    "Corentin Moutet": {
-      "rank": 36,
-      "points": 1278
+      "rank": 31,
+      "points": 1470
     },
     "Alexander Blockx": {
+      "rank": 32,
+      "points": 1396
+    },
+    "Zizou Bergs": {
+      "rank": 33,
+      "points": 1365
+    },
+    "Matteo Arnaldi": {
+      "rank": 34,
+      "points": 1349
+    },
+    "Cameron Norrie": {
+      "rank": 35,
+      "points": 1345
+    },
+    "Ignacio Buse": {
+      "rank": 36,
+      "points": 1335
+    },
+    "Arthur Fery": {
       "rank": 37,
-      "points": 1275
-    },
-    "Mariano Navone": {
-      "rank": 38,
-      "points": 1165
-    },
-    "Tallon Griekspoor": {
-      "rank": 39,
-      "points": 1165
-    },
-    "Adrian Mannarino": {
-      "rank": 40,
-      "points": 1139
-    },
-    "Denis Shapovalov": {
-      "rank": 41,
-      "points": 1130
-    },
-    "Alex Michelsen": {
-      "rank": 42,
-      "points": 1115
+      "points": 1285
     },
     "Raphael Collignon": {
+      "rank": 38,
+      "points": 1222
+    },
+    "Karen Khachanov": {
+      "rank": 39,
+      "points": 1140
+    },
+    "Daniel Merida": {
+      "rank": 40,
+      "points": 1117
+    },
+    "Alex Michelsen": {
+      "rank": 41,
+      "points": 1090
+    },
+    "Matteo Berrettini": {
+      "rank": 42,
+      "points": 1085
+    },
+    "Jan Lennard Struff": {
       "rank": 43,
       "points": 1069
     },
-    "Jaume Munar": {
+    "Mariano Navone": {
       "rank": 44,
-      "points": 1065
-    },
-    "Juan Manuel Cerundolo": {
-      "rank": 45,
-      "points": 1055
-    },
-    "Kamil Majchrzak": {
-      "rank": 46,
-      "points": 1032
-    },
-    "Tomas Machac": {
-      "rank": 47,
-      "points": 1020
-    },
-    "Zizou Bergs": {
-      "rank": 48,
-      "points": 1010
-    },
-    "Matteo Berrettini": {
-      "rank": 49,
-      "points": 985
+      "points": 1066
     },
     "Terence Atmane": {
-      "rank": 50,
-      "points": 982
+      "rank": 45,
+      "points": 1057
     },
-    "Miomir Kecmanovic": {
-      "rank": 51,
-      "points": 980
-    },
-    "Botic Van De Zandschulp": {
-      "rank": 52,
-      "points": 969
+    "Jaume Munar": {
+      "rank": 46,
+      "points": 1050
     },
     "Nuno Borges": {
-      "rank": 53,
-      "points": 945
+      "rank": 47,
+      "points": 1045
+    },
+    "Denis Shapovalov": {
+      "rank": 48,
+      "points": 1045
+    },
+    "Stefanos Tsitsipas": {
+      "rank": 49,
+      "points": 1020
     },
     "Thiago Agustin Tirante": {
+      "rank": 50,
+      "points": 1011
+    },
+    "Juan Manuel Cerundolo": {
+      "rank": 51,
+      "points": 1006
+    },
+    "Adrian Mannarino": {
+      "rank": 52,
+      "points": 1005
+    },
+    "Sebastian Baez": {
+      "rank": 53,
+      "points": 1005
+    },
+    "Luca Van Assche": {
       "rank": 54,
-      "points": 944
+      "points": 1001
     },
     "Yannick Hanfmann": {
       "rank": 55,
-      "points": 940
+      "points": 986
     },
-    "Sebastian Baez": {
+    "Tallon Griekspoor": {
       "rank": 56,
-      "points": 935
+      "points": 985
     },
-    "Camilo Ugo Carabelli": {
+    "Quentin Halys": {
       "rank": 57,
+      "points": 980
+    },
+    "Ethan Quinn": {
+      "rank": 58,
+      "points": 979
+    },
+    "Botic Van De Zandschulp": {
+      "rank": 59,
+      "points": 969
+    },
+    "Corentin Moutet": {
+      "rank": 60,
+      "points": 965
+    },
+    "Roman Andres Burruchaga": {
+      "rank": 61,
+      "points": 962
+    },
+    "Tomas Machac": {
+      "rank": 62,
+      "points": 960
+    },
+    "Fabian Marozsan": {
+      "rank": 63,
+      "points": 950
+    },
+    "Sebastian Korda": {
+      "rank": 64,
+      "points": 950
+    },
+    "Daniel Altmaier": {
+      "rank": 65,
+      "points": 944
+    },
+    "Miomir Kecmanovic": {
+      "rank": 66,
       "points": 930
     },
     "Martin Landaluce": {
-      "rank": 58,
-      "points": 926
-    },
-    "Daniel Altmaier": {
-      "rank": 59,
-      "points": 924
-    },
-    "Marin Cilic": {
-      "rank": 60,
-      "points": 911
-    },
-    "Sebastian Korda": {
-      "rank": 61,
-      "points": 900
-    },
-    "Fabian Marozsan": {
-      "rank": 62,
-      "points": 895
-    },
-    "Ethan Quinn": {
-      "rank": 63,
-      "points": 894
-    },
-    "Hamad Medjedovic": {
-      "rank": 64,
-      "points": 894
-    },
-    "Mattia Bellucci": {
-      "rank": 65,
-      "points": 876
-    },
-    "Roman Andres Burruchaga": {
-      "rank": 66,
-      "points": 875
-    },
-    "Jenson Brooksby": {
       "rank": 67,
-      "points": 867
+      "points": 922
     },
-    "Vit Kopriva": {
+    "Kamil Majchrzak": {
       "rank": 68,
-      "points": 856
-    },
-    "Zachary Svajda": {
-      "rank": 69,
-      "points": 848
-    },
-    "Aleksandar Kovacevic": {
-      "rank": 70,
-      "points": 837
-    },
-    "Pablo Carreno Busta": {
-      "rank": 71,
-      "points": 834
-    },
-    "Lorenzo Sonego": {
-      "rank": 72,
-      "points": 833
-    },
-    "Adolfo Daniel Vallejo": {
-      "rank": 73,
-      "points": 828
-    },
-    "Jesper De Jong": {
-      "rank": 74,
-      "points": 808
-    },
-    "Valentin Royer": {
-      "rank": 75,
-      "points": 798
-    },
-    "Marton Fucsovics": {
-      "rank": 76,
-      "points": 781
-    },
-    "Jan Lennard Struff": {
-      "rank": 77,
-      "points": 779
-    },
-    "James Duckworth": {
-      "rank": 78,
-      "points": 776
-    },
-    "Holger Rune": {
-      "rank": 79,
-      "points": 760
-    },
-    "Arthur Cazaux": {
-      "rank": 80,
-      "points": 757
-    },
-    "Dino Prizmic": {
-      "rank": 81,
-      "points": 735
-    },
-    "Luca Van Assche": {
-      "rank": 82,
-      "points": 735
-    },
-    "Rinky Hijikata": {
-      "rank": 83,
-      "points": 717
-    },
-    "Giovanni Mpetshi Perricard": {
-      "rank": 84,
-      "points": 710
-    },
-    "Daniel Merida": {
-      "rank": 85,
-      "points": 706
-    },
-    "Marcos Giron": {
-      "rank": 86,
-      "points": 705
-    },
-    "Emilio Nava": {
-      "rank": 87,
-      "points": 704
-    },
-    "Stefanos Tsitsipas": {
-      "rank": 88,
-      "points": 700
-    },
-    "Sho Shimabukuro": {
-      "rank": 89,
-      "points": 691
-    },
-    "Francisco Comesana": {
-      "rank": 90,
-      "points": 688
-    },
-    "Gabriel Diallo": {
-      "rank": 91,
-      "points": 685
-    },
-    "Adam Walton": {
-      "rank": 92,
-      "points": 676
-    },
-    "Benjamin Bonzi": {
-      "rank": 93,
-      "points": 673
-    },
-    "Marco Trungelliti": {
-      "rank": 94,
-      "points": 670
+      "points": 917
     },
     "Hubert Hurkacz": {
-      "rank": 95,
-      "points": 665
+      "rank": 69,
+      "points": 915
     },
-    "Eliot Spizzirri": {
-      "rank": 96,
-      "points": 662
+    "Adolfo Daniel Vallejo": {
+      "rank": 70,
+      "points": 914
     },
-    "Jaime Faria": {
-      "rank": 97,
-      "points": 660
+    "Vit Kopriva": {
+      "rank": 71,
+      "points": 886
     },
-    "Aleksandr Shevchenko": {
-      "rank": 98,
-      "points": 658
+    "Pablo Carreno Busta": {
+      "rank": 72,
+      "points": 885
     },
-    "Yibing Wu": {
-      "rank": 99,
-      "points": 634
+    "Hamad Medjedovic": {
+      "rank": 73,
+      "points": 854
     },
-    "Alexei Popyrin": {
-      "rank": 100,
-      "points": 630
-    },
-    "Quentin Halys": {
-      "rank": 101,
-      "points": 626
+    "Jenson Brooksby": {
+      "rank": 74,
+      "points": 840
     },
     "Alex Molcan": {
-      "rank": 102,
-      "points": 626
+      "rank": 75,
+      "points": 791
+    },
+    "Camilo Ugo Carabelli": {
+      "rank": 76,
+      "points": 790
+    },
+    "Jan Choinski": {
+      "rank": 77,
+      "points": 770
+    },
+    "Valentin Royer": {
+      "rank": 78,
+      "points": 768
+    },
+    "Jaime Faria": {
+      "rank": 79,
+      "points": 762
+    },
+    "Marin Cilic": {
+      "rank": 80,
+      "points": 751
+    },
+    "Mattia Bellucci": {
+      "rank": 81,
+      "points": 751
+    },
+    "Marton Fucsovics": {
+      "rank": 82,
+      "points": 750
+    },
+    "Marcos Giron": {
+      "rank": 83,
+      "points": 750
+    },
+    "Zachary Svajda": {
+      "rank": 84,
+      "points": 749
+    },
+    "Arthur Gea": {
+      "rank": 85,
+      "points": 744
+    },
+    "James Duckworth": {
+      "rank": 86,
+      "points": 743
+    },
+    "Facundo Diaz Acosta": {
+      "rank": 87,
+      "points": 732
+    },
+    "Lorenzo Sonego": {
+      "rank": 88,
+      "points": 718
+    },
+    "Aleksandr Shevchenko": {
+      "rank": 89,
+      "points": 699
+    },
+    "Sho Shimabukuro": {
+      "rank": 90,
+      "points": 697
+    },
+    "Marco Trungelliti": {
+      "rank": 91,
+      "points": 693
+    },
+    "Giovanni Mpetshi Perricard": {
+      "rank": 92,
+      "points": 690
+    },
+    "Coleman Wong": {
+      "rank": 93,
+      "points": 680
+    },
+    "Martin Damm": {
+      "rank": 94,
+      "points": 677
+    },
+    "Rinky Hijikata": {
+      "rank": 95,
+      "points": 673
+    },
+    "Aleksandar Kovacevic": {
+      "rank": 96,
+      "points": 673
+    },
+    "Hugo Gaston": {
+      "rank": 97,
+      "points": 672
+    },
+    "Adam Walton": {
+      "rank": 98,
+      "points": 670
     },
     "Aleksandar Vukic": {
+      "rank": 99,
+      "points": 666
+    },
+    "Benjamin Bonzi": {
+      "rank": 100,
+      "points": 656
+    },
+    "Dino Prizmic": {
+      "rank": 101,
+      "points": 652
+    },
+    "Holger Rune": {
+      "rank": 102,
+      "points": 650
+    },
+    "Roman Safiullin": {
       "rank": 103,
-      "points": 614
+      "points": 648
     },
     "Damir Dzumhur": {
       "rank": 104,
+      "points": 632
+    },
+    "Gabriel Diallo": {
+      "rank": 105,
+      "points": 625
+    },
+    "Jesper De Jong": {
+      "rank": 106,
+      "points": 618
+    },
+    "Jacob Fearnley": {
+      "rank": 107,
+      "points": 617
+    },
+    "Emilio Nava": {
+      "rank": 108,
       "points": 604
     },
-    "Martin Damm": {
-      "rank": 105,
+    "Francisco Comesana": {
+      "rank": 109,
       "points": 603
     },
-    "Jan Choinski": {
-      "rank": 106,
-      "points": 601
-    },
-    "Yunchaokete Bu": {
-      "rank": 107,
-      "points": 598
-    },
-    "Coleman Wong": {
-      "rank": 108,
-      "points": 584
-    },
-    "Reilly Opelka": {
-      "rank": 109,
-      "points": 571
-    },
-    "Stan Wawrinka": {
+    "Michael Zheng": {
       "rank": 110,
-      "points": 563
-    },
-    "Sebastian Ofner": {
-      "rank": 111,
-      "points": 557
-    },
-    "Nikoloz Basilashvili": {
-      "rank": 112,
-      "points": 554
-    },
-    "Dalibor Svrcina": {
-      "rank": 113,
-      "points": 550
-    },
-    "Patrick Kypson": {
-      "rank": 114,
-      "points": 548
+      "points": 595
     },
     "Titouan Droguet": {
-      "rank": 115,
-      "points": 534
+      "rank": 111,
+      "points": 594
     },
-    "Leandro Riedi": {
-      "rank": 116,
-      "points": 533
-    },
-    "Hugo Gaston": {
-      "rank": 117,
-      "points": 533
-    },
-    "Arthur Fery": {
-      "rank": 118,
-      "points": 528
-    },
-    "Pablo Llamas Ruiz": {
-      "rank": 119,
-      "points": 525
-    },
-    "Facundo Diaz Acosta": {
-      "rank": 120,
-      "points": 525
-    },
-    "Nicolai Budkov Kjaer": {
-      "rank": 121,
-      "points": 522
-    },
-    "Henrique Rocha": {
-      "rank": 122,
-      "points": 519
-    },
-    "Christopher O'Connell": {
-      "rank": 123,
-      "points": 505
-    },
-    "Cristian Garin": {
-      "rank": 124,
-      "points": 504
-    },
-    "Alexandre Muller": {
-      "rank": 125,
-      "points": 494
-    },
-    "Dane Sweeny": {
-      "rank": 126,
-      "points": 493
-    },
-    "Roman Safiullin": {
-      "rank": 127,
-      "points": 483
-    },
-    "Francesco Maestrelli": {
-      "rank": 128,
-      "points": 480
-    },
-    "Vilius Gaubas": {
-      "rank": 129,
-      "points": 474
-    },
-    "Stefano Travaglia": {
-      "rank": 130,
-      "points": 464
-    },
-    "Andrea Pellegrino": {
-      "rank": 131,
-      "points": 457
-    },
-    "Arthur Gea": {
-      "rank": 132,
-      "points": 457
-    },
-    "Nishesh Basavareddy": {
-      "rank": 133,
-      "points": 453
-    },
-    "Pedro Martinez": {
-      "rank": 134,
-      "points": 451
-    },
-    "Tomas Barrios Vera": {
-      "rank": 135,
-      "points": 442
-    },
-    "Kyrian Jacquet": {
-      "rank": 136,
-      "points": 433
-    },
-    "Otto Virtanen": {
-      "rank": 137,
-      "points": 432
-    },
-    "Gustavo Heide": {
-      "rank": 138,
-      "points": 430
-    },
-    "Jurij Rodionov": {
-      "rank": 139,
-      "points": 426
-    },
-    "Billy Harris": {
-      "rank": 140,
-      "points": 425
-    },
-    "August Holmgren": {
-      "rank": 141,
-      "points": 423
+    "Shintaro Mochizuki": {
+      "rank": 112,
+      "points": 577
     },
     "Toby Samuel": {
-      "rank": 142,
-      "points": 414
+      "rank": 113,
+      "points": 576
     },
-    "Michael Zheng": {
+    "Dalibor Svrcina": {
+      "rank": 114,
+      "points": 574
+    },
+    "Patrick Kypson": {
+      "rank": 115,
+      "points": 570
+    },
+    "Otto Virtanen": {
+      "rank": 116,
+      "points": 564
+    },
+    "Eliot Spizzirri": {
+      "rank": 117,
+      "points": 557
+    },
+    "Yibing Wu": {
+      "rank": 118,
+      "points": 553
+    },
+    "Kyrian Jacquet": {
+      "rank": 119,
+      "points": 551
+    },
+    "Yunchaokete Bu": {
+      "rank": 120,
+      "points": 546
+    },
+    "Zsombor Piros": {
+      "rank": 121,
+      "points": 542
+    },
+    "Nicolas Mejia": {
+      "rank": 122,
+      "points": 530
+    },
+    "Vilius Gaubas": {
+      "rank": 123,
+      "points": 523
+    },
+    "Dane Sweeny": {
+      "rank": 124,
+      "points": 518
+    },
+    "Stan Wawrinka": {
+      "rank": 125,
+      "points": 513
+    },
+    "Henrique Rocha": {
+      "rank": 126,
+      "points": 509
+    },
+    "Sebastian Ofner": {
+      "rank": 127,
+      "points": 505
+    },
+    "Alexei Popyrin": {
+      "rank": 128,
+      "points": 500
+    },
+    "Christopher O'Connell": {
+      "rank": 129,
+      "points": 491
+    },
+    "Pablo Llamas Ruiz": {
+      "rank": 130,
+      "points": 489
+    },
+    "Leandro Riedi": {
+      "rank": 131,
+      "points": 487
+    },
+    "Nikoloz Basilashvili": {
+      "rank": 132,
+      "points": 482
+    },
+    "Gustavo Heide": {
+      "rank": 133,
+      "points": 474
+    },
+    "Jurij Rodionov": {
+      "rank": 134,
+      "points": 463
+    },
+    "Andrea Pellegrino": {
+      "rank": 135,
+      "points": 454
+    },
+    "Alexandre Muller": {
+      "rank": 136,
+      "points": 445
+    },
+    "Cristian Garin": {
+      "rank": 137,
+      "points": 438
+    },
+    "Grigor Dimitrov": {
+      "rank": 138,
+      "points": 432
+    },
+    "Arthur Cazaux": {
+      "rank": 139,
+      "points": 432
+    },
+    "Stefano Travaglia": {
+      "rank": 140,
+      "points": 429
+    },
+    "Hugo Dellien": {
+      "rank": 141,
+      "points": 426
+    },
+    "Reilly Opelka": {
+      "rank": 142,
+      "points": 421
+    },
+    "Jack Draper": {
       "rank": 143,
       "points": 410
     },
     "Mackenzie Mcdonald": {
       "rank": 144,
-      "points": 409
+      "points": 405
     },
-    "Jack Pinnington Jones": {
+    "Tom Gentzsch": {
       "rank": 145,
-      "points": 409
-    },
-    "Stefanos Sakellaridis": {
-      "rank": 146,
-      "points": 404
-    },
-    "Tristan Schoolkate": {
-      "rank": 147,
-      "points": 403
-    },
-    "Rei Sakamoto": {
-      "rank": 148,
-      "points": 403
-    },
-    "Elmer Moller": {
-      "rank": 149,
-      "points": 400
-    },
-    "Shintaro Mochizuki": {
-      "rank": 150,
-      "points": 397
-    },
-    "Alex Bolt": {
-      "rank": 151,
-      "points": 381
-    },
-    "Jacob Fearnley": {
-      "rank": 152,
-      "points": 380
+      "points": 402
     },
     "Dusan Lajovic": {
+      "rank": 146,
+      "points": 400
+    },
+    "Tomas Barrios Vera": {
+      "rank": 147,
+      "points": 400
+    },
+    "Nishesh Basavareddy": {
+      "rank": 148,
+      "points": 399
+    },
+    "Timofey Skatov": {
+      "rank": 149,
+      "points": 391
+    },
+    "Joel Schwaerzler": {
+      "rank": 150,
+      "points": 390
+    },
+    "Pedro Martinez": {
+      "rank": 151,
+      "points": 386
+    },
+    "Soonwoo Kwon": {
+      "rank": 152,
+      "points": 381
+    },
+    "Chris Rodesch": {
       "rank": 153,
-      "points": 378
-    },
-    "Zdenek Kolar": {
-      "rank": 154,
-      "points": 378
-    },
-    "Moez Echargui": {
-      "rank": 155,
-      "points": 376
+      "points": 377
     },
     "Juan Carlos Prado Angelo": {
-      "rank": 156,
-      "points": 374
+      "rank": 154,
+      "points": 375
     },
-    "Jordan Thompson": {
-      "rank": 157,
+    "Nicolai Budkov Kjaer": {
+      "rank": 155,
       "points": 373
     },
-    "Liam Draxl": {
-      "rank": 158,
+    "Zdenek Kolar": {
+      "rank": 156,
+      "points": 370
+    },
+    "Stefanos Sakellaridis": {
+      "rank": 157,
       "points": 368
     },
-    "Marco Cecchinato": {
+    "Zhizhen Zhang": {
+      "rank": 158,
+      "points": 365
+    },
+    "Mark Lajal": {
       "rank": 159,
       "points": 361
     },
-    "Jack Draper": {
-      "rank": 160,
-      "points": 360
-    },
-    "Lloyd Harris": {
-      "rank": 161,
-      "points": 359
-    },
-    "Zhizhen Zhang": {
-      "rank": 162,
-      "points": 359
-    },
-    "Roberto Bautista Agut": {
-      "rank": 163,
-      "points": 358
-    },
-    "Grigor Dimitrov": {
-      "rank": 164,
-      "points": 357
-    },
-    "Hugo Dellien": {
-      "rank": 165,
-      "points": 357
-    },
-    "Roberto Carballes Baena": {
-      "rank": 166,
-      "points": 353
-    },
-    "Mark Lajal": {
-      "rank": 167,
-      "points": 352
-    },
-    "Nicolas Mejia": {
-      "rank": 168,
-      "points": 352
-    },
-    "Luca Nardi": {
-      "rank": 169,
-      "points": 348
-    },
-    "Lukas Neumayer": {
-      "rank": 170,
-      "points": 345
-    },
     "Daniil Glinka": {
-      "rank": 171,
-      "points": 345
-    },
-    "Zsombor Piros": {
-      "rank": 172,
-      "points": 342
-    },
-    "Ugo Blanchet": {
-      "rank": 173,
-      "points": 341
-    },
-    "Joel Schwaerzler": {
-      "rank": 174,
-      "points": 341
-    },
-    "Gonzalo Bueno": {
-      "rank": 175,
-      "points": 341
-    },
-    "Luka Mikrut": {
-      "rank": 176,
-      "points": 340
-    },
-    "Lukas Klein": {
-      "rank": 177,
-      "points": 335
-    },
-    "Timofey Skatov": {
-      "rank": 178,
-      "points": 335
-    },
-    "Chris Rodesch": {
-      "rank": 179,
-      "points": 334
-    },
-    "Federico Cina": {
-      "rank": 180,
-      "points": 333
+      "rank": 160,
+      "points": 357
     },
     "Borna Gojo": {
-      "rank": 181,
-      "points": 332
+      "rank": 161,
+      "points": 354
     },
-    "Yoshihito Nishioka": {
-      "rank": 182,
-      "points": 331
-    },
-    "Gauthier Onclin": {
-      "rank": 183,
-      "points": 331
-    },
-    "Alexis Galarneau": {
-      "rank": 184,
-      "points": 328
-    },
-    "Elias Ymer": {
-      "rank": 185,
-      "points": 312
-    },
-    "David Jorda Sanchis": {
-      "rank": 186,
-      "points": 312
-    },
-    "Remy Bertola": {
-      "rank": 187,
-      "points": 311
-    },
-    "Colton Smith": {
-      "rank": 188,
-      "points": 309
-    },
-    "Bernard Tomic": {
-      "rank": 189,
-      "points": 309
-    },
-    "Francesco Passaro": {
-      "rank": 190,
-      "points": 304
+    "Alex Bolt": {
+      "rank": 162,
+      "points": 354
     },
     "Clement Tabur": {
-      "rank": 191,
-      "points": 303
+      "rank": 163,
+      "points": 353
     },
-    "Gianluca Cadenasso": {
-      "rank": 192,
-      "points": 303
+    "Bernard Tomic": {
+      "rank": 164,
+      "points": 352
+    },
+    "Rei Sakamoto": {
+      "rank": 165,
+      "points": 350
+    },
+    "Francesco Maestrelli": {
+      "rank": 166,
+      "points": 349
+    },
+    "Billy Harris": {
+      "rank": 167,
+      "points": 349
+    },
+    "Luca Nardi": {
+      "rank": 168,
+      "points": 346
+    },
+    "Gauthier Onclin": {
+      "rank": 169,
+      "points": 339
     },
     "Tristan Boyer": {
-      "rank": 193,
-      "points": 302
+      "rank": 170,
+      "points": 338
     },
-    "Michael Mmoh": {
-      "rank": 194,
-      "points": 301
+    "Lukas Neumayer": {
+      "rank": 171,
+      "points": 334
     },
-    "Giulio Zeppieri": {
-      "rank": 195,
-      "points": 296
+    "Elmer Moller": {
+      "rank": 172,
+      "points": 333
     },
-    "Carlos Taberner": {
-      "rank": 196,
-      "points": 295
+    "Marco Cecchinato": {
+      "rank": 173,
+      "points": 332
+    },
+    "Federico Cina": {
+      "rank": 174,
+      "points": 324
+    },
+    "Lloyd Harris": {
+      "rank": 175,
+      "points": 323
+    },
+    "Max Alcala Gurri": {
+      "rank": 176,
+      "points": 323
+    },
+    "Jack Pinnington Jones": {
+      "rank": 177,
+      "points": 322
+    },
+    "Gonzalo Bueno": {
+      "rank": 178,
+      "points": 322
     },
     "Jerome Kym": {
-      "rank": 197,
-      "points": 291
+      "rank": 179,
+      "points": 321
     },
-    "Juan Pablo Ficovich": {
-      "rank": 198,
-      "points": 291
+    "Michael Mmoh": {
+      "rank": 180,
+      "points": 321
+    },
+    "Federico Agustin Gomez": {
+      "rank": 181,
+      "points": 320
+    },
+    "Remy Bertola": {
+      "rank": 182,
+      "points": 319
+    },
+    "Roberto Bautista Agut": {
+      "rank": 183,
+      "points": 318
+    },
+    "Luka Mikrut": {
+      "rank": 184,
+      "points": 317
+    },
+    "Alexis Galarneau": {
+      "rank": 185,
+      "points": 314
+    },
+    "Taro Daniel": {
+      "rank": 186,
+      "points": 311
+    },
+    "David Jorda Sanchis": {
+      "rank": 187,
+      "points": 305
+    },
+    "Tristan Schoolkate": {
+      "rank": 188,
+      "points": 302
+    },
+    "Andrea Guerrieri": {
+      "rank": 189,
+      "points": 302
+    },
+    "Roberto Carballes Baena": {
+      "rank": 190,
+      "points": 299
     },
     "Vitaliy Sachko": {
-      "rank": 199,
+      "rank": 191,
+      "points": 298
+    },
+    "Ugo Blanchet": {
+      "rank": 192,
+      "points": 296
+    },
+    "Lautaro Midon": {
+      "rank": 193,
+      "points": 293
+    },
+    "Diego Dedura": {
+      "rank": 194,
       "points": 291
     },
-    "Genaro Alberto Olivieri": {
+    "Lorenzo Giustino": {
+      "rank": 195,
+      "points": 290
+    },
+    "Gianluca Cadenasso": {
+      "rank": 196,
+      "points": 289
+    },
+    "Moez Echargui": {
+      "rank": 197,
+      "points": 287
+    },
+    "Keegan Smith": {
+      "rank": 198,
+      "points": 287
+    },
+    "Yoshihito Nishioka": {
+      "rank": 199,
+      "points": 286
+    },
+    "Colton Smith": {
       "rank": 200,
-      "points": 288
+      "points": 283
     },
-    "Harold Mayot": {
+    "Liam Broady": {
       "rank": 201,
-      "points": 284
+      "points": 282
     },
-    "Soonwoo Kwon": {
+    "Thiago Seyboth Wild": {
       "rank": 202,
-      "points": 280
+      "points": 281
     },
     "Harry Wendelken": {
       "rank": 203,
-      "points": 280
+      "points": 281
     },
-    "Taro Daniel": {
+    "Edas Butvilas": {
       "rank": 204,
-      "points": 279
+      "points": 280
     },
     "Clement Chidekh": {
       "rank": 205,
-      "points": 277
+      "points": 280
     },
-    "Yu Hsiou Hsu": {
+    "Daniel Rincon": {
       "rank": 206,
       "points": 274
     },
-    "James Mccabe": {
+    "Luka Pavlovic": {
       "rank": 207,
       "points": 273
     },
-    "Gilles Arnaud Bailly": {
+    "Henri Squire": {
       "rank": 208,
       "points": 273
     },
-    "Matej Dodig": {
+    "Pol Martin Tiffon": {
       "rank": 209,
-      "points": 272
+      "points": 269
     },
-    "Liam Broady": {
+    "Andre Ilagan": {
       "rank": 210,
-      "points": 272
-    },
-    "Nicolas Jarry": {
-      "rank": 211,
-      "points": 270
-    },
-    "Federico Agustin Gomez": {
-      "rank": 212,
-      "points": 270
+      "points": 269
     },
     "Laslo Djere": {
-      "rank": 213,
+      "rank": 211,
+      "points": 268
+    },
+    "Elias Ymer": {
+      "rank": 212,
       "points": 266
     },
     "Rio Noguchi": {
-      "rank": 214,
-      "points": 266
-    },
-    "Nikolas Sanchez Izquierdo": {
-      "rank": 215,
-      "points": 266
-    },
-    "Moise Kouame": {
-      "rank": 216,
+      "rank": 213,
       "points": 265
     },
-    "Tom Gentzsch": {
-      "rank": 217,
+    "Moise Kouame": {
+      "rank": 214,
       "points": 263
     },
-    "Luka Pavlovic": {
+    "Guy Den Ouden": {
+      "rank": 215,
+      "points": 263
+    },
+    "Liam Draxl": {
+      "rank": 216,
+      "points": 261
+    },
+    "Nikolas Sanchez Izquierdo": {
+      "rank": 217,
+      "points": 261
+    },
+    "Kimmer Coppejans": {
       "rank": 218,
-      "points": 261
-    },
-    "Pol Martin Tiffon": {
-      "rank": 219,
-      "points": 261
-    },
-    "Felix Gill": {
-      "rank": 220,
       "points": 260
     },
-    "Filip Misolic": {
+    "Braden Shick": {
+      "rank": 219,
+      "points": 260
+    },
+    "Henry Searle": {
+      "rank": 220,
+      "points": 259
+    },
+    "Felix Gill": {
       "rank": 221,
       "points": 259
     },
-    "Kimmer Coppejans": {
+    "Francesco Passaro": {
       "rank": 222,
       "points": 258
     },
-    "Chun Hsin Tseng": {
+    "Dan Added": {
       "rank": 223,
       "points": 254
     },
-    "Hugo Grenier": {
-      "rank": 224,
-      "points": 254
-    },
     "Darwin Blanch": {
+      "rank": 224,
+      "points": 249
+    },
+    "Genaro Alberto Olivieri": {
       "rank": 225,
-      "points": 253
+      "points": 249
     },
-    "Edas Butvilas": {
+    "August Holmgren": {
       "rank": 226,
-      "points": 253
+      "points": 247
     },
-    "Lautaro Midon": {
+    "Oliver Crawford": {
       "rank": 227,
-      "points": 251
+      "points": 247
     },
-    "Lorenzo Giustino": {
+    "Juncheng Shang": {
       "rank": 228,
-      "points": 251
+      "points": 245
     },
-    "Andrea Guerrieri": {
+    "Stefano Napolitano": {
       "rank": 229,
-      "points": 248
+      "points": 245
+    },
+    "Gilles Arnaud Bailly": {
+      "rank": 230,
+      "points": 245
     },
     "Frederico Ferreira Silva": {
-      "rank": 230,
-      "points": 246
-    },
-    "Max Houkes": {
       "rank": 231,
       "points": 245
     },
-    "Oliver Crawford": {
+    "Raul Brancaccio": {
       "rank": 232,
-      "points": 243
-    },
-    "Alejandro Moro Canas": {
-      "rank": 233,
-      "points": 242
-    },
-    "Max Alcala Gurri": {
-      "rank": 234,
-      "points": 240
-    },
-    "Henri Squire": {
-      "rank": 235,
-      "points": 238
-    },
-    "Joao Lucas Reis Da Silva": {
-      "rank": 236,
-      "points": 238
-    },
-    "Dan Added": {
-      "rank": 237,
-      "points": 237
+      "points": 244
     },
     "Guido Ivan Justo": {
-      "rank": 238,
-      "points": 237
+      "rank": 233,
+      "points": 244
     },
-    "Yi Zhou": {
-      "rank": 239,
-      "points": 234
+    "Maks Kasnikowski": {
+      "rank": 234,
+      "points": 243
     },
-    "David Goffin": {
-      "rank": 240,
-      "points": 233
+    "Kilian Feldbausch": {
+      "rank": 235,
+      "points": 241
     },
-    "Stefano Napolitano": {
-      "rank": 241,
-      "points": 233
-    },
-    "Guy Den Ouden": {
-      "rank": 242,
-      "points": 232
+    "Juan Pablo Varillas": {
+      "rank": 236,
+      "points": 240
     },
     "Franco Roncadelli": {
-      "rank": 243,
-      "points": 232
+      "rank": 237,
+      "points": 240
     },
-    "Pedro Boscardin Dias": {
-      "rank": 244,
-      "points": 231
+    "Giulio Zeppieri": {
+      "rank": 238,
+      "points": 239
+    },
+    "Sumit Nagal": {
+      "rank": 239,
+      "points": 239
+    },
+    "Alejandro Moro Canas": {
+      "rank": 240,
+      "points": 239
     },
     "Jay Clarke": {
+      "rank": 241,
+      "points": 236
+    },
+    "Max Houkes": {
+      "rank": 242,
+      "points": 235
+    },
+    "James Mccabe": {
+      "rank": 243,
+      "points": 235
+    },
+    "Yi Zhou": {
+      "rank": 244,
+      "points": 234
+    },
+    "Yu Hsiou Hsu": {
       "rank": 245,
+      "points": 232
+    },
+    "Marc Andrea Huesler": {
+      "rank": 246,
       "points": 230
     },
-    "Keegan Smith": {
-      "rank": 246,
-      "points": 229
-    },
-    "Alex Barrena": {
+    "Florent Bax": {
       "rank": 247,
-      "points": 228
-    },
-    "Raul Brancaccio": {
-      "rank": 248,
       "points": 227
+    },
+    "Max Basing": {
+      "rank": 248,
+      "points": 226
     },
     "Pavel Kotov": {
       "rank": 249,
       "points": 226
     },
-    "Pierre Hugues Herbert": {
+    "Andrej Nedic": {
       "rank": 250,
-      "points": 224
+      "points": 226
     },
-    "Andy Andrade": {
+    "Matej Dodig": {
       "rank": 251,
+      "points": 225
+    },
+    "Harold Mayot": {
+      "rank": 252,
       "points": 223
     },
-    "Philip Henning": {
-      "rank": 252,
+    "Abdullah Shelbayh": {
+      "rank": 253,
+      "points": 222
+    },
+    "Felix Balshaw": {
+      "rank": 254,
+      "points": 220
+    },
+    "Martin Krumich": {
+      "rank": 255,
+      "points": 220
+    },
+    "Andy Andrade": {
+      "rank": 256,
       "points": 219
     },
     "Buvaysar Gadamauri": {
-      "rank": 253,
+      "rank": 257,
       "points": 219
     },
-    "Hynek Barton": {
-      "rank": 254,
-      "points": 219
-    },
-    "Kaichi Uchida": {
-      "rank": 255,
+    "Hugo Grenier": {
+      "rank": 258,
       "points": 218
     },
-    "Daniel Rincon": {
-      "rank": 256,
-      "points": 215
-    },
-    "Florent Bax": {
-      "rank": 257,
-      "points": 215
-    },
-    "Andre Ilagan": {
-      "rank": 258,
-      "points": 215
+    "Alex Barrena": {
+      "rank": 259,
+      "points": 218
     },
     "Michele Ribecai": {
-      "rank": 259,
-      "points": 211
-    },
-    "Gael Monfils": {
       "rank": 260,
-      "points": 210
+      "points": 218
     },
-    "Fajing Sun": {
+    "Kaichi Uchida": {
       "rank": 261,
-      "points": 209
+      "points": 218
     },
-    "Diego Dedura": {
+    "Matias Soto": {
       "rank": 262,
-      "points": 209
+      "points": 214
     },
-    "Henry Searle": {
+    "Joao Lucas Reis Da Silva": {
       "rank": 263,
-      "points": 206
+      "points": 214
     },
-    "Juncheng Shang": {
+    "Mili Poljicak": {
       "rank": 264,
-      "points": 205
+      "points": 213
     },
     "Franco Agamenone": {
       "rank": 265,
-      "points": 205
-    },
-    "Stefan Dostanic": {
-      "rank": 266,
-      "points": 204
-    },
-    "Alvaro Guillen Meza": {
-      "rank": 267,
-      "points": 204
-    },
-    "Alastair Gray": {
-      "rank": 268,
-      "points": 203
-    },
-    "Filip Cristian Jianu": {
-      "rank": 269,
-      "points": 203
-    },
-    "Nick Hardt": {
-      "rank": 270,
-      "points": 202
-    },
-    "Miguel Damas": {
-      "rank": 271,
-      "points": 202
-    },
-    "Justin Engel": {
-      "rank": 272,
-      "points": 201
-    },
-    "Maks Kasnikowski": {
-      "rank": 273,
-      "points": 195
-    },
-    "Charles Broom": {
-      "rank": 274,
-      "points": 195
-    },
-    "Petr Bar Biryukov": {
-      "rank": 275,
-      "points": 194
-    },
-    "George Loffhagen": {
-      "rank": 276,
-      "points": 192
-    },
-    "Andrej Nedic": {
-      "rank": 277,
-      "points": 192
-    },
-    "Sascha Gueymard Wayenburg": {
-      "rank": 278,
-      "points": 192
-    },
-    "Kilian Feldbausch": {
-      "rank": 279,
-      "points": 191
-    },
-    "Martin Krumich": {
-      "rank": 280,
-      "points": 191
-    },
-    "Juan Bautista Torres": {
-      "rank": 281,
-      "points": 190
-    },
-    "Calvin Hemery": {
-      "rank": 282,
-      "points": 189
-    },
-    "Duje Ajdukovic": {
-      "rank": 283,
-      "points": 189
-    },
-    "Robin Bertrand": {
-      "rank": 284,
-      "points": 188
-    },
-    "Sumit Nagal": {
-      "rank": 285,
-      "points": 187
-    },
-    "Thiago Monteiro": {
-      "rank": 286,
-      "points": 187
+      "points": 213
     },
     "Cezar Cretu": {
+      "rank": 266,
+      "points": 211
+    },
+    "Ilia Simakin": {
+      "rank": 267,
+      "points": 210
+    },
+    "Hynek Barton": {
+      "rank": 268,
+      "points": 210
+    },
+    "Chun Hsin Tseng": {
+      "rank": 269,
+      "points": 209
+    },
+    "Alastair Gray": {
+      "rank": 270,
+      "points": 209
+    },
+    "Juan Bautista Torres": {
+      "rank": 271,
+      "points": 208
+    },
+    "Daniel Elahi Galan": {
+      "rank": 272,
+      "points": 207
+    },
+    "Petr Bar Biryukov": {
+      "rank": 273,
+      "points": 207
+    },
+    "Thiago Monteiro": {
+      "rank": 274,
+      "points": 204
+    },
+    "Inaki Montes De La Torre": {
+      "rank": 275,
+      "points": 204
+    },
+    "Giles Hussey": {
+      "rank": 276,
+      "points": 204
+    },
+    "Nick Hardt": {
+      "rank": 277,
+      "points": 202
+    },
+    "Pedro Boscardin Dias": {
+      "rank": 278,
+      "points": 201
+    },
+    "Stefan Dostanic": {
+      "rank": 279,
+      "points": 200
+    },
+    "Sandro Kopp": {
+      "rank": 280,
+      "points": 200
+    },
+    "Matheus Pucinelli De Almeida": {
+      "rank": 281,
+      "points": 199
+    },
+    "Yanki Erel": {
+      "rank": 282,
+      "points": 199
+    },
+    "Alvaro Guillen Meza": {
+      "rank": 283,
+      "points": 199
+    },
+    "Filip Cristian Jianu": {
+      "rank": 284,
+      "points": 197
+    },
+    "J.J. Wolf": {
+      "rank": 285,
+      "points": 195
+    },
+    "Matteo Martineau": {
+      "rank": 286,
+      "points": 195
+    },
+    "Pierre Hugues Herbert": {
       "rank": 287,
-      "points": 186
+      "points": 194
     },
-    "Yosuke Watanuki": {
+    "Juan Manuel La Serna": {
       "rank": 288,
-      "points": 185
+      "points": 193
     },
-    "Dali Blanch": {
+    "Charles Broom": {
       "rank": 289,
-      "points": 185
+      "points": 192
     },
-    "Maxim Mrva": {
+    "Akira Santillan": {
       "rank": 290,
-      "points": 185
+      "points": 191
     },
     "Murphy Cassone": {
       "rank": 291,
+      "points": 190
+    },
+    "Rodrigo Pacheco Mendez": {
+      "rank": 292,
+      "points": 190
+    },
+    "Florian Broska": {
+      "rank": 293,
+      "points": 189
+    },
+    "David Goffin": {
+      "rank": 294,
+      "points": 188
+    },
+    "Federico Bondioli": {
+      "rank": 295,
+      "points": 186
+    },
+    "Stefan Kozlov": {
+      "rank": 296,
+      "points": 185
+    },
+    "Justin Engel": {
+      "rank": 297,
+      "points": 185
+    },
+    "Mert Alkaya": {
+      "rank": 298,
+      "points": 185
+    },
+    "Philip Henning": {
+      "rank": 299,
       "points": 184
     },
-    "Thiago Seyboth Wild": {
-      "rank": 292,
-      "points": 183
-    },
-    "Giles Hussey": {
-      "rank": 293,
-      "points": 183
-    },
-    "Daniel Elahi Galan": {
-      "rank": 294,
-      "points": 181
-    },
-    "Johannus Monday": {
-      "rank": 295,
-      "points": 181
-    },
-    "Sergey Fomin": {
-      "rank": 296,
-      "points": 181
-    },
-    "Daniel Evans": {
-      "rank": 297,
-      "points": 180
-    },
-    "Juan Manuel La Serna": {
-      "rank": 298,
-      "points": 180
-    },
-    "Abdullah Shelbayh": {
-      "rank": 299,
-      "points": 180
-    },
-    "Matias Soto": {
+    "Radu Mihai Papoe": {
       "rank": 300,
-      "points": 179
+      "points": 184
+    },
+    "Petr Nesterov": {
+      "rank": 301,
+      "points": 184
+    },
+    "Miguel Damas": {
+      "rank": 302,
+      "points": 183
+    },
+    "Sean Cuenin": {
+      "rank": 303,
+      "points": 181
+    },
+    "Duje Ajdukovic": {
+      "rank": 304,
+      "points": 181
+    },
+    "Gael Monfils": {
+      "rank": 305,
+      "points": 180
     },
     "Filippo Romano": {
-      "rank": 301,
+      "rank": 306,
+      "points": 180
+    },
+    "Philip Sekulic": {
+      "rank": 307,
+      "points": 180
+    },
+    "Sergey Fomin": {
+      "rank": 308,
+      "points": 180
+    },
+    "Maxim Mrva": {
+      "rank": 309,
       "points": 178
     },
-    "Ilia Simakin": {
-      "rank": 302,
-      "points": 177
-    },
-    "Antoine Ghibaudo": {
-      "rank": 303,
-      "points": 177
-    },
-    "Mikhail Kukushkin": {
-      "rank": 304,
-      "points": 177
-    },
-    "Hamish Stewart": {
-      "rank": 305,
-      "points": 177
-    },
-    "Murkel Dellien": {
-      "rank": 306,
-      "points": 177
-    },
-    "Thomas Faurel": {
-      "rank": 307,
-      "points": 176
-    },
-    "Lilian Marmousez": {
-      "rank": 308,
-      "points": 176
-    },
-    "Juan Pablo Varillas": {
-      "rank": 309,
-      "points": 176
-    },
-    "Akira Santillan": {
+    "Daniel Milavsky": {
       "rank": 310,
+      "points": 178
+    },
+    "Matthew Dellavedova": {
+      "rank": 311,
+      "points": 178
+    },
+    "Johannus Monday": {
+      "rank": 312,
+      "points": 177
+    },
+    "Dali Blanch": {
+      "rank": 313,
+      "points": 177
+    },
+    "Hayato Matsuoka": {
+      "rank": 314,
+      "points": 177
+    },
+    "Jay Friend": {
+      "rank": 315,
       "points": 176
     },
-    "Marc Andrea Huesler": {
-      "rank": 311,
+    "Igor Marcondes": {
+      "rank": 316,
       "points": 175
     },
-    "Inaki Montes De La Torre": {
-      "rank": 312,
-      "points": 174
+    "Jordan Thompson": {
+      "rank": 317,
+      "points": 173
     },
-    "Eliakim Coulibaly": {
-      "rank": 313,
-      "points": 174
-    },
-    "Jonas Forejtek": {
-      "rank": 314,
+    "Max Schoenhaus": {
+      "rank": 318,
       "points": 172
+    },
+    "Luciano Emanuel Ambrogi": {
+      "rank": 319,
+      "points": 171
     },
     "Andres Martin": {
-      "rank": 315,
-      "points": 172
-    },
-    "Oriol Roca Batalla": {
-      "rank": 316,
-      "points": 171
-    },
-    "Alex Martinez": {
-      "rank": 317,
-      "points": 171
-    },
-    "Blaise Bicknell": {
-      "rank": 318,
-      "points": 171
-    },
-    "Beibit Zhukayev": {
-      "rank": 319,
-      "points": 170
-    },
-    "Felix Balshaw": {
       "rank": 320,
       "points": 170
     },
-    "Daniel Michalski": {
+    "Gabriele Piraino": {
       "rank": 321,
-      "points": 170
+      "points": 169
     },
-    "Stefan Kozlov": {
+    "Gonzalo Villanueva": {
       "rank": 322,
-      "points": 169
-    },
-    "Luciano Emanuel Ambrogi": {
-      "rank": 323,
-      "points": 169
-    },
-    "Philip Sekulic": {
-      "rank": 324,
       "points": 168
     },
-    "Andrea Collarini": {
-      "rank": 325,
-      "points": 167
-    },
-    "Sandro Kopp": {
-      "rank": 326,
+    "Carl Emil Overbeck": {
+      "rank": 323,
       "points": 166
     },
-    "Yasutaka Uchiyama": {
+    "Fajing Sun": {
+      "rank": 324,
+      "points": 166
+    },
+    "Tyler Zink": {
+      "rank": 325,
+      "points": 165
+    },
+    "Calvin Hemery": {
+      "rank": 326,
+      "points": 164
+    },
+    "Marvin Moeller": {
       "rank": 327,
       "points": 164
     },
-    "Tiago Pereira": {
+    "Enrico Dalla Valle": {
       "rank": 328,
       "points": 164
     },
-    "Igor Marcondes": {
+    "Sascha Gueymard Wayenburg": {
       "rank": 329,
-      "points": 163
+      "points": 164
     },
-    "Braden Shick": {
+    "Daniel Michalski": {
       "rank": 330,
       "points": 163
     },
-    "Max Basing": {
+    "Thomas Faurel": {
       "rank": 331,
       "points": 162
     },
-    "Mert Alkaya": {
+    "Petr Brunclik": {
       "rank": 332,
       "points": 162
     },
-    "Tyler Zink": {
+    "Mikhail Kukushkin": {
       "rank": 333,
       "points": 162
     },
-    "Paul Jubb": {
+    "Eliakim Coulibaly": {
       "rank": 334,
-      "points": 161
+      "points": 162
     },
-    "Jacopo Vasami": {
+    "Murkel Dellien": {
       "rank": 335,
-      "points": 159
-    },
-    "Michael Geerts": {
-      "rank": 336,
-      "points": 159
-    },
-    "Petr Brunclik": {
-      "rank": 337,
-      "points": 158
-    },
-    "Max Schoenhaus": {
-      "rank": 338,
-      "points": 158
-    },
-    "Matteo Martineau": {
-      "rank": 339,
-      "points": 157
-    },
-    "Nicolas Kicker": {
-      "rank": 340,
-      "points": 156
-    },
-    "Rodrigo Pacheco Mendez": {
-      "rank": 341,
-      "points": 155
-    },
-    "Yanki Erel": {
-      "rank": 342,
-      "points": 153
-    },
-    "Juan Estevez": {
-      "rank": 343,
-      "points": 153
-    },
-    "Cedrik Marcel Stebe": {
-      "rank": 344,
-      "points": 152
-    },
-    "Mili Poljicak": {
-      "rank": 345,
-      "points": 152
-    },
-    "Tung Lin Wu": {
-      "rank": 346,
-      "points": 152
-    },
-    "Hayato Matsuoka": {
-      "rank": 347,
-      "points": 150
+      "points": 162
     },
     "Dominic Stricker": {
-      "rank": 348,
-      "points": 149
+      "rank": 336,
+      "points": 161
     },
-    "Oliver Tarvet": {
-      "rank": 349,
-      "points": 147
+    "Mathys Erhard": {
+      "rank": 337,
+      "points": 161
     },
-    "Mitchell Krueger": {
-      "rank": 350,
-      "points": 147
+    "Marko Topo": {
+      "rank": 338,
+      "points": 160
     },
-    "Florian Broska": {
-      "rank": 351,
-      "points": 147
+    "Juan Estevez": {
+      "rank": 339,
+      "points": 160
     },
-    "Mats Rosenkranz": {
-      "rank": 352,
-      "points": 145
+    "Hernan Casanova": {
+      "rank": 340,
+      "points": 159
+    },
+    "Antoine Ghibaudo": {
+      "rank": 341,
+      "points": 159
+    },
+    "Max Hans Rehberg": {
+      "rank": 342,
+      "points": 158
+    },
+    "Ognjen Milic": {
+      "rank": 343,
+      "points": 158
     },
     "Facundo Mena": {
+      "rank": 344,
+      "points": 157
+    },
+    "Hamish Stewart": {
+      "rank": 345,
+      "points": 157
+    },
+    "Yasutaka Uchiyama": {
+      "rank": 346,
+      "points": 156
+    },
+    "Jan Kumstat": {
+      "rank": 347,
+      "points": 156
+    },
+    "Michael Geerts": {
+      "rank": 348,
+      "points": 156
+    },
+    "Tiago Pereira": {
+      "rank": 349,
+      "points": 154
+    },
+    "Juan Pablo Ficovich": {
+      "rank": 350,
+      "points": 153
+    },
+    "Oriol Roca Batalla": {
+      "rank": 351,
+      "points": 153
+    },
+    "Tiago Torres": {
+      "rank": 352,
+      "points": 153
+    },
+    "Raphael Perot": {
       "rank": 353,
-      "points": 145
+      "points": 152
     },
-    "Carlo Alberto Caniato": {
+    "Ivan Marrero Curbelo": {
       "rank": 354,
-      "points": 145
+      "points": 151
     },
-    "Daniel Milavsky": {
+    "Edward Winter": {
       "rank": 355,
+      "points": 149
+    },
+    "Mitchell Krueger": {
+      "rank": 356,
+      "points": 148
+    },
+    "Anton Matusevich": {
+      "rank": 357,
+      "points": 147
+    },
+    "Jake Delaney": {
+      "rank": 358,
       "points": 145
     },
-    "Sean Cuenin": {
-      "rank": 356,
-      "points": 144
-    },
-    "Yuta Shimizu": {
-      "rank": 357,
-      "points": 144
-    },
-    "Radu Mihai Papoe": {
-      "rank": 358,
-      "points": 144
-    },
-    "Federico Bondioli": {
+    "Andrey Chepelev": {
       "rank": 359,
       "points": 144
     },
-    "Luca Castelnuovo": {
+    "Carlos Sanchez Jover": {
       "rank": 360,
       "points": 143
     },
-    "Matthew Dellavedova": {
+    "Mats Rosenkranz": {
       "rank": 361,
-      "points": 143
+      "points": 142
     },
-    "Ioannis Xilas": {
+    "Marc Polmans": {
       "rank": 362,
       "points": 142
     },
-    "Enrico Dalla Valle": {
+    "Francesco Forti": {
       "rank": 363,
+      "points": 142
+    },
+    "Tommaso Compagnucci": {
+      "rank": 364,
       "points": 141
     },
-    "Marko Topo": {
-      "rank": 364,
-      "points": 140
-    },
-    "Norbert Gombos": {
+    "Geoffrey Blancaneaux": {
       "rank": 365,
-      "points": 140
+      "points": 141
     },
-    "Marc Polmans": {
+    "Nicolas Kicker": {
       "rank": 366,
       "points": 140
     },
-    "Carlos Sanchez Jover": {
+    "Alex Martinez": {
       "rank": 367,
-      "points": 140
+      "points": 139
     },
-    "Marvin Moeller": {
+    "Manas Dhamne": {
       "rank": 368,
       "points": 139
     },
-    "Andrey Chepelev": {
+    "Lucas Poullain": {
       "rank": 369,
       "points": 139
     },
-    "Ognjen Milic": {
+    "Tung Lin Wu": {
       "rank": 370,
+      "points": 138
+    },
+    "Jacopo Vasami": {
+      "rank": 371,
       "points": 137
     },
-    "Ivan Gakhov": {
-      "rank": 371,
-      "points": 136
-    },
-    "Marek Gengel": {
+    "Jonas Forejtek": {
       "rank": 372,
+      "points": 137
+    },
+    "Robin Bertrand": {
+      "rank": 373,
+      "points": 137
+    },
+    "Ilya Ivashka": {
+      "rank": 374,
       "points": 136
     },
-    "Gabriele Piraino": {
-      "rank": 373,
-      "points": 134
-    },
-    "Tommaso Compagnucci": {
-      "rank": 374,
-      "points": 134
-    },
-    "Nerman Fatic": {
+    "Andrea Collarini": {
       "rank": 375,
-      "points": 133
+      "points": 136
+    },
+    "Cruz Hewitt": {
+      "rank": 376,
+      "points": 136
+    },
+    "Max Wiskandt": {
+      "rank": 377,
+      "points": 135
     },
     "Eduardo Ribeiro": {
-      "rank": 376,
-      "points": 133
-    },
-    "Anton Matusevich": {
-      "rank": 377,
-      "points": 133
-    },
-    "Garrett Johns": {
       "rank": 378,
-      "points": 133
+      "points": 134
     },
-    "Francesco Forti": {
+    "Blaise Bicknell": {
       "rank": 379,
+      "points": 134
+    },
+    "Oliver Tarvet": {
+      "rank": 380,
       "points": 132
     },
-    "Daniel Masur": {
-      "rank": 380,
-      "points": 131
-    },
-    "Marat Sharipov": {
+    "Carlos Taberner": {
       "rank": 381,
       "points": 131
     },
-    "Manas Dhamne": {
+    "Cedrik Marcel Stebe": {
       "rank": 382,
-      "points": 130
+      "points": 131
     },
-    "Andrew Fenty": {
+    "Trevor Svajda": {
       "rank": 383,
-      "points": 130
+      "points": 131
     },
-    "Mathys Erhard": {
+    "Paul Jubb": {
       "rank": 384,
-      "points": 130
+      "points": 131
     },
-    "Kasidit Samrej": {
+    "Marek Gengel": {
       "rank": 385,
-      "points": 130
-    },
-    "Ryan Peniston": {
-      "rank": 386,
-      "points": 129
-    },
-    "Justin Boulais": {
-      "rank": 387,
-      "points": 129
-    },
-    "Geoffrey Blancaneaux": {
-      "rank": 388,
-      "points": 129
-    },
-    "Tom Paris": {
-      "rank": 389,
-      "points": 128
-    },
-    "Vadym Ursu": {
-      "rank": 390,
-      "points": 128
-    },
-    "Raphael Perot": {
-      "rank": 391,
-      "points": 127
-    },
-    "Santiago Rodriguez Taverna": {
-      "rank": 392,
-      "points": 127
-    },
-    "Alex Rybakov": {
-      "rank": 393,
-      "points": 126
-    },
-    "Renta Tokuda": {
-      "rank": 394,
-      "points": 126
-    },
-    "Lucio Ratti": {
-      "rank": 395,
-      "points": 125
-    },
-    "Petr Nesterov": {
-      "rank": 396,
-      "points": 124
-    },
-    "Gonzalo Villanueva": {
-      "rank": 397,
-      "points": 124
-    },
-    "Arthur Weber": {
-      "rank": 398,
-      "points": 122
-    },
-    "Patrick Zahraj": {
-      "rank": 399,
-      "points": 122
-    },
-    "Andrej Martin": {
-      "rank": 400,
-      "points": 121
-    },
-    "Arthur Nagel": {
-      "rank": 401,
-      "points": 121
-    },
-    "Lui Maxted": {
-      "rank": 402,
-      "points": 120
+      "points": 131
     },
     "Samuele Pieri": {
-      "rank": 403,
-      "points": 120
+      "rank": 386,
+      "points": 131
     },
-    "Jay Friend": {
-      "rank": 404,
-      "points": 119
+    "Dimitar Kuzmanov": {
+      "rank": 387,
+      "points": 131
     },
-    "Mika Brunold": {
-      "rank": 405,
-      "points": 119
+    "Lilian Marmousez": {
+      "rank": 388,
+      "points": 130
     },
-    "Hernan Casanova": {
-      "rank": 406,
-      "points": 119
+    "Lucio Ratti": {
+      "rank": 389,
+      "points": 130
     },
-    "Ivan Marrero Curbelo": {
-      "rank": 407,
-      "points": 119
+    "Garrett Johns": {
+      "rank": 390,
+      "points": 130
     },
-    "Adrian Boitan": {
-      "rank": 408,
-      "points": 119
-    },
-    "Matheus Pucinelli De Almeida": {
-      "rank": 409,
-      "points": 119
-    },
-    "Oleg Prihodko": {
-      "rank": 410,
-      "points": 118
-    },
-    "Carlos Maria Zarate": {
-      "rank": 411,
-      "points": 118
-    },
-    "Jake Delaney": {
-      "rank": 412,
-      "points": 118
-    },
-    "Daniel Dutra Da Silva": {
-      "rank": 413,
-      "points": 118
+    "Ioannis Xilas": {
+      "rank": 391,
+      "points": 130
     },
     "Jack Kennedy": {
-      "rank": 414,
-      "points": 117
+      "rank": 392,
+      "points": 129
     },
-    "Cyril Vandermeersch": {
-      "rank": 415,
-      "points": 117
+    "Yuta Shimizu": {
+      "rank": 393,
+      "points": 129
     },
-    "Samir Banerjee": {
-      "rank": 416,
-      "points": 116
+    "Carlos Maria Zarate": {
+      "rank": 394,
+      "points": 128
+    },
+    "Georgii Kravchenko": {
+      "rank": 395,
+      "points": 128
+    },
+    "Oleg Prihodko": {
+      "rank": 396,
+      "points": 126
+    },
+    "Daniel Masur": {
+      "rank": 397,
+      "points": 125
+    },
+    "Justin Boulais": {
+      "rank": 398,
+      "points": 125
+    },
+    "Marat Sharipov": {
+      "rank": 399,
+      "points": 125
+    },
+    "Dhakshineswar Suresh": {
+      "rank": 400,
+      "points": 124
+    },
+    "Andrew Fenty": {
+      "rank": 401,
+      "points": 124
+    },
+    "Andrej Martin": {
+      "rank": 402,
+      "points": 123
+    },
+    "Lui Maxted": {
+      "rank": 403,
+      "points": 123
+    },
+    "Arthur Nagel": {
+      "rank": 404,
+      "points": 123
+    },
+    "Santiago Rodriguez Taverna": {
+      "rank": 405,
+      "points": 123
+    },
+    "Arthur Weber": {
+      "rank": 406,
+      "points": 122
     },
     "Stefan Palosi": {
+      "rank": 407,
+      "points": 122
+    },
+    "Vadym Ursu": {
+      "rank": 408,
+      "points": 121
+    },
+    "Laurent Lokoli": {
+      "rank": 409,
+      "points": 120
+    },
+    "Sebastian Sorger": {
+      "rank": 410,
+      "points": 120
+    },
+    "Juan Cruz Martin Manzano": {
+      "rank": 411,
+      "points": 120
+    },
+    "Kasidit Samrej": {
+      "rank": 412,
+      "points": 120
+    },
+    "Patrick Zahraj": {
+      "rank": 413,
+      "points": 119
+    },
+    "Mateus Alves": {
+      "rank": 414,
+      "points": 118
+    },
+    "Olle Wallin": {
+      "rank": 415,
+      "points": 118
+    },
+    "Yosuke Watanuki": {
+      "rank": 416,
+      "points": 117
+    },
+    "Nerman Fatic": {
       "rank": 417,
-      "points": 116
+      "points": 117
     },
-    "Corentin Denolly": {
+    "Mees Rottgering": {
       "rank": 418,
-      "points": 115
+      "points": 117
     },
-    "Semen Pankin": {
+    "Eric Vanshelboim": {
       "rank": 419,
-      "points": 115
-    },
-    "James Trotter": {
-      "rank": 420,
-      "points": 114
-    },
-    "Li Tu": {
-      "rank": 421,
-      "points": 114
-    },
-    "Alex Hernandez": {
-      "rank": 422,
-      "points": 114
-    },
-    "Javier Barranco Cosano": {
-      "rank": 423,
-      "points": 113
+      "points": 117
     },
     "Johan Nikles": {
+      "rank": 420,
+      "points": 116
+    },
+    "Sergio Callejon Hernando": {
+      "rank": 421,
+      "points": 116
+    },
+    "Masamichi Imamura": {
+      "rank": 422,
+      "points": 116
+    },
+    "Mika Brunold": {
+      "rank": 423,
+      "points": 115
+    },
+    "Norbert Gombos": {
       "rank": 424,
-      "points": 113
+      "points": 115
     },
-    "Luca Potenza": {
+    "Beibit Zhukayev": {
       "rank": 425,
-      "points": 113
+      "points": 114
     },
-    "Maximus Jones": {
+    "Semen Pankin": {
       "rank": 426,
       "points": 113
     },
-    "Jack Loge": {
+    "Massimo Giunta": {
       "rank": 427,
       "points": 113
     },
-    "Cannon Kingsley": {
+    "Niels Visker": {
       "rank": 428,
-      "points": 112
+      "points": 113
     },
-    "Lucas Poullain": {
+    "Constantin Bittoun Kouzmine": {
       "rank": 429,
+      "points": 113
+    },
+    "Cannon Kingsley": {
+      "rank": 430,
       "points": 112
     },
-    "Jie Cui": {
-      "rank": 430,
-      "points": 111
-    },
-    "Masamichi Imamura": {
+    "Cyril Vandermeersch": {
       "rank": 431,
+      "points": 112
+    },
+    "Vladyslav Orlov": {
+      "rank": 432,
+      "points": 112
+    },
+    "Ozan Baris": {
+      "rank": 433,
       "points": 111
     },
-    "Edward Winter": {
-      "rank": 432,
-      "points": 110
-    },
-    "Gianmarco Ferrari": {
-      "rank": 433,
-      "points": 110
-    },
-    "Brandon Holt": {
+    "Valerio Aboian": {
       "rank": 434,
-      "points": 109
+      "points": 111
     },
-    "Adria Soriano Barrera": {
+    "Mika Petkovic": {
       "rank": 435,
-      "points": 109
+      "points": 111
     },
-    "Bor Artnak": {
+    "Henry Bernet": {
       "rank": 436,
-      "points": 109
+      "points": 110
     },
-    "Carl Emil Overbeck": {
+    "James Trotter": {
       "rank": 437,
       "points": 109
     },
-    "Benjamin Hassan": {
+    "Maximus Jones": {
       "rank": 438,
       "points": 109
     },
-    "Massimo Giunta": {
+    "Yannik Kelm": {
       "rank": 439,
       "points": 109
     },
-    "Facundo Bagnis": {
+    "Thanasi Kokkinakis": {
       "rank": 440,
       "points": 108
     },
-    "Radu Albot": {
+    "Adrian Boitan": {
       "rank": 441,
       "points": 108
     },
-    "Sergio Callejon Hernando": {
+    "Dylan Dietrich": {
       "rank": 442,
-      "points": 108
+      "points": 107
     },
-    "Dimitar Kuzmanov": {
+    "Corentin Denolly": {
       "rank": 443,
-      "points": 108
+      "points": 107
     },
-    "Tibo Colson": {
+    "Denis Yevseyev": {
       "rank": 444,
       "points": 107
     },
-    "Moerani Bouzige": {
+    "Spencer Johnson": {
       "rank": 445,
-      "points": 107
+      "points": 106
     },
-    "Alafia Ayeni": {
+    "Alejo Sanchez Quilez": {
       "rank": 446,
       "points": 106
     },
-    "Olle Wallin": {
+    "Omar Jasika": {
       "rank": 447,
       "points": 106
     },
-    "Milos Karol": {
+    "Bor Artnak": {
       "rank": 448,
       "points": 105
     },
-    "Miguel Tobon": {
+    "Robert Strombachs": {
       "rank": 449,
       "points": 105
     },
-    "Fabrizio Andaloro": {
+    "Karim Bennani": {
       "rank": 450,
       "points": 104
     },
-    "Sanhui Shin": {
+    "Koki Matsuda": {
       "rank": 451,
       "points": 104
     },
-    "Joao Eduardo Schiessl": {
+    "Luca Castelnuovo": {
       "rank": 452,
-      "points": 103
+      "points": 104
     },
-    "Robert Strombachs": {
+    "Daniel Dutra Da Silva": {
       "rank": 453,
-      "points": 103
+      "points": 104
     },
-    "Christoph Negritu": {
+    "Ryan Peniston": {
       "rank": 454,
       "points": 103
     },
-    "Niels Visker": {
+    "Tom Paris": {
       "rank": 455,
       "points": 103
     },
-    "Lorenzo Joaquin Rodriguez": {
+    "Renta Tokuda": {
       "rank": 456,
       "points": 103
     },
-    "Denis Yevseyev": {
+    "Viktor Durasovic": {
       "rank": 457,
-      "points": 102
+      "points": 103
     },
-    "Quinn Vandecasteele": {
+    "Moerani Bouzige": {
       "rank": 458,
+      "points": 103
+    },
+    "Jie Cui": {
+      "rank": 459,
       "points": 102
     },
-    "Andrea Picchione": {
-      "rank": 459,
-      "points": 101
-    },
-    "Mateus Alves": {
+    "Alafia Ayeni": {
       "rank": 460,
       "points": 101
     },
-    "Nicolas Alvarez Varona": {
+    "Matthew William Donald": {
       "rank": 461,
-      "points": 100
+      "points": 101
     },
-    "Sebastian Sorger": {
+    "Carlo Alberto Caniato": {
       "rank": 462,
-      "points": 100
+      "points": 101
     },
-    "Eero Vasa": {
+    "Lorenzo Joaquin Rodriguez": {
       "rank": 463,
+      "points": 101
+    },
+    "Christian Langmo": {
+      "rank": 464,
+      "points": 101
+    },
+    "Gianmarco Ferrari": {
+      "rank": 465,
       "points": 100
     },
-    "Valerio Aboian": {
-      "rank": 464,
+    "Javier Barranco Cosano": {
+      "rank": 466,
       "points": 99
     },
-    "Aidan Mchugh": {
-      "rank": 465,
-      "points": 98
-    },
-    "Jacopo Berrettini": {
-      "rank": 466,
-      "points": 98
-    },
-    "Alex Marti Pujolras": {
+    "Daniel Siniakov": {
       "rank": 467,
+      "points": 99
+    },
+    "Eero Vasa": {
+      "rank": 468,
+      "points": 99
+    },
+    "Maxime Chazal": {
+      "rank": 469,
+      "points": 99
+    },
+    "Alex Hernandez": {
+      "rank": 470,
+      "points": 99
+    },
+    "Sergi Perez Contri": {
+      "rank": 471,
       "points": 98
     },
-    "Hikaru Shiraishi": {
-      "rank": 468,
+    "Jack Loge": {
+      "rank": 472,
       "points": 98
     },
     "Jason Kubler": {
-      "rank": 469,
-      "points": 97
-    },
-    "Trevor Svajda": {
-      "rank": 470,
-      "points": 97
-    },
-    "Henry Bernet": {
-      "rank": 471,
-      "points": 97
-    },
-    "Georgii Kravchenko": {
-      "rank": 472,
-      "points": 97
-    },
-    "Sergi Perez Contri": {
       "rank": 473,
       "points": 97
     },
-    "Christian Langmo": {
+    "Reda Bennani": {
       "rank": 474,
       "points": 97
     },
-    "Mees Rottgering": {
+    "Emile Hudd": {
       "rank": 475,
+      "points": 97
+    },
+    "Filip Misolic": {
+      "rank": 476,
       "points": 96
     },
-    "Lorenzo Carboni": {
-      "rank": 476,
+    "Blake Ellis": {
+      "rank": 477,
+      "points": 96
+    },
+    "Ivan Gakhov": {
+      "rank": 478,
+      "points": 96
+    },
+    "Kei Nishikori": {
+      "rank": 479,
       "points": 95
     },
-    "Dhakshineswar Suresh": {
-      "rank": 477,
-      "points": 94
-    },
-    "Laurent Lokoli": {
-      "rank": 478,
-      "points": 94
-    },
-    "Daniel Siniakov": {
-      "rank": 479,
-      "points": 94
+    "Pedro Vives Marcos": {
+      "rank": 480,
+      "points": 95
     },
     "Rudolf Molleker": {
-      "rank": 480,
-      "points": 94
-    },
-    "Filip Peliwo": {
       "rank": 481,
-      "points": 94
+      "points": 95
     },
-    "Alexander Binda": {
+    "Luca Potenza": {
       "rank": 482,
+      "points": 95
+    },
+    "Quinn Vandecasteele": {
+      "rank": 483,
+      "points": 95
+    },
+    "Dusan Obradovic": {
+      "rank": 484,
+      "points": 95
+    },
+    "Yassine Dlimi": {
+      "rank": 485,
       "points": 94
     },
-    "Viacheslav Bielinskyi": {
-      "rank": 483,
+    "Duncan Chan": {
+      "rank": 486,
       "points": 93
     },
-    "Koki Matsuda": {
-      "rank": 484,
-      "points": 92
-    },
-    "Matthew William Donald": {
-      "rank": 485,
-      "points": 92
-    },
-    "Takuya Kumasaka": {
-      "rank": 486,
-      "points": 92
-    },
-    "Eric Vanshelboim": {
+    "Milos Karol": {
       "rank": 487,
-      "points": 92
+      "points": 93
     },
-    "Karan Singh": {
+    "George Loffhagen": {
       "rank": 488,
-      "points": 92
+      "points": 93
     },
-    "Maxime Chazal": {
+    "Sanhui Shin": {
       "rank": 489,
-      "points": 91
+      "points": 93
     },
-    "Hiroki Moriya": {
+    "Lorenzo Carboni": {
       "rank": 490,
-      "points": 91
+      "points": 93
     },
-    "Pietro Fellin": {
+    "Karl Poling": {
       "rank": 491,
-      "points": 91
+      "points": 93
     },
-    "Thanasi Kokkinakis": {
+    "Thijs Boogaard": {
       "rank": 492,
-      "points": 90
-    },
-    "Viktor Durasovic": {
-      "rank": 493,
-      "points": 90
-    },
-    "Vladyslav Orlov": {
-      "rank": 494,
-      "points": 90
-    },
-    "Juan Cruz Martin Manzano": {
-      "rank": 495,
-      "points": 90
-    },
-    "Pedro Sakamoto": {
-      "rank": 496,
-      "points": 90
-    },
-    "Dan  Martin": {
-      "rank": 497,
-      "points": 89
+      "points": 92
     },
     "Enzo Aguiard": {
+      "rank": 493,
+      "points": 92
+    },
+    "Samir Banerjee": {
+      "rank": 494,
+      "points": 91
+    },
+    "Kenta Miyoshi": {
+      "rank": 495,
+      "points": 91
+    },
+    "Li Tu": {
+      "rank": 496,
+      "points": 91
+    },
+    "Patrick Schoen": {
+      "rank": 497,
+      "points": 91
+    },
+    "Anton Shepp": {
       "rank": 498,
-      "points": 89
+      "points": 91
     },
-    "Alejo Sanchez Quilez": {
+    "Miguel Tobon": {
       "rank": 499,
-      "points": 89
+      "points": 91
     },
-    "Dominik Palan": {
+    "Aziz Ouakaa": {
       "rank": 500,
-      "points": 89
+      "points": 91
     }
   }
 }
