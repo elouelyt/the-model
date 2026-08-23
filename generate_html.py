@@ -440,6 +440,16 @@ def _daily_pick_html(pick: dict | None) -> str:
         <span class="dp-edge-label">Edge sobre mercado</span>
         <span class="dp-edge-val">+{edge_pct:.1f} pp</span>
     </div>
+    <div class="dp-firstset">
+        <div class="dp-firstset-badge">STAKE · PRIMER SET</div>
+        <div class="dp-firstset-text">
+            Apostar como <strong>Ganador del 1er Set</strong> en Stake.
+            Si el jugador gana el primer set, la apuesta se cobra —
+            aunque pierda el 2º set o el partido.
+            La probabilidad de ganar el primer set es mayor que ganar el partido
+            (~70% vs ~63%), lo que mejora el EV real de la apuesta.
+        </div>
+    </div>
     {struggling_banner}
 </div>
 <style>
@@ -586,6 +596,32 @@ def _daily_pick_html(pick: dict | None) -> str:
 .dp-sent {{
     font-size: 11px;
     font-weight: 500;
+}}
+.dp-firstset {{
+    margin-top: 12px;
+    background: rgba(0,168,107,0.08);
+    border: 1px solid rgba(0,168,107,0.25);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}}
+.dp-firstset-badge {{
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+}}
+.dp-firstset-text {{
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+}}
+.dp-firstset-text strong {{
+    color: var(--text);
+    font-weight: 600;
 }}
 .dp-warn {{
     margin-top: 10px;
@@ -901,6 +937,131 @@ def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
     </table>""", net, total_apostado, roi_pct
 
 
+def _strategy_html() -> str:
+    """Render the active betting strategy rules panel."""
+    return """
+<section class="strategy-panel">
+  <div class="strategy-header">
+    <span class="strategy-eyebrow">ESTRATEGIA ACTIVA</span>
+    <h2 class="strategy-title">Reglas de Apuesta</h2>
+  </div>
+  <div class="strategy-rules">
+    <div class="srule srule-green">
+      <div class="srule-num">01</div>
+      <div class="srule-body">
+        <strong>Una sola apuesta al día</strong>
+        <p>Solo la Apuesta del Día marcada arriba. Sin parlays, sin múltiples — una apuesta, máximo control.</p>
+      </div>
+    </div>
+    <div class="srule srule-green">
+      <div class="srule-num">02</div>
+      <div class="srule-body">
+        <strong>Apostar siempre en Stake — Ganador del 1er Set</strong>
+        <p>En Stake, la apuesta cuenta como ganada si el jugador elegido gana el primer set, aunque pierda el segundo set o el partido completo. Esto aumenta la tasa de acierto efectiva de ~63% (victoria en partido) a ~70% (victoria en 1er set), mejorando el EV real de cada apuesta.</p>
+      </div>
+    </div>
+    <div class="srule srule-amber">
+      <div class="srule-num">03</div>
+      <div class="srule-body">
+        <strong>Solo apostar si hay edge &gt; 3 pp y modelo &gt; 61%</strong>
+        <p>Si la Apuesta del Día no aparece, es que no hay señal válida hoy. No forzar apuestas — la paciencia es una posición.</p>
+      </div>
+    </div>
+    <div class="srule srule-amber">
+      <div class="srule-num">04</div>
+      <div class="srule-body">
+        <strong>Stake fijo: 15 € por apuesta</strong>
+        <p>Sin Kelly variable, sin aumentar en rachas positivas ni negativas. Stake fijo protege el bankroll de días catastrófico.</p>
+      </div>
+    </div>
+    <div class="srule srule-muted">
+      <div class="srule-num">05</div>
+      <div class="srule-body">
+        <strong>Evitar jugadores con rachas negativas documentadas</strong>
+        <p>El sistema marca con ⚠ jugadores con 4+ pérdidas en el historial. Considera reducir el stake o saltar esa apuesta.</p>
+      </div>
+    </div>
+    <div class="srule srule-muted">
+      <div class="srule-num">06</div>
+      <div class="srule-body">
+        <strong>Sin parlays</strong>
+        <p>A ~63% de acierto por pierna, un parlay de 2 necesita 76% para ser EV positivo. El modelo no llega a ese umbral — los parlays son EV negativo en nuestro caso.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+.strategy-panel {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.strategy-eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+.strategy-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.strategy-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.srule {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border-radius: 6px;
+  padding: 12px 14px;
+  border-left: 3px solid transparent;
+}
+.srule-green {
+  background: rgba(0,168,107,0.07);
+  border-left-color: var(--green);
+}
+.srule-amber {
+  background: rgba(245,158,11,0.07);
+  border-left-color: var(--orange);
+}
+.srule-muted {
+  background: rgba(255,255,255,0.03);
+  border-left-color: var(--border-2);
+}
+.srule-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.srule-body strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  margin-bottom: 3px;
+}
+.srule-body p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+</style>
+"""
+
+
 def _track_record_html(track_record: dict) -> str:
     """Generate multi-month track record with tab selector."""
     if not track_record or not track_record.get("months"):
@@ -1036,12 +1197,14 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         parlays_html = ""
         safe_parlays_html = ""
         daily_pick_html = ""
+        strategy_html = _strategy_html()
     elif not results:
         content = _no_matches_html()
         summary_html = ""
         parlays_html = ""
         safe_parlays_html = ""
         daily_pick_html = ""
+        strategy_html = _strategy_html()
     else:
         value_bets = sum(
             1 for m in results if "players" in m
@@ -1065,6 +1228,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         content = "\n".join(_match_card_html(m) for m in results)
 
     track_record_html = _track_record_html(track_record or {})
+    strategy_html = _strategy_html()
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -1830,6 +1994,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
 <main>
   {summary_html}
   {daily_pick_html}
+  {strategy_html}
   {parlays_html}
   {safe_parlays_html}
   {track_record_html}
