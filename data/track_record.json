@@ -912,6 +912,20 @@
             }
           ],
           "resolved": false
+        },
+        "24": {
+          "parlays": [
+            {
+              "legs": [
+                "Marcos Giron",
+                "James Duckworth"
+              ],
+              "stake_odds": 1.765,
+              "best_odds": 1.765,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
