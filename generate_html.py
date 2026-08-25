@@ -1197,14 +1197,14 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         parlays_html = ""
         safe_parlays_html = ""
         daily_pick_html = ""
-        strategy_html = _strategy_html()
+        strategy_html = ""
     elif not results:
         content = _no_matches_html()
         summary_html = ""
         parlays_html = ""
         safe_parlays_html = ""
         daily_pick_html = ""
-        strategy_html = _strategy_html()
+        strategy_html = ""
     else:
         value_bets = sum(
             1 for m in results if "players" in m
