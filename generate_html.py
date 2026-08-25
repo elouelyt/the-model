@@ -2043,12 +2043,14 @@ def main() -> None:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
 
-    # NOTE: _save_predictions removed — prediction files auto-injected phantom bets.
-    # Bets are now tracked only via scripts/log_bet.py.
-
     track_record = _load_track_record()
-    # NOTE: _inject_all_predictions removed — track_record only updated via scripts/log_bet.py
-    # Auto-logging pipeline parlays caused phantom "pending" bets for matches never placed.
+
+    # Auto-log daily pick (single bet) as pending so check_results.py resolves it tomorrow.
+    # Only singles (daily_pick) are logged — parlays/combinadas are never auto-logged.
+    if daily_pick:
+        _log_daily_pick_to_track_record(daily_pick, track_record)
+        _save_track_record(track_record)
+
     html = generate_html(
         results, parlays=parlays, safe_parlays=safe_parlays,
         error=error, track_record=track_record, daily_pick=daily_pick,
@@ -2097,6 +2099,59 @@ def _save_track_record(track_record: dict) -> None:
     track_file = Path("data/track_record.json")
     track_file.parent.mkdir(parents=True, exist_ok=True)
     track_file.write_text(json.dumps(track_record, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
+    """Add today's daily_pick as a pending single bet entry.
+
+    Only runs if no entry exists for today — manual entries via log_bet.py take precedence.
+    Also saves a minimal prediction file so check_results.py can resolve the result tomorrow.
+    """
+    today = datetime.now(timezone.utc)
+    month_str = today.strftime("%Y-%m")
+    day_key = str(today.day)
+    date_str = today.strftime("%Y-%m-%d")
+
+    months = track_record.setdefault("months", {})
+    months.setdefault(month_str, {"days": {}})
+    days = months[month_str]["days"]
+
+    if day_key in days:
+        return  # already logged — don't overwrite
+
+    days[day_key] = {
+        "parlays": [{
+            "legs": [pick["player"]],
+            "stake_odds": pick.get("stake_odds"),
+            "best_odds": pick.get("stake_odds"),
+            "won": None,
+        }],
+        "resolved": False,
+    }
+
+    # Save minimal prediction file so check_results.py can look up the match result
+    pred_path = Path("data/predictions") / f"{date_str}.json"
+    pred_path.parent.mkdir(exist_ok=True)
+    existing: dict = {}
+    if pred_path.exists():
+        try:
+            existing = json.loads(pred_path.read_text(encoding="utf-8"))
+        except Exception:
+            existing = {}
+    existing["date"] = date_str
+    existing.setdefault("parlays", [])
+    pick_parlay = {
+        "picks": [pick],
+        "stake_total_odds": pick.get("stake_odds"),
+        "total_odds": pick.get("stake_odds"),
+    }
+    if not any(
+        p.get("picks", [{}])[0].get("player") == pick["player"]
+        for p in existing["parlays"]
+    ):
+        existing["parlays"].append(pick_parlay)
+    pred_path.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
+    logger.info("Auto-logged daily pick: %s @ %s (pending)", pick["player"], pick.get("stake_odds"))
 
 
 def _inject_all_predictions(track_record: dict) -> None:
