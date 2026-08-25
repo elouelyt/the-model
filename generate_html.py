@@ -2048,8 +2048,8 @@ def main() -> None:
         _save_predictions(parlays)
 
     track_record = _load_track_record()
-    _inject_all_predictions(track_record)  # inject any predictions file not yet in track_record
-    _save_track_record(track_record)       # persist so check_results.py can add won/lost
+    # NOTE: _inject_all_predictions removed — track_record only updated via scripts/log_bet.py
+    # Auto-logging pipeline parlays caused phantom "pending" bets for matches never placed.
     html = generate_html(
         results, parlays=parlays, safe_parlays=safe_parlays,
         error=error, track_record=track_record, daily_pick=daily_pick,

@@ -898,48 +898,6 @@
             }
           ],
           "resolved": true
-        },
-        "23": {
-          "parlays": [
-            {
-              "legs": [
-                "Rinky Hijikata",
-                "Andaloro, Fabrizio"
-              ],
-              "stake_odds": null,
-              "best_odds": 1.704,
-              "won": null
-            }
-          ],
-          "resolved": false
-        },
-        "24": {
-          "parlays": [
-            {
-              "legs": [
-                "Marcos Giron",
-                "James Duckworth"
-              ],
-              "stake_odds": 1.765,
-              "best_odds": 1.765,
-              "won": null
-            }
-          ],
-          "resolved": false
-        },
-        "25": {
-          "parlays": [
-            {
-              "legs": [
-                "Juan Manuel Cerundolo",
-                "Daniil Medvedev"
-              ],
-              "stake_odds": 1.768,
-              "best_odds": 1.768,
-              "won": null
-            }
-          ],
-          "resolved": false
         }
       }
     }
