@@ -2043,9 +2043,8 @@ def main() -> None:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         error = str(exc)
 
-    # Save today's predictions for track record (skip if file already exists)
-    if parlays:
-        _save_predictions(parlays)
+    # NOTE: _save_predictions removed — prediction files auto-injected phantom bets.
+    # Bets are now tracked only via scripts/log_bet.py.
 
     track_record = _load_track_record()
     # NOTE: _inject_all_predictions removed — track_record only updated via scripts/log_bet.py

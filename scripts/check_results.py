@@ -498,23 +498,12 @@ def process_pending(tr: dict) -> int:
         parlays_raw = pred.get("parlays", [])
         day_results = list(existing.get("parlays", []))
 
-        if not day_results:
-            for parl in parlays_raw:
-                legs = [p["player"] for p in parl.get("picks", [])]
-                key = frozenset(legs)
-                if key in seen_leg_sets:
-                    logger.info("Skipping duplicate parlay %s for %s (seen in earlier day)", legs, day_str)
-                    continue
-                day_results.append({
-                    "legs":       legs,
-                    "stake_odds": parl.get("stake_total_odds"),
-                    "best_odds":  parl.get("total_odds"),
-                    "won":        None,
-                })
-                seen_leg_sets.add(key)
+        # NOTE: auto-injection removed — day_results only comes from track_record.json
+        # (logged via scripts/log_bet.py). Prediction files are only used to look up
+        # match outcomes for entries the user already placed manually.
 
         if not day_results:
-            logger.info("Day %s has no unique parlays after dedup — skipping", day_str)
+            logger.info("Day %s has no manually logged parlays — skipping", day_str)
             continue
 
         any_updated  = False
