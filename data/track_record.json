@@ -926,6 +926,20 @@
             }
           ],
           "resolved": false
+        },
+        "25": {
+          "parlays": [
+            {
+              "legs": [
+                "Juan Manuel Cerundolo",
+                "Daniil Medvedev"
+              ],
+              "stake_odds": 1.768,
+              "best_odds": 1.768,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
