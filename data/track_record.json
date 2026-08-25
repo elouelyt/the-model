@@ -633,8 +633,8 @@
               "legs": [
                 "Luciano Darderi"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.73,
+              "best_odds": 1.73,
               "won": true
             }
           ],
