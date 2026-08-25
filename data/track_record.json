@@ -614,180 +614,6 @@
     },
     "2026-08": {
       "days": {
-        "1": {
-          "parlays": [
-            {
-              "legs": [
-                "Rafael Jodar",
-                "Benjamin Bonzi"
-              ],
-              "stake_odds": 1.67,
-              "best_odds": 1.783,
-              "won": true
-            }
-          ],
-          "resolved": true
-        },
-        "2": {
-          "parlays": [
-            {
-              "legs": [
-                "Cameron Norrie",
-                "Martin Landaluce"
-              ],
-              "stake_odds": 1.724,
-              "best_odds": 1.75,
-              "won": false
-            }
-          ],
-          "resolved": true
-        },
-        "3": {
-          "parlays": [
-            {
-              "legs": [
-                "Andrey Rublev",
-                "Kamil Majchrzak"
-              ],
-              "stake_odds": 1.573,
-              "best_odds": 1.662,
-              "won": false
-            },
-            {
-              "legs": [
-                "Andrey Rublev",
-                "Thiago Agustin Tirante"
-              ],
-              "stake_odds": 1.597,
-              "best_odds": 1.662,
-              "won": false
-            },
-            {
-              "legs": [
-                "Andrey Rublev",
-                "Martin Landaluce"
-              ],
-              "stake_odds": null,
-              "best_odds": 1.786,
-              "won": false
-            },
-            {
-              "legs": [
-                "Thiago Agustin Tirante",
-                "Kamil Majchrzak"
-              ],
-              "stake_odds": 1.716,
-              "best_odds": 1.796,
-              "won": false
-            },
-            {
-              "legs": [
-                "Cameron Norrie",
-                "Kamil Majchrzak"
-              ],
-              "stake_odds": 1.625,
-              "best_odds": 1.675,
-              "won": false
-            }
-          ],
-          "resolved": true
-        },
-        "4": {
-          "parlays": [
-            {
-              "legs": [
-                "Felix Auger-Aliassime",
-                "Learner Tien"
-              ],
-              "stake_odds": 1.609,
-              "best_odds": 1.686,
-              "won": false
-            },
-            {
-              "legs": [
-                "Andrey Rublev",
-                "Learner Tien"
-              ],
-              "stake_odds": 1.676,
-              "best_odds": 1.768,
-              "won": false
-            },
-            {
-              "legs": [
-                "Learner Tien",
-                "Thiago Agustin Tirante"
-              ],
-              "stake_odds": 1.756,
-              "best_odds": 1.836,
-              "won": true
-            },
-            {
-              "legs": [
-                "Felix Auger-Aliassime",
-                "Thiago Agustin Tirante"
-              ],
-              "stake_odds": 1.597,
-              "best_odds": 1.674,
-              "won": false
-            }
-          ],
-          "resolved": true
-        },
-        "5": {
-          "parlays": [
-            {
-              "legs": [
-                "Felix Auger-Aliassime",
-                "Jakub Mensik"
-              ],
-              "stake_odds": 1.694,
-              "best_odds": 1.8,
-              "won": false
-            },
-            {
-              "legs": [
-                "Felix Auger-Aliassime",
-                "Ben Shelton"
-              ],
-              "stake_odds": 1.597,
-              "best_odds": 1.688,
-              "won": false
-            },
-            {
-              "legs": [
-                "Tommy Paul",
-                "Learner Tien"
-              ],
-              "stake_odds": 1.595,
-              "best_odds": 1.696,
-              "won": true
-            },
-            {
-              "legs": [
-                "Daniil Medvedev",
-                "Learner Tien"
-              ],
-              "stake_odds": 1.702,
-              "best_odds": 1.807,
-              "won": false
-            }
-          ],
-          "resolved": true
-        },
-        "6": {
-          "parlays": [
-            {
-              "legs": [
-                "Brandon Nakashima",
-                "Arthur Fils"
-              ],
-              "stake_odds": 1.729,
-              "best_odds": 1.822,
-              "won": false
-            }
-          ],
-          "resolved": true
-        },
         "9": {
           "parlays": [
             {
@@ -796,6 +622,19 @@
               ],
               "stake_odds": 1.81,
               "best_odds": 1.81,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "25": {
+          "parlays": [
+            {
+              "legs": [
+                "Luciano Darderi"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
               "won": true
             }
           ],
