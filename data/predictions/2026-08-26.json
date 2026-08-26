@@ -1,0 +1,37 @@
+{
+  "date": "2026-08-26",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 20,
+          "points": 2175,
+          "opponent": "Botic Van de Zandschulp",
+          "opponent_rank": 59,
+          "model_prob": 0.65,
+          "raw_implied": 0.4651,
+          "edge": 0.1849,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 2.15,
+          "stake_price": 2.15,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Botic Van De Zandschulp vs Luciano Darderi - Match ATP - Winston-Salem Open 1970 - Round of 16 - tennismajors.com",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Darderi's significant model edge and higher ranking suggest he is undervalued by the market, which may be underestimating his capability on hard court, especially given his 'in form' sentiment and no prior H2H to skew perceptions.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}
