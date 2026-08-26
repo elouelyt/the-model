@@ -1228,7 +1228,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         content = "\n".join(_match_card_html(m) for m in results)
 
     track_record_html = _track_record_html(track_record or {})
-    strategy_html = _strategy_html()
+    strategy_html = ""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
