@@ -648,10 +648,10 @@
               ],
               "stake_odds": null,
               "best_odds": null,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
