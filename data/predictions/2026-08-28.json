@@ -1,0 +1,37 @@
+{
+  "date": "2026-08-28",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Ignacio Buse",
+          "rank": 36,
+          "points": 1335,
+          "opponent": "Benjamin Bonzi",
+          "opponent_rank": 100,
+          "model_prob": 0.6171,
+          "raw_implied": 0.4854,
+          "edge": 0.1317,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.79,
+          "stake_price": 1.79,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Ignacio Buse vs Benjamin Bonzi · Semifinal · ATP Winston Salem - Tennis.com",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model's significant edge for Buse (ranked #36) is driven by his superior ranking and recent positive form, suggesting the market undervalues his current hard-court capability against a lower-ranked opponent.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}

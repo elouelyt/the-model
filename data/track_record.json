@@ -652,6 +652,19 @@
             }
           ],
           "resolved": true
+        },
+        "28": {
+          "parlays": [
+            {
+              "legs": [
+                "Ignacio Buse"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
