@@ -1,0 +1,37 @@
+{
+  "date": "2026-08-30",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Tomas Machac",
+          "rank": 62,
+          "points": 960,
+          "opponent": "Samuel, Toby",
+          "opponent_rank": 499,
+          "model_prob": 0.7462,
+          "raw_implied": 0.463,
+          "edge": 0.2832,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 2.16,
+          "stake_price": 2.16,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Rottgering Cruises Past World No. 58 Machac, Advances to Winston-Salem Open Round of 16 - Wake Forest University Athletics",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Tomas Machac's strong ranking (#62) and positive form are the primary drivers for the model's substantial edge, indicating the market is significantly undervaluing his probability (46.3%) in this hard-court match despite no H2H history.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}
