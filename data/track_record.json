@@ -661,10 +661,10 @@
               ],
               "stake_odds": null,
               "best_odds": null,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "29": {
           "parlays": [
