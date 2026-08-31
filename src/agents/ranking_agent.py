@@ -1,4 +1,4 @@
-"""Ranking agent — reads ATP rankings from data/rankings_cache.json.
+﻿"""Ranking agent — reads ATP rankings from data/rankings_cache.json.
 
 The cache is updated locally via scripts/rankings_update.py (which uses
 cloudscraper to bypass Cloudflare) and pushed to GitHub so that GitHub
@@ -45,9 +45,19 @@ def _load_rankings_cache() -> dict[str, dict]:
         return {}
 
 
+def _normalize_name(name: str) -> str:
+    """Normalize 'Lastname, Firstname' → 'Firstname Lastname' for consistent matching."""
+    if "," in name:
+        parts = [p.strip() for p in name.split(",", 1)]
+        if len(parts) == 2:
+            return f"{parts[1]} {parts[0]}"
+    return name
+
+
 def _match_name(odds_name: str, cache_names: list[str]) -> str | None:
     """Fuzzy-match an odds API player name to the closest cached name."""
-    odds_lower = odds_name.lower()
+    normalized = _normalize_name(odds_name)
+    odds_lower = normalized.lower()
     name_map = {n.lower(): n for n in cache_names}
 
     if odds_lower in name_map:

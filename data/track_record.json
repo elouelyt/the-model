@@ -1,4 +1,4 @@
-{
+﻿{
   "months": {
     "2026-07": {
       "days": {
@@ -687,10 +687,23 @@
               ],
               "stake_odds": null,
               "best_odds": null,
-              "won": false
+              "won": null
             }
           ],
-          "resolved": true
+          "resolved": false
+        },
+        "31": {
+          "parlays": [
+            {
+              "legs": [
+                "Santillan, Akira"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
