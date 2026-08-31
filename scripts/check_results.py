@@ -444,7 +444,7 @@ def check_parlay(parlay: dict, pred_date: str) -> bool | None:
 
 def load_track_record() -> dict:
     if _TRACK_FILE.exists():
-        return json.loads(_TRACK_FILE.read_text(encoding="utf-8"))
+        return json.loads(_TRACK_FILE.read_text(encoding="utf-8-sig"))
     return {"months": {}}
 
 
