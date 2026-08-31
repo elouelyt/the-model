@@ -1,0 +1,37 @@
+{
+  "date": "2026-08-31",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Santillan, Akira",
+          "rank": 64,
+          "points": 950,
+          "opponent": "Omar Jasika",
+          "opponent_rank": 447,
+          "model_prob": 0.7422,
+          "raw_implied": 0.4587,
+          "edge": 0.2835,
+          "signal": "value_bet",
+          "surface": "grass",
+          "sport_title": "",
+          "best_price": 2.18,
+          "stake_price": 2.18,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Santillan vs Ramanathan : Betting • Winnetka 2017 - TennisTemple",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Santillan's strong positive edge (+28.3%) stems from the market undervaluing his #64 ranking against Jasika's #447. His superior ranking and positive form on grass make him a clear favorite, yet the market has him as an underdog (45.9% implied vs. 74.2% model prob).",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}
