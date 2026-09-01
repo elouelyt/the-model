@@ -687,16 +687,33 @@
               ],
               "stake_odds": null,
               "best_odds": null,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "31": {
           "parlays": [
             {
               "legs": [
                 "Santillan, Akira"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
+              "won": null
+            }
+          ],
+          "resolved": false
+        }
+      }
+    },
+    "2026-09": {
+      "days": {
+        "1": {
+          "parlays": [
+            {
+              "legs": [
+                "Adolfo Daniel Vallejo"
               ],
               "stake_odds": null,
               "best_odds": null,

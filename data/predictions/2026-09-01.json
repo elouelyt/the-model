@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-01",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Adolfo Daniel Vallejo",
+          "rank": 70,
+          "points": 914,
+          "opponent": "Gael Monfils",
+          "opponent_rank": 305,
+          "model_prob": 0.7094,
+          "raw_implied": 0.5715,
+          "edge": 0.1379,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.74,
+          "stake_price": 1.74,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": null,
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Vallejo's significant model edge (+13.8%) likely stems from his superior ranking (#70 vs #305) and current form, as there's no H2H to consider. His higher points total (914 vs 180) further supports his favorability on hard court.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}
