@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-02",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luciano Darderi",
+          "rank": 20,
+          "points": 2175,
+          "opponent": "Dalibor Svrcina",
+          "opponent_rank": 114,
+          "model_prob": 0.7206,
+          "raw_implied": 0.604,
+          "edge": 0.1165,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.59,
+          "stake_price": 1.59,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "September 3, 2026: Luciano Darderi vs Dalibor Svrcina: Set 2 Winner Tennis Prediction Market - Robinhood",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model's significant edge for Darderi stems from his superior ranking (#20 vs #114) and strong current form, suggesting he is undervalued despite the lack of H2H data on hard court.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}

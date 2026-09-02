@@ -674,10 +674,10 @@
               ],
               "stake_odds": null,
               "best_odds": null,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "30": {
           "parlays": [
@@ -714,6 +714,19 @@
             {
               "legs": [
                 "Adolfo Daniel Vallejo"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
+              "won": false
+            }
+          ],
+          "resolved": true
+        },
+        "2": {
+          "parlays": [
+            {
+              "legs": [
+                "Luciano Darderi"
               ],
               "stake_odds": null,
               "best_odds": null,
