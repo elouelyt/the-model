@@ -730,16 +730,29 @@
               ],
               "stake_odds": null,
               "best_odds": null,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "3": {
           "parlays": [
             {
               "legs": [
                 "Luciano Darderi"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "4": {
+          "parlays": [
+            {
+              "legs": [
+                "Flavio Cobolli"
               ],
               "stake_odds": null,
               "best_odds": null,
