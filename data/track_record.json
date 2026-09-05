@@ -756,6 +756,19 @@
               ],
               "stake_odds": null,
               "best_odds": null,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "5": {
+          "parlays": [
+            {
+              "legs": [
+                "Flavio Cobolli"
+              ],
+              "stake_odds": null,
+              "best_odds": null,
               "won": null
             }
           ],

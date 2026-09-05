@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-05",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Flavio Cobolli",
+          "rank": 10,
+          "points": 3330,
+          "opponent": "Alexander Blockx",
+          "opponent_rank": 32,
+          "model_prob": 0.6704,
+          "raw_implied": 0.5252,
+          "edge": 0.1452,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.82,
+          "stake_price": 1.82,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "French Open final: Alexander Zverev beats Flavio Cobolli in 5 sets for long-awaited first Grand Slam title - Yahoo Sports",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Cobolli's substantial positive edge is driven by his superior ranking (#10) and positive/in form sentiment, indicating the market underestimates his chances against the lower-ranked Blockx on hard court. The lack of H2H history means his form is the primary differentiator.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}
