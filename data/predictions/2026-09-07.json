@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-07",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Frances Tiafoe",
+          "rank": 23,
+          "points": 2130,
+          "opponent": "Alex Michelsen",
+          "opponent_rank": 41,
+          "model_prob": 0.633,
+          "raw_implied": 0.5969,
+          "edge": 0.0361,
+          "signal": "marginal",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.62,
+          "stake_price": 1.62,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": false,
+            "flag": "neutral",
+            "label": null,
+            "headline": null,
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model favors Tiafoe due to his superior ranking and established hard court pedigree, suggesting his market price undervalues his experience against a less seasoned opponent.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": null
+    }
+  ]
+}
