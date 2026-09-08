@@ -646,8 +646,8 @@
               "legs": [
                 "Luciano Darderi"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 2.15,
+              "best_odds": 2.15,
               "won": false
             }
           ],
@@ -659,8 +659,8 @@
               "legs": [
                 "Ignacio Buse"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.79,
+              "best_odds": 1.79,
               "won": true
             }
           ],
@@ -672,8 +672,8 @@
               "legs": [
                 "Zsombor Piros"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 2.7,
+              "best_odds": 2.7,
               "won": false
             }
           ],
@@ -685,8 +685,8 @@
               "legs": [
                 "Tomas Machac"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 2.16,
+              "best_odds": 2.16,
               "won": false
             }
           ],
@@ -698,8 +698,8 @@
               "legs": [
                 "Santillan, Akira"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 2.18,
+              "best_odds": 2.18,
               "won": null
             }
           ],
@@ -715,8 +715,8 @@
               "legs": [
                 "Adolfo Daniel Vallejo"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.74,
+              "best_odds": 1.74,
               "won": false
             }
           ],
@@ -728,8 +728,8 @@
               "legs": [
                 "Luciano Darderi"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.59,
+              "best_odds": 1.59,
               "won": true
             }
           ],
@@ -741,8 +741,8 @@
               "legs": [
                 "Luciano Darderi"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.66,
+              "best_odds": 1.66,
               "won": true
             }
           ],
@@ -754,8 +754,8 @@
               "legs": [
                 "Flavio Cobolli"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.81,
+              "best_odds": 1.81,
               "won": true
             }
           ],
@@ -767,8 +767,8 @@
               "legs": [
                 "Flavio Cobolli"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.82,
+              "best_odds": 1.82,
               "won": false
             }
           ],
@@ -780,8 +780,8 @@
               "legs": [
                 "Frances Tiafoe"
               ],
-              "stake_odds": null,
-              "best_odds": null,
+              "stake_odds": 1.62,
+              "best_odds": 1.62,
               "won": true
             }
           ],
