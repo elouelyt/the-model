@@ -851,10 +851,16 @@ def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
         lost_count = sum(1 for p in parlays_day if p.get("won") is False)
         pending    = sum(1 for p in parlays_day if p.get("won") is None)
 
-        day_won_eur  = sum(
-            stake_per_bet * (p.get("stake_odds") or p.get("best_odds") or 1) - stake_per_bet
-            for p in parlays_day if p.get("won") is True
-        )
+        day_won_eur = 0.0
+        day_won_unknown = 0  # WON bets with no odds recorded
+        for p in parlays_day:
+            if p.get("won") is not True:
+                continue
+            odds = p.get("stake_odds") or p.get("best_odds")
+            if odds:
+                day_won_eur += stake_per_bet * odds - stake_per_bet
+            else:
+                day_won_unknown += 1
         day_lost_eur = lost_count * stake_per_bet
         total_won_eur  += day_won_eur
         total_lost_eur += day_lost_eur
@@ -893,12 +899,14 @@ def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
         </details>"""
 
         day_apostado  = len(parlays_day) * stake_per_bet
-        lost_display  = f"-{total_lost_eur:.2f}€" if total_lost_eur > 0 else "0.00€"
+        lost_display  = f"-{day_lost_eur:.2f}€" if day_lost_eur > 0 else "0.00€"
+        unknown_badge = f' <span style="color:var(--muted);font-size:10px;">+{day_won_unknown}✓?</span>' if day_won_unknown else ""
+        won_display   = f"+{day_won_eur:.2f}€{unknown_badge}" if (day_won_eur > 0 or day_won_unknown) else "0.00€"
         rows_html += f"""<tr>
             <td style="font-weight:600;">{day_num}</td>
             <td>{detail_html}</td>
             <td style="color:var(--muted);">{day_apostado:.0f}€</td>
-            <td style="color:#10b981;">+{total_won_eur:.2f}€</td>
+            <td style="color:#10b981;">{won_display}</td>
             <td style="color:#f87171;">{lost_display}</td>
             <td style="color:{roi_color};font-weight:700;">{roi_day:+.2f}€</td>
         </tr>"""
@@ -2119,11 +2127,14 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     if day_key in days:
         return  # already logged — don't overwrite
 
+    stake_odds = pick.get("stake_price")
+    best_odds  = pick.get("best_price") or stake_odds
+
     days[day_key] = {
         "parlays": [{
             "legs": [pick["player"]],
-            "stake_odds": pick.get("stake_odds"),
-            "best_odds": pick.get("stake_odds"),
+            "stake_odds": stake_odds,
+            "best_odds": best_odds,
             "won": None,
         }],
         "resolved": False,
@@ -2142,8 +2153,8 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     existing.setdefault("parlays", [])
     pick_parlay = {
         "picks": [pick],
-        "stake_total_odds": pick.get("stake_odds"),
-        "total_odds": pick.get("stake_odds"),
+        "stake_total_odds": stake_odds,
+        "total_odds": best_odds,
     }
     if not any(
         p.get("picks", [{}])[0].get("player") == pick["player"]
@@ -2151,7 +2162,7 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     ):
         existing["parlays"].append(pick_parlay)
     pred_path.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info("Auto-logged daily pick: %s @ %s (pending)", pick["player"], pick.get("stake_odds"))
+    logger.info("Auto-logged daily pick: %s @ %s (pending)", pick["player"], best_odds)
 
 
 def _inject_all_predictions(track_record: dict) -> None:
