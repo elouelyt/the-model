@@ -1,12 +1,10 @@
 {
-  "timestamp": "2026-09-09T16:00:32.420234+00:00",
-  "player_count": 6,
+  "timestamp": "2026-09-10T16:00:32.895412+00:00",
+  "player_count": 4,
   "odds": {
-    "Karen Khachanov": 1.57,
-    "Alexander Blockx": 2.36,
-    "Alexander Zverev": 1.09,
-    "Botic van de Zandschulp": 6.4,
-    "Frances Tiafoe": 3.25,
-    "Ben Shelton": 1.3
+    "Alexander Zverev": 1.17,
+    "Karen Khachanov": 4.5,
+    "Frances Tiafoe": 3.3,
+    "Ben Shelton": 1.29
   }
 }
