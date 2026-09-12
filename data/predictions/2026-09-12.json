@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-12",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alexander Zverev",
+          "rank": 3,
+          "points": 8090,
+          "opponent": "Ben Shelton",
+          "opponent_rank": 6,
+          "model_prob": 0.6646,
+          "raw_implied": 0.5962,
+          "edge": 0.0684,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.65,
+          "stake_price": 1.65,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "US Open 2026 results: Ben Shelton beats Frances Tiafoe to set up final against Alexander Zverev - BBC",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Zverev's significant model edge (+6.8%) on hard court is likely driven by his superior ranking (#3 vs #6) and consistent positive form, suggesting the market may be undervaluing his overall game against a player he's never faced.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.65,
+      "total_odds": 1.65
+    }
+  ]
+}
