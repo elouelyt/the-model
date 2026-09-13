@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-13",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alexander Zverev",
+          "rank": 3,
+          "points": 8090,
+          "opponent": "Ben Shelton",
+          "opponent_rank": 6,
+          "model_prob": 0.6646,
+          "raw_implied": 0.5983,
+          "edge": 0.0663,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.68,
+          "stake_price": 1.68,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Ben Shelton faces date with destiny against Zverev in US Open final - The Guardian",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Zverev's significant model edge (+6.6%) is driven by his superior ranking (#3 vs #6) and consistent hard court form, suggesting the market undervalues his chances against a less experienced opponent on this surface.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.68,
+      "total_odds": 1.68
+    }
+  ]
+}

@@ -795,6 +795,19 @@
               ],
               "stake_odds": 1.65,
               "best_odds": 1.65,
+              "won": true
+            }
+          ],
+          "resolved": true
+        },
+        "13": {
+          "parlays": [
+            {
+              "legs": [
+                "Alexander Zverev"
+              ],
+              "stake_odds": 1.68,
+              "best_odds": 1.68,
               "won": null
             }
           ],
