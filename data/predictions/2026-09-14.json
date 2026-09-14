@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-14",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Nakashima, Bryce",
+          "rank": 22,
+          "points": 2135,
+          "opponent": "Vandecasteele, Quinn",
+          "opponent_rank": 483,
+          "model_prob": 0.8436,
+          "raw_implied": 0.5025,
+          "edge": 0.3411,
+          "signal": "value_bet",
+          "surface": "grass",
+          "sport_title": "",
+          "best_price": 1.99,
+          "stake_price": 1.99,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Nakashima riding wave of career-best tennis - Cincinnati Open",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Nakashima's substantial model edge (+34.1%) is driven by his superior ranking (#22) and strong form, indicating the market is undervaluing his high probability of winning against a much lower-ranked opponent on grass.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.99,
+      "total_odds": 1.99
+    }
+  ]
+}

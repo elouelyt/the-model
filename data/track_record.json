@@ -812,6 +812,19 @@
             }
           ],
           "resolved": false
+        },
+        "14": {
+          "parlays": [
+            {
+              "legs": [
+                "Nakashima, Bryce"
+              ],
+              "stake_odds": 1.99,
+              "best_odds": 1.99,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }
