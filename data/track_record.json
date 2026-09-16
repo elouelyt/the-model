@@ -825,6 +825,19 @@
             }
           ],
           "resolved": false
+        },
+        "16": {
+          "parlays": [
+            {
+              "legs": [
+                "Binda, Alexandr"
+              ],
+              "stake_odds": null,
+              "best_odds": 3.1,
+              "won": null
+            }
+          ],
+          "resolved": false
         }
       }
     }

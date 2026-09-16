@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-16",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Binda, Alexandr",
+          "rank": 13,
+          "points": 2525,
+          "opponent": "Fajing Sun",
+          "opponent_rank": 324,
+          "model_prob": 0.749,
+          "raw_implied": 0.3226,
+          "edge": 0.4264,
+          "signal": "value_bet",
+          "surface": "grass",
+          "sport_title": "",
+          "best_price": 3.1,
+          "stake_price": null,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Alexandr Binda vs Tung-Lin Wu » Best Odds and Stats - Odds Scanner",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model's significant edge for Binda (Rank #13) is driven by his superior ranking and strong current form, suggesting the market is heavily undervaluing his chances against a much lower-ranked opponent (Sun #324) despite no prior H2H on grass.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": null,
+      "total_odds": 3.1
+    }
+  ]
+}
