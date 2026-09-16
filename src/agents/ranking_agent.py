@@ -63,7 +63,7 @@ def _match_name(odds_name: str, cache_names: list[str]) -> str | None:
     if odds_lower in name_map:
         return name_map[odds_lower]
 
-    matches = difflib.get_close_matches(odds_lower, list(name_map.keys()), n=1, cutoff=0.6)
+    matches = difflib.get_close_matches(odds_lower, list(name_map.keys()), n=1, cutoff=0.80)
     if matches:
         return name_map[matches[0]]
 
