@@ -717,7 +717,8 @@
               ],
               "stake_odds": 1.74,
               "best_odds": 1.74,
-              "won": false
+              "won": false,
+              "opponent": "Gael Monfils"
             }
           ],
           "resolved": true
@@ -730,7 +731,8 @@
               ],
               "stake_odds": 1.59,
               "best_odds": 1.59,
-              "won": true
+              "won": true,
+              "opponent": "Dalibor Svrcina"
             }
           ],
           "resolved": true
@@ -743,7 +745,8 @@
               ],
               "stake_odds": 1.66,
               "best_odds": 1.66,
-              "won": true
+              "won": true,
+              "opponent": "Dalibor Svrcina"
             }
           ],
           "resolved": true
@@ -756,7 +759,8 @@
               ],
               "stake_odds": 1.81,
               "best_odds": 1.81,
-              "won": true
+              "won": true,
+              "opponent": "Alexander Blockx"
             }
           ],
           "resolved": true
@@ -769,7 +773,8 @@
               ],
               "stake_odds": 1.82,
               "best_odds": 1.82,
-              "won": false
+              "won": false,
+              "opponent": "Alexander Blockx"
             }
           ],
           "resolved": true
@@ -782,7 +787,8 @@
               ],
               "stake_odds": 1.62,
               "best_odds": 1.62,
-              "won": true
+              "won": true,
+              "opponent": "Alex Michelsen"
             }
           ],
           "resolved": true
@@ -795,7 +801,8 @@
               ],
               "stake_odds": 1.65,
               "best_odds": 1.65,
-              "won": true
+              "won": true,
+              "opponent": "Ben Shelton"
             }
           ],
           "resolved": true
@@ -808,7 +815,8 @@
               ],
               "stake_odds": 1.68,
               "best_odds": 1.68,
-              "won": null
+              "won": null,
+              "opponent": "Ben Shelton"
             }
           ],
           "resolved": false
@@ -821,19 +829,6 @@
               ],
               "stake_odds": 1.99,
               "best_odds": 1.99,
-              "won": null
-            }
-          ],
-          "resolved": false
-        },
-        "16": {
-          "parlays": [
-            {
-              "legs": [
-                "Binda, Alexandr"
-              ],
-              "stake_odds": null,
-              "best_odds": 3.1,
               "won": null
             }
           ],

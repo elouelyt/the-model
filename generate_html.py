@@ -875,6 +875,8 @@ def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
         detail_rows = ""
         for i, p in enumerate(parlays_day, 1):
             legs     = ", ".join(p.get("legs", []))
+            opponent = p.get("opponent")
+            legs_display = f"{legs} vs {opponent}" if opponent else legs
             odds     = p.get("stake_odds") or p.get("best_odds")
             odds_str = f"{odds:.2f}" if odds else "—"
             if p.get("won") is True:
@@ -885,7 +887,7 @@ def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
                 result_badge = '<span style="color:var(--muted);">pending</span>'
             detail_rows += (
                 f'<tr><td style="color:var(--muted);font-size:11px;">#{i}</td>'
-                f'<td style="font-size:11px;">{legs}</td>'
+                f'<td style="font-size:11px;">{legs_display}</td>'
                 f'<td style="font-size:11px;">{odds_str}</td>'
                 f'<td>{result_badge}</td></tr>'
             )
@@ -2130,13 +2132,17 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     stake_odds = pick.get("stake_price")
     best_odds  = pick.get("best_price") or stake_odds
 
+    entry: dict = {
+        "legs": [pick["player"]],
+        "stake_odds": stake_odds,
+        "best_odds": best_odds,
+        "won": None,
+    }
+    if pick.get("opponent"):
+        entry["opponent"] = pick["opponent"]
+
     days[day_key] = {
-        "parlays": [{
-            "legs": [pick["player"]],
-            "stake_odds": stake_odds,
-            "best_odds": best_odds,
-            "won": None,
-        }],
+        "parlays": [entry],
         "resolved": False,
     }
 
