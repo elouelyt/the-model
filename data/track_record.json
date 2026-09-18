@@ -833,6 +833,20 @@
             }
           ],
           "resolved": false
+        },
+        "18": {
+          "parlays": [
+            {
+              "legs": [
+                "Marco Trungelliti"
+              ],
+              "stake_odds": 1.74,
+              "best_odds": 1.74,
+              "won": null,
+              "opponent": "Monteiro, Thiago"
+            }
+          ],
+          "resolved": false
         }
       }
     }

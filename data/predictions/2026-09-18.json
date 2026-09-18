@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-18",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Marco Trungelliti",
+          "rank": 91,
+          "points": 693,
+          "opponent": "Monteiro, Thiago",
+          "opponent_rank": 274,
+          "model_prob": 0.6588,
+          "raw_implied": 0.5747,
+          "edge": 0.0841,
+          "signal": "value_bet",
+          "surface": "grass",
+          "sport_title": "",
+          "best_price": 1.74,
+          "stake_price": 1.74,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Marco Trungelliti, 36, Sets New Open Era Record After Reaching Marrakech Final - ubitennis.net",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Bet on Marco Trungelliti. Blended model gives 65.9% vs bookmaker raw price of 57.5% — edge of 8.4% survives the vig. · Grass court — serve and net skills add variance beyond rankings.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.74,
+      "total_odds": 1.74
+    }
+  ]
+}

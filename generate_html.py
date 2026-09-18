@@ -1072,6 +1072,57 @@ def _strategy_html() -> str:
 """
 
 
+def _mma_section_html(fights: list) -> str:
+    """Render the MMA fights section."""
+    if not fights:
+        return ""
+
+    from datetime import timezone
+
+    rows = ""
+    for f in fights:
+        ct = f["commence_dt"]
+        date_str = ct.strftime("%d/%m %H:%M UTC")
+        o1, o2 = f["odds1"], f["odds2"]
+        imp1, imp2 = f["implied1"], f["implied2"]
+        vig = round((imp1 + imp2 - 1) * 100, 1)
+        fav = f["fighter1"] if o1 < o2 else f["fighter2"]
+        fav_odds = min(o1, o2)
+        und_odds = max(o1, o2)
+        und = f["fighter2"] if o1 < o2 else f["fighter1"]
+
+        fav_color = "#10b981"
+        und_color = "#f59e0b"
+
+        rows += f"""
+        <div class="mma-fight-card">
+          <div class="mma-fight-date">{date_str}</div>
+          <div class="mma-fighters">
+            <div class="mma-fighter mma-fav">
+              <span class="mma-name">{fav}</span>
+              <span class="mma-odds" style="color:{fav_color};">{fav_odds:.2f}</span>
+              <span class="mma-impl" style="color:var(--muted);">{imp1*100 if o1 < o2 else imp2*100:.1f}%</span>
+            </div>
+            <div class="mma-vs">vs</div>
+            <div class="mma-fighter mma-und">
+              <span class="mma-name">{und}</span>
+              <span class="mma-odds" style="color:{und_color};">{und_odds:.2f}</span>
+              <span class="mma-impl" style="color:var(--muted);">{imp2*100 if o1 < o2 else imp1*100:.1f}%</span>
+            </div>
+          </div>
+          <div class="mma-vig">vig {vig:+.1f}%</div>
+        </div>"""
+
+    return f"""
+<section class="mma-section">
+  <h2 class="section-title" style="margin-bottom:12px;">🥊 MMA / UFC</h2>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:16px;">Cuotas en vivo · sin modelo de ranking aún · solo referencia</p>
+  <div class="mma-grid">
+    {rows}
+  </div>
+</section>"""
+
+
 def _track_record_html(track_record: dict) -> str:
     """Generate multi-month track record with tab selector."""
     if not track_record or not track_record.get("months"):
@@ -1239,6 +1290,10 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
 
     track_record_html = _track_record_html(track_record or {})
     strategy_html = ""
+
+    from src.agents.mma_odds_agent import fetch_mma_odds
+    mma_fights = fetch_mma_odds()
+    mma_html = _mma_section_html(mma_fights)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -1974,6 +2029,25 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     box-shadow: 0 0 0 1px rgba(249,115,22,0.20);
   }}
 
+  /* ── MMA Section ─────────────────────────────────────────── */
+  .mma-section {{ margin: 32px 0; }}
+  .mma-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }}
+  .mma-fight-card {{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }}
+  .mma-fight-date {{ font-size: 11px; color: var(--muted); margin-bottom: 10px; }}
+  .mma-fighters {{ display: flex; align-items: center; gap: 8px; }}
+  .mma-fighter {{ flex: 1; display: flex; flex-direction: column; gap: 2px; }}
+  .mma-fighter.mma-und {{ text-align: right; }}
+  .mma-name {{ font-size: 13px; font-weight: 600; color: var(--text); }}
+  .mma-odds {{ font-size: 16px; font-weight: 700; }}
+  .mma-impl {{ font-size: 11px; }}
+  .mma-vs {{ font-size: 11px; color: var(--muted); flex-shrink: 0; padding: 0 4px; }}
+  .mma-vig {{ font-size: 10px; color: var(--muted); margin-top: 8px; text-align: right; }}
+
   /* ── Footer ──────────────────────────────────────────────── */
   footer {{
     border-top: 1px solid var(--border);
@@ -2008,6 +2082,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
   {parlays_html}
   {safe_parlays_html}
   {track_record_html}
+  {mma_html}
   {content}
 </main>
 
