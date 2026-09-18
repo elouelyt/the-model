@@ -1072,52 +1072,174 @@ def _strategy_html() -> str:
 """
 
 
+def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, edge_fn) -> list:
+    """Add model predictions, rankings and edge to each MMA fight dict."""
+    if not fights:
+        return []
+
+    all_names = []
+    for f in fights:
+        all_names += [f["fighter1"], f["fighter2"]]
+
+    stats_map = fetch_stats_fn(all_names)
+    rankings_map = fetch_rankings_fn(all_names)
+
+    enriched = []
+    for f in fights:
+        n1, n2 = f["fighter1"], f["fighter2"]
+        s1 = stats_map.get(n1, {})
+        s2 = stats_map.get(n2, {})
+        r1 = rankings_map.get(n1, {})
+        r2 = rankings_map.get(n2, {})
+
+        pred = predict_fn(s1, s2, f1_name=n1, f2_name=n2)
+        edge1 = edge_fn(pred["prob_f1"], f["odds1"])
+        edge2 = edge_fn(pred["prob_f2"], f["odds2"])
+
+        best_edge = edge1 if edge1 >= edge2 else edge2
+        best_fighter = n1 if edge1 >= edge2 else n2
+        best_odds = f["odds1"] if edge1 >= edge2 else f["odds2"]
+        best_prob = pred["prob_f1"] if edge1 >= edge2 else pred["prob_f2"]
+
+        signal = "value_bet" if best_edge >= 0.07 else ("marginal" if best_edge >= 0.03 else "no_bet")
+
+        enriched.append({
+            **f,
+            "stats1": s1,
+            "stats2": s2,
+            "rank1": r1.get("rank"),
+            "rank2": r2.get("rank"),
+            "division1": r1.get("division", ""),
+            "division2": r2.get("division", ""),
+            "prob1": pred["prob_f1"],
+            "prob2": pred["prob_f2"],
+            "edge1": edge1,
+            "edge2": edge2,
+            "best_fighter": best_fighter,
+            "best_odds": best_odds,
+            "best_prob": best_prob,
+            "best_edge": best_edge,
+            "signal": signal,
+            "model_used": pred.get("model_used", False),
+            "features": pred.get("features", {}),
+        })
+
+    enriched.sort(key=lambda x: -x["best_edge"])
+    return enriched
+
+
 def _mma_section_html(fights: list) -> str:
-    """Render the MMA fights section."""
+    """Render the MMA fights section with model predictions when available."""
     if not fights:
         return ""
 
-    from datetime import timezone
+    model_active = any(f.get("model_used") for f in fights)
+    value_fights = [f for f in fights if f.get("signal") == "value_bet"]
+    marginal_fights = [f for f in fights if f.get("signal") == "marginal"]
+
+    # Pick del día MMA: highest edge value_bet
+    mma_pick_html = ""
+    if value_fights:
+        pick = value_fights[0]
+        edge_pct = round(pick["best_edge"] * 100, 1)
+        prob_pct  = round(pick["best_prob"] * 100, 1)
+        signal_badge = f'<span style="background:#10b981;color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">VALUE BET +{edge_pct}%</span>'
+        mma_pick_html = f"""
+<div class="mma-pick-card">
+  <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">🥊 PICK DEL DÍA MMA</div>
+  <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">{pick["best_fighter"]}</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">vs {pick["fighter2"] if pick["best_fighter"]==pick["fighter1"] else pick["fighter1"]} · {pick["commence_dt"].strftime("%d/%m %H:%M UTC")}</div>
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    {signal_badge}
+    <span style="font-size:18px;font-weight:700;color:#f97316;">{pick["best_odds"]:.2f}</span>
+    <span style="color:var(--muted);font-size:12px;">Modelo: {prob_pct}% · Implied: {round((1/pick["best_odds"])*100,1)}%</span>
+  </div>
+</div>"""
 
     rows = ""
-    for f in fights:
+    for f in fights[:30]:  # cap at 30 cards
         ct = f["commence_dt"]
-        date_str = ct.strftime("%d/%m %H:%M UTC")
+        date_str = ct.strftime("%d/%m %H:%M")
         o1, o2 = f["odds1"], f["odds2"]
-        imp1, imp2 = f["implied1"], f["implied2"]
-        vig = round((imp1 + imp2 - 1) * 100, 1)
-        fav = f["fighter1"] if o1 < o2 else f["fighter2"]
-        fav_odds = min(o1, o2)
-        und_odds = max(o1, o2)
-        und = f["fighter2"] if o1 < o2 else f["fighter1"]
+        n1, n2 = f["fighter1"], f["fighter2"]
 
-        fav_color = "#10b981"
-        und_color = "#f59e0b"
+        p1 = f.get("prob1", f["implied1"])
+        p2 = f.get("prob2", f["implied2"])
+        e1 = f.get("edge1", 0)
+        e2 = f.get("edge2", 0)
+        sig = f.get("signal", "no_bet")
+
+        # Signal color for card border
+        border_color = {"value_bet": "#10b981", "marginal": "#f59e0b"}.get(sig, "var(--border)")
+
+        # Fighter 1
+        c1_color = "#10b981" if e1 > 0.03 else ("var(--text)" if e1 >= 0 else "#f87171")
+        c2_color = "#10b981" if e2 > 0.03 else ("var(--text)" if e2 >= 0 else "#f87171")
+
+        rank1_str = f"#{f['rank1']}" if f.get("rank1") else ""
+        rank2_str = f"#{f['rank2']}" if f.get("rank2") else ""
+
+        stats_row1 = ""
+        stats_row2 = ""
+        if f.get("stats1") or f.get("stats2"):
+            s1, s2 = f.get("stats1", {}), f.get("stats2", {})
+            r1 = f"{s1['reach_cm']:.0f}cm" if s1.get("reach_cm") else "—"
+            r2 = f"{s2['reach_cm']:.0f}cm" if s2.get("reach_cm") else "—"
+            a1 = f"{s1['age']:.0f}a" if s1.get("age") else "—"
+            a2 = f"{s2['age']:.0f}a" if s2.get("age") else "—"
+            stats_row1 = f'<span style="font-size:10px;color:var(--muted);">reach {r1} · {a1}</span>'
+            stats_row2 = f'<span style="font-size:10px;color:var(--muted);">reach {r2} · {a2}</span>'
+
+        edge_badge1 = f'<span style="font-size:10px;color:{c1_color};font-weight:600;">{e1*100:+.1f}%</span>' if f.get("model_used") else ""
+        edge_badge2 = f'<span style="font-size:10px;color:{c2_color};font-weight:600;">{e2*100:+.1f}%</span>' if f.get("model_used") else ""
 
         rows += f"""
-        <div class="mma-fight-card">
-          <div class="mma-fight-date">{date_str}</div>
+        <div class="mma-fight-card" style="border-color:{border_color};">
+          <div class="mma-fight-date">{date_str} UTC {f'· <span style="font-size:10px;color:var(--muted);">{f["division1"] or ""}</span>' if f.get("division1") else ""}</div>
           <div class="mma-fighters">
-            <div class="mma-fighter mma-fav">
-              <span class="mma-name">{fav}</span>
-              <span class="mma-odds" style="color:{fav_color};">{fav_odds:.2f}</span>
-              <span class="mma-impl" style="color:var(--muted);">{imp1*100 if o1 < o2 else imp2*100:.1f}%</span>
+            <div class="mma-fighter">
+              <span class="mma-name">{n1} <span style="color:var(--muted);font-size:10px;">{rank1_str}</span></span>
+              {stats_row1}
+              <div style="display:flex;align-items:baseline;gap:6px;">
+                <span class="mma-odds" style="color:{c1_color};">{o1:.2f}</span>
+                <span class="mma-impl">{p1*100:.0f}%</span>
+                {edge_badge1}
+              </div>
             </div>
             <div class="mma-vs">vs</div>
-            <div class="mma-fighter mma-und">
-              <span class="mma-name">{und}</span>
-              <span class="mma-odds" style="color:{und_color};">{und_odds:.2f}</span>
-              <span class="mma-impl" style="color:var(--muted);">{imp2*100 if o1 < o2 else imp1*100:.1f}%</span>
+            <div class="mma-fighter" style="text-align:right;">
+              <span class="mma-name">{n2} <span style="color:var(--muted);font-size:10px;">{rank2_str}</span></span>
+              {stats_row2}
+              <div style="display:flex;align-items:baseline;gap:6px;justify-content:flex-end;">
+                {edge_badge2}
+                <span class="mma-impl">{p2*100:.0f}%</span>
+                <span class="mma-odds" style="color:{c2_color};">{o2:.2f}</span>
+              </div>
             </div>
           </div>
-          <div class="mma-vig">vig {vig:+.1f}%</div>
         </div>"""
+
+    model_note = (
+        '<span style="color:#10b981;">● Modelo activo</span>'
+        if model_active else
+        '<span style="color:var(--muted);">○ Sin modelo (ejecuta ufc_scrape_fighters.py + ufc_train_model.py)</span>'
+    )
+    vb_count = len(value_fights)
+    mg_count = len(marginal_fights)
+    pills = ""
+    if vb_count:
+        pills += f'<span style="background:#10b981;color:#000;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">{vb_count} value bets</span> '
+    if mg_count:
+        pills += f'<span style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">{mg_count} marginales</span>'
 
     return f"""
 <section class="mma-section">
-  <h2 class="section-title" style="margin-bottom:12px;">🥊 MMA / UFC</h2>
-  <p style="color:var(--muted);font-size:12px;margin-bottom:16px;">Cuotas en vivo · sin modelo de ranking aún · solo referencia</p>
-  <div class="mma-grid">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+    <h2 class="section-title" style="margin:0;">🥊 MMA / UFC</h2>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">{pills} {model_note}</div>
+  </div>
+  {mma_pick_html}
+  <div class="mma-grid" style="margin-top:16px;">
     {rows}
   </div>
 </section>"""
@@ -1292,7 +1414,12 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     strategy_html = ""
 
     from src.agents.mma_odds_agent import fetch_mma_odds
-    mma_fights = fetch_mma_odds()
+    from src.agents.mma_stats_agent import fetch_fighter_stats
+    from src.agents.mma_ranking_agent import fetch_ufc_rankings
+    from src.agents.mma_model_agent import predict_fight, compute_edge
+
+    mma_fights_raw = fetch_mma_odds()
+    mma_fights = _enrich_mma_fights(mma_fights_raw, fetch_fighter_stats, fetch_ufc_rankings, predict_fight, compute_edge)
     mma_html = _mma_section_html(mma_fights)
 
     return f"""<!DOCTYPE html>
@@ -2031,6 +2158,13 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
 
   /* ── MMA Section ─────────────────────────────────────────── */
   .mma-section {{ margin: 32px 0; }}
+  .mma-pick-card {{
+    background: linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(16,185,129,0.06) 100%);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }}
   .mma-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }}
   .mma-fight-card {{
     background: var(--surface);
