@@ -1093,15 +1093,22 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
         r2 = rankings_map.get(n2, {})
 
         pred = predict_fn(s1, s2, f1_name=n1, f2_name=n2)
-        edge1 = edge_fn(pred["prob_f1"], f["odds1"])
-        edge2 = edge_fn(pred["prob_f2"], f["odds2"])
+        has_real_model = pred.get("model_used") and bool(s1) and bool(s2)
 
-        best_edge = edge1 if edge1 >= edge2 else edge2
-        best_fighter = n1 if edge1 >= edge2 else n2
-        best_odds = f["odds1"] if edge1 >= edge2 else f["odds2"]
-        best_prob = pred["prob_f1"] if edge1 >= edge2 else pred["prob_f2"]
-
-        signal = "value_bet" if best_edge >= 0.07 else ("marginal" if best_edge >= 0.03 else "no_bet")
+        if has_real_model:
+            edge1 = edge_fn(pred["prob_f1"], f["odds1"])
+            edge2 = edge_fn(pred["prob_f2"], f["odds2"])
+            best_edge = edge1 if edge1 >= edge2 else edge2
+            best_fighter = n1 if edge1 >= edge2 else n2
+            best_odds = f["odds1"] if edge1 >= edge2 else f["odds2"]
+            best_prob = pred["prob_f1"] if edge1 >= edge2 else pred["prob_f2"]
+            signal = "value_bet" if best_edge >= 0.07 else ("marginal" if best_edge >= 0.03 else "no_bet")
+        else:
+            edge1 = edge2 = best_edge = 0.0
+            best_fighter = n1 if f["odds1"] < f["odds2"] else n2
+            best_odds = min(f["odds1"], f["odds2"])
+            best_prob = 0.0
+            signal = "no_bet"
 
         enriched.append({
             **f,
@@ -1111,8 +1118,8 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
             "rank2": r2.get("rank"),
             "division1": r1.get("division", ""),
             "division2": r2.get("division", ""),
-            "prob1": pred["prob_f1"],
-            "prob2": pred["prob_f2"],
+            "prob1": pred["prob_f1"] if has_real_model else f["implied1"],
+            "prob2": pred["prob_f2"] if has_real_model else f["implied2"],
             "edge1": edge1,
             "edge2": edge2,
             "best_fighter": best_fighter,
@@ -1120,7 +1127,7 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
             "best_prob": best_prob,
             "best_edge": best_edge,
             "signal": signal,
-            "model_used": pred.get("model_used", False),
+            "model_used": has_real_model,
             "features": pred.get("features", {}),
         })
 
