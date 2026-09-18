@@ -25,5 +25,8 @@ venv/
 # Exception: daily predictions and track record (written by GitHub Actions)
 !data/track_record.json
 !data/manual_odds.json
+!data/ufc_fighters_cache.json
+!data/ufc_fights_history.json
+!data/ufc_model.json
 !data/predictions/
 !data/predictions/*.json

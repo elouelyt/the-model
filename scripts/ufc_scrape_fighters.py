@@ -1,145 +1,156 @@
-"""Scrape UFC fighter stats from ufcstats.com.
-
-Fetches all fighters A-Z: height, reach, DOB, record, sig strike %, TD%, TD def%, sub avg.
-Output: data/ufc_fighters_cache.json
-Run locally (no VPN needed — ufcstats.com is not behind Cloudflare).
-"""
+"""Scrape UFC fighter stats from ESPN Core API — parallel version."""
 
 import json
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
-from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)
 
 _OUT = Path(__file__).resolve().parents[1] / "data" / "ufc_fighters_cache.json"
-_BASE = "http://ufcstats.com/statistics/fighters"
-_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; UFC-scraper/1.0)"}
+_BASE = "https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc"
+_WORKERS = 20
 
 
-def _inches_to_cm(val: str) -> float | None:
-    """Convert '6\' 2"' or '74"' to cm."""
-    val = val.strip()
-    if not val or val == "--":
-        return None
+def _make_session() -> requests.Session:
+    s = requests.Session()
+    s.headers["User-Agent"] = "Mozilla/5.0 (compatible; UFC-scraper/1.0)"
+    retry = Retry(total=3, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503])
+    s.mount("https://", HTTPAdapter(max_retries=retry))
+    return s
+
+
+_SESSION = _make_session()
+
+
+def _get(url: str, session: requests.Session | None = None, params: dict | None = None) -> dict | None:
+    sess = session or _SESSION
     try:
-        if "'" in val:
-            parts = val.replace('"', "").split("'")
-            feet, inches = int(parts[0].strip()), float(parts[1].strip() or 0)
-            return round((feet * 12 + inches) * 2.54, 1)
-        if '"' in val:
-            return round(float(val.replace('"', "")) * 2.54, 1)
-    except Exception:
-        pass
-    return None
-
-
-def _parse_pct(val: str) -> float | None:
-    val = val.strip().replace("%", "")
-    if not val or val == "--":
-        return None
-    try:
-        return round(float(val) / 100, 4)
-    except Exception:
-        return None
-
-
-def _parse_dob(val: str) -> str | None:
-    val = val.strip()
-    if not val or val == "--":
-        return None
-    try:
-        return datetime.strptime(val, "%b %d, %Y").date().isoformat()
-    except Exception:
-        return None
-
-
-def _age(dob_iso: str | None) -> float | None:
-    if not dob_iso:
-        return None
-    try:
-        born = datetime.fromisoformat(dob_iso)
-        return round((datetime.now() - born).days / 365.25, 1)
-    except Exception:
-        return None
-
-
-def scrape_page(char: str) -> list[dict]:
-    url = f"{_BASE}?char={char}&page=all"
-    try:
-        r = requests.get(url, headers=_HEADERS, timeout=20)
+        r = sess.get(url, params=params, timeout=15)
         r.raise_for_status()
+        return r.json()
     except Exception as exc:
-        logger.warning("Failed to fetch %s: %s", url, exc)
-        return []
+        logger.debug("GET %s failed: %s", url, exc)
+        return None
 
-    soup = BeautifulSoup(r.text, "html.parser")
-    rows = soup.select("table.b-statistics__table tbody tr")
-    fighters = []
-    for row in rows:
-        cells = row.find_all("td")
-        if len(cells) < 10:
-            continue
-        texts = [c.get_text(strip=True) for c in cells]
-        first, last = texts[0], texts[1]
-        if not first and not last:
-            continue
-        name = f"{first} {last}".strip()
-        nick = texts[2]
-        height_cm = _inches_to_cm(texts[3])
-        reach_cm = _inches_to_cm(texts[4])
-        stance = texts[5]
-        dob = _parse_dob(texts[6])
-        sig_str_acc = _parse_pct(texts[7])
-        sig_str_def = _parse_pct(texts[8])
-        td_acc = _parse_pct(texts[9])
-        td_def = _parse_pct(texts[10]) if len(texts) > 10 else None
 
-        # Win/Loss/Draw from first cell link title if available
-        link = cells[0].find("a")
-        fighter_url = link["href"] if link and link.get("href") else None
+def _espn_id_from_ref(ref: str) -> str:
+    # e.g. "…/athletes/4916248?lang=…" → "4916248"
+    import re
+    m = re.search(r"/athletes/(\d+)", ref)
+    return m.group(1) if m else ""
 
-        fighters.append({
-            "name": name,
-            "nickname": nick or None,
-            "height_cm": height_cm,
-            "reach_cm": reach_cm,
-            "stance": stance or None,
-            "dob": dob,
-            "age": _age(dob),
-            "sig_str_acc": sig_str_acc,
-            "sig_str_def": sig_str_def,
-            "td_acc": td_acc,
-            "td_def": td_def,
-            "url": fighter_url,
-        })
-    return fighters
+
+def _fetch_fighter(ref: str) -> dict | None:
+    sess = _make_session()
+    detail = _get(ref, sess)
+    if not detail:
+        return None
+
+    name = detail.get("fullName") or detail.get("displayName")
+    if not name:
+        return None
+
+    espn_id = _espn_id_from_ref(ref)
+    height_in = detail.get("height")
+    weight_lbs = detail.get("weight")
+    height_cm = round(height_in * 2.54, 1) if height_in else None
+
+    # fetch records inline
+    wins = losses = tkos = subs = 0
+    records_ref_data = detail.get("records")
+    if isinstance(records_ref_data, dict) and "$ref" in records_ref_data:
+        rec = _get(records_ref_data["$ref"], sess)
+        if rec:
+            stats = {}
+            for item in rec.get("items", []):
+                for s in item.get("stats", []):
+                    stats[s["name"]] = s.get("value", 0)
+            wins = int(stats.get("wins", 0))
+            losses = int(stats.get("losses", 0))
+            tkos = int(stats.get("tkos", 0))
+            subs = int(stats.get("submissions", 0))
+
+    total_finishes = tkos + subs
+    finish_rate = round(total_finishes / wins, 4) if wins > 0 else 0.0
+    win_rate = round(wins / (wins + losses), 4) if (wins + losses) > 0 else 0.5
+
+    return {
+        "name": name,
+        "espn_id": espn_id,
+        "height_cm": height_cm,
+        "weight_lbs": weight_lbs,
+        "reach_cm": None,
+        "age": detail.get("age"),
+        "wins": wins,
+        "losses": losses,
+        "tkos": tkos,
+        "submissions": subs,
+        "finish_rate": finish_rate,
+        "win_rate": win_rate,
+    }
+
+
+def _collect_refs() -> list[str]:
+    refs = []
+    page = 1
+    while True:
+        data = _get(f"{_BASE}/athletes", params={"limit": 100, "page": page})
+        if not data:
+            break
+        items = data.get("items", [])
+        if not items:
+            break
+        refs.extend(item["$ref"] for item in items if item.get("$ref"))
+        total_pages = data.get("pageCount", 1)
+        if page >= total_pages:
+            break
+        page += 1
+        time.sleep(0.1)
+    return refs
 
 
 def main() -> None:
-    all_fighters: dict[str, dict] = {}
-    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    logger.info("Collecting fighter refs...")
+    refs = _collect_refs()
+    logger.info("Found %d fighters — fetching details with %d workers...", len(refs), _WORKERS)
 
-    for char in alphabet:
-        logger.info("Scraping fighters: %s", char.upper())
-        batch = scrape_page(char)
-        for f in batch:
-            all_fighters[f["name"]] = f
-        logger.info("  → %d fighters (total: %d)", len(batch), len(all_fighters))
-        time.sleep(0.5)
+    fighters: dict[str, dict] = {}
+    done = 0
+
+    with ThreadPoolExecutor(max_workers=_WORKERS) as pool:
+        future_to_ref = {pool.submit(_fetch_fighter, ref): ref for ref in refs}
+        for future in as_completed(future_to_ref):
+            done += 1
+            result = future.result()
+            if result:
+                fighters[result["name"]] = result
+                pct = done * 100 // len(refs)
+                bar = "█" * (pct // 5) + "░" * (20 - pct // 5)
+                print(f"\r  [{bar}] {pct:3d}%  {done}/{len(refs)}  ✓ {len(fighters)} guardados", end="", flush=True)
+            elif done % 50 == 0:
+                pct = done * 100 // len(refs)
+                bar = "█" * (pct // 5) + "░" * (20 - pct // 5)
+                print(f"\r  [{bar}] {pct:3d}%  {done}/{len(refs)}  ✓ {len(fighters)} guardados", end="", flush=True)
+    print()  # newline after progress bar
+
+    logger.info("Done. Total fighters: %d", len(fighters))
 
     payload = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "count": len(all_fighters),
-        "fighters": all_fighters,
+        "source": "ESPN Core API",
+        "count": len(fighters),
+        "fighters": fighters,
     }
     _OUT.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info("Saved %d fighters to %s", len(all_fighters), _OUT)
+    logger.info("Saved to %s", _OUT)
 
 
 if __name__ == "__main__":
