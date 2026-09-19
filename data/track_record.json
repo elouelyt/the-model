@@ -815,11 +815,11 @@
               ],
               "stake_odds": 1.68,
               "best_odds": 1.68,
-              "won": null,
+              "won": true,
               "opponent": "Ben Shelton"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "14": {
           "parlays": [
