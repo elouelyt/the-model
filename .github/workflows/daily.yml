@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-generate.txt
 
+      - name: Update ATP rankings cache
+        run: python scripts/rankings_update.py || echo "Rankings update failed — using cached data"
+
       - name: Check yesterday's results
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
@@ -50,16 +53,19 @@ jobs:
           cp data/track_record.json /tmp/track_record_generated.json
           cp -r data/predictions /tmp/predictions_generated
           cp -f data/scores_cache.json /tmp/scores_cache_generated.json 2>/dev/null || true
+          cp -f data/rankings_cache.json /tmp/rankings_cache_generated.json 2>/dev/null || true
           git fetch origin main
           git reset --hard origin/main
           cp /tmp/index_generated.html index.html
           cp /tmp/track_record_generated.json data/track_record.json
           cp -r /tmp/predictions_generated/. data/predictions/
           cp -f /tmp/scores_cache_generated.json data/scores_cache.json 2>/dev/null || true
+          cp -f /tmp/rankings_cache_generated.json data/rankings_cache.json 2>/dev/null || true
           git add index.html || true
           git add data/predictions/ || true
           git add data/track_record.json || true
           git add data/scores_cache.json || true
+          git add data/rankings_cache.json || true
           git diff --cached --quiet \
             && echo "No changes to commit." \
             || git commit -m "chore: update predictions $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"

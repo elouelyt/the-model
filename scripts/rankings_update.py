@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 """Update data/rankings_cache.json by scraping the ATP Tour rankings page.
 
-Run locally once per week (rankings update every Monday):
-    python scripts/rankings_update.py
-
-Flow:
-1. Scrape atptour.com/en/rankings/singles (top 500) with cloudscraper
-2. Write data/rankings_cache.json with timestamp
-3. git add + commit + push so GitHub Actions picks it up
+Designed to run in GitHub Actions (atptour.com allows GitHub runner IPs).
+Run manually only if you have a clean IP — local IPs often get 403.
 """
 
 import json
@@ -41,17 +36,15 @@ _HEADERS = {
 
 
 def scrape_rankings() -> dict[str, dict]:
-    """Scrape ATP rankings page and return name → {rank, points} dict."""
-    logger.info("Fetching ATP rankings from %s …", _ATP_URL)
+    logger.info("Fetching ATP rankings from %s", _ATP_URL)
     s = cloudscraper.create_scraper()
     resp = s.get(_ATP_URL, headers=_HEADERS, timeout=30)
     resp.raise_for_status()
 
     soup = BeautifulSoup(resp.text, "html.parser")
     rows = soup.select("table tbody tr")
-
     if not rows:
-        raise ValueError("Could not find rankings table — page structure may have changed")
+        raise ValueError("Rankings table not found — page structure may have changed")
 
     rankings: dict[str, dict] = {}
     rank_counter = 0
@@ -87,7 +80,7 @@ def scrape_rankings() -> dict[str, dict]:
             rankings[full_name] = {"rank": rank, "points": points}
 
     if not rankings:
-        raise ValueError("No players parsed from ATP page — page structure may have changed")
+        raise ValueError("No players parsed — page structure may have changed")
 
     logger.info("Scraped %d players from ATP rankings", len(rankings))
     return rankings
@@ -105,31 +98,29 @@ def main() -> None:
     CACHE_PATH.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info("Saved %d players to %s", len(rankings), CACHE_PATH)
 
-    # Print top 10 as sanity check
     top10 = sorted(rankings.items(), key=lambda x: x[1]["rank"])[:10]
     print("\nTop 10 ATP:")
     for name, data in top10:
         print(f"  {data['rank']:>3}. {name:<25} {data['points']:>6} pts")
 
-    # git add + commit + push
-    logger.info("Committing and pushing rankings_cache.json …")
+    import os
+    if os.environ.get("CI"):
+        # In GitHub Actions — commit is handled by the workflow's final step
+        logger.info("Running in CI — skipping git commit (workflow handles it)")
+        return
+
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     try:
         subprocess.run(["git", "add", str(CACHE_PATH)], cwd=ROOT, check=True)
         subprocess.run(
-            ["git", "commit", "-m",
-             f"data: update rankings_cache.json ({ts}) — {len(rankings)} players"],
+            ["git", "commit", "-m", f"data: rankings_cache.json ({ts}) — {len(rankings)} players"],
             cwd=ROOT, check=True,
         )
         subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT, check=True)
         subprocess.run(["git", "push", "origin", "main"], cwd=ROOT, check=True)
-        logger.info("Done — rankings_cache.json live on GitHub")
+        logger.info("Done")
     except subprocess.CalledProcessError as exc:
         logger.error("Git step failed: %s", exc)
-        logger.info(
-            "Cache was written locally. Push manually:\n"
-            "  git add data/rankings_cache.json && git commit -m 'data: rankings cache' && git push"
-        )
         sys.exit(1)
 
 
