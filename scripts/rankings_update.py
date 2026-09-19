@@ -1,112 +1,135 @@
 #!/usr/bin/env python3
-"""Update data/rankings_cache.json by scraping the ATP Tour rankings page.
+"""Update data/rankings_cache.json from ESPN Core API (no Cloudflare, no auth).
 
-Designed to run in GitHub Actions (atptour.com allows GitHub runner IPs).
-Run manually only if you have a clean IP — local IPs often get 403.
+ESPN has full ATP rankings updated weekly.
+Endpoint: sports.core.api.espn.com/v2/sports/tennis/leagues/atp/seasons/{year}/rankings/1
 """
 
 import json
 import logging
+import os
 import re
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import cloudscraper
-from bs4 import BeautifulSoup
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.parent
 CACHE_PATH = ROOT / "data" / "rankings_cache.json"
-
-_ATP_URL = "https://www.atptour.com/en/rankings/singles?rankRange=1-500"
-_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/125.0.0.0 Safari/537.36"
-    ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.google.com/",
-}
+_BASE = "https://sports.core.api.espn.com/v2/sports/tennis/leagues/atp"
+_YEAR = datetime.now().year
 
 
-def scrape_rankings() -> dict[str, dict]:
-    logger.info("Fetching ATP rankings from %s", _ATP_URL)
-    s = cloudscraper.create_scraper()
-    resp = s.get(_ATP_URL, headers=_HEADERS, timeout=30)
-    resp.raise_for_status()
+def _session() -> requests.Session:
+    s = requests.Session()
+    s.headers["User-Agent"] = "Mozilla/5.0"
+    retry = Retry(total=3, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503])
+    s.mount("https://", HTTPAdapter(max_retries=retry))
+    s.mount("http://", HTTPAdapter(max_retries=retry))
+    return s
 
-    soup = BeautifulSoup(resp.text, "html.parser")
-    rows = soup.select("table tbody tr")
-    if not rows:
-        raise ValueError("Rankings table not found — page structure may have changed")
+
+def _get(url: str, sess: requests.Session, params: dict | None = None) -> dict | None:
+    try:
+        r = sess.get(url, params=params, timeout=15)
+        r.raise_for_status()
+        return r.json()
+    except Exception as exc:
+        logger.warning("GET %s: %s", url, exc)
+        return None
+
+
+def _latest_rankings_url(sess: requests.Session) -> str | None:
+    """Get the URL of the most recent weekly rankings snapshot."""
+    data = _get(f"{_BASE}/seasons/{_YEAR}/rankings/1", sess)
+    if not data:
+        return None
+    refs = data.get("rankings", [])
+    if not refs:
+        return None
+    # last item = most recent week
+    return refs[-1].get("$ref")
+
+
+def _athlete_name(ref: str, sess: requests.Session) -> str | None:
+    data = _get(ref, sess)
+    if not data:
+        return None
+    return data.get("fullName") or data.get("displayName")
+
+
+def fetch_rankings(sess: requests.Session) -> dict[str, dict]:
+    url = _latest_rankings_url(sess)
+    if not url:
+        raise ValueError("Could not find latest rankings URL")
+    logger.info("Fetching rankings from %s", url)
+
+    data = _get(url, sess, params={"limit": 1000})
+    if not data:
+        raise ValueError("Empty response from rankings endpoint")
+
+    ranks = data.get("ranks", [])
+    logger.info("Got %d ranked entries", len(ranks))
 
     rankings: dict[str, dict] = {}
-    rank_counter = 0
-
-    for row in rows:
-        cells = row.select("td")
-        if len(cells) < 3:
+    for entry in ranks:
+        rank = entry.get("current")
+        points = int(entry.get("points", 0))
+        athlete_ref = (entry.get("athlete") or {}).get("$ref", "")
+        if not rank or not athlete_ref:
             continue
 
-        rank_text = re.sub(r"[^\d]", "", cells[0].get_text(strip=True))
-        if not rank_text:
-            rank_counter += 1
-            rank = rank_counter
-        else:
-            rank = int(rank_text)
-            rank_counter = rank
-
-        player_link = row.select_one('a[href*="/en/players/"]')
-        if not player_link:
+        # extract athlete id from ref
+        m = re.search(r"/athletes/(\d+)", athlete_ref)
+        if not m:
             continue
-        href = player_link.get("href", "")
-        slug_match = re.search(r"/en/players/([^/]+)/", href)
-        if not slug_match:
+
+        name = _athlete_name(athlete_ref, sess)
+        if not name:
             continue
-        full_name = slug_match.group(1).replace("-", " ").title()
 
-        points_text = re.sub(r"[^\d]", "", cells[2].get_text(strip=True))
-        if not points_text:
-            continue
-        points = int(points_text)
+        rankings[name] = {"rank": rank, "points": points}
+        if len(rankings) % 50 == 0:
+            logger.info("  %d players resolved...", len(rankings))
+        time.sleep(0.05)
 
-        if full_name not in rankings:
-            rankings[full_name] = {"rank": rank, "points": points}
-
-    if not rankings:
-        raise ValueError("No players parsed — page structure may have changed")
-
-    logger.info("Scraped %d players from ATP rankings", len(rankings))
     return rankings
 
 
 def main() -> None:
-    rankings = scrape_rankings()
+    sess = _session()
+    rankings = fetch_rankings(sess)
+    logger.info("Built rankings for %d players", len(rankings))
+
+    if len(rankings) < 100:
+        raise ValueError(f"Too few players ({len(rankings)}) — something went wrong")
+
+    # sanity check
+    top5 = sorted(rankings.items(), key=lambda x: x[1]["rank"])[:5]
+    print("\nTop 5 ATP:")
+    for name, data in top5:
+        print(f"  {data['rank']:>3}. {name:<25} {data['points']:>6} pts")
 
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        "source": "ESPN Core API",
         "player_count": len(rankings),
         "rankings": rankings,
     }
     CACHE_PATH.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info("Saved %d players to %s", len(rankings), CACHE_PATH)
+    logger.info("Saved to %s", CACHE_PATH)
 
-    top10 = sorted(rankings.items(), key=lambda x: x[1]["rank"])[:10]
-    print("\nTop 10 ATP:")
-    for name, data in top10:
-        print(f"  {data['rank']:>3}. {name:<25} {data['points']:>6} pts")
-
-    import os
     if os.environ.get("CI"):
-        # In GitHub Actions — commit is handled by the workflow's final step
-        logger.info("Running in CI — skipping git commit (workflow handles it)")
+        logger.info("CI mode — skipping git commit (workflow handles it)")
         return
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
