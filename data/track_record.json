@@ -847,6 +847,20 @@
             }
           ],
           "resolved": false
+        },
+        "19": {
+          "parlays": [
+            {
+              "legs": [
+                "Heide, Gustavo"
+              ],
+              "stake_odds": null,
+              "best_odds": 2.12,
+              "won": null,
+              "opponent": "Dominic Stricker"
+            }
+          ],
+          "resolved": false
         }
       }
     }
