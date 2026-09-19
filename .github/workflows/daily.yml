@@ -33,6 +33,11 @@ jobs:
       - name: Update ATP rankings cache
         run: python scripts/rankings_update.py || echo "Rankings update failed — using cached data"
 
+      - name: Health check
+        env:
+          THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+        run: python scripts/daily_health_check.py
+
       - name: Check yesterday's results
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
