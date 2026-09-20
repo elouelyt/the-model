@@ -2,7 +2,7 @@
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -34,6 +34,7 @@ def fetch_mma_odds() -> list[dict]:
         return []
 
     now = datetime.now(timezone.utc)
+    cutoff = now + timedelta(days=60)
     fights = []
 
     for match in resp.json():
@@ -43,8 +44,8 @@ def fetch_mma_odds() -> list[dict]:
         except ValueError:
             continue
 
-        if ct <= now:
-            continue  # skip in-play / past
+        if ct <= now or ct > cutoff:
+            continue  # skip in-play / past / too far ahead
 
         bookmakers = match.get("bookmakers", [])
         stake_bm = next((b for b in bookmakers if b["key"] == "stake"), None)
