@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-24",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Valentin Vacherot",
+          "rank": 19,
+          "points": 2250,
+          "opponent": "Lloyd Harris",
+          "opponent_rank": 136,
+          "model_prob": 0.7663,
+          "raw_implied": 0.5714,
+          "edge": 0.1949,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.75,
+          "stake_price": 1.75,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": null,
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model's significant edge for Vacherot (ranked #19) is driven by his superior ranking and consistent hard court form, suggesting the market is undervaluing his overall game against a lower-ranked opponent.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.75,
+      "total_odds": 1.75
+    }
+  ]
+}
