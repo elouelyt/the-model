@@ -208,14 +208,15 @@ def _fetch_tennisexplorer_result(player: str, pred_date_str: str) -> str | None:
     Sofascore, is not blanket-blocked for datacenter/cloud IPs — verified reachable from
     both GitHub Actions runners and residential connections.
     """
-    pred_date  = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
-    cutoff_end = pred_date + timedelta(days=6)
+    pred_date    = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end   = pred_date + timedelta(days=6)
+    window_start = pred_date - timedelta(days=1)  # tolerance for timezone drift, same as source 1
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
-    day = pred_date
+    day = window_start
     while day <= cutoff_end:
         url = (
             f"https://www.tennisexplorer.com/results/"

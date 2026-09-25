@@ -856,11 +856,11 @@
               ],
               "stake_odds": null,
               "best_odds": 2.12,
-              "won": null,
+              "won": true,
               "opponent": "Dominic Stricker"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "24": {
           "parlays": [
