@@ -2,8 +2,14 @@
 
 Source priority:
   1. The Odds API /v4/sports/{sport}/scores  — our own API key, recent ATP results (≤3 days)
-  2. ESPN ATP scoreboard API                 — covers ATP 250/500/1000 (sometimes blocked)
-  3. JeffSackmann/tennis_atp CSV             — covers ALL ATP + Challengers (past years only)
+  2. Tennisexplorer.com results pages        — covers ATP/Challenger/Futures/ITF, not IP-blocked
+  3. Sofascore                               — full ATP history, but blocks all datacenter/cloud
+                                                IPs with a blanket 403 (confirmed on GitHub Actions
+                                                runners and residential IPs alike as of 2026-09) —
+                                                kept as a cheap fallback in case that ever changes
+  4. ESPN ATP scoreboard API                 — covers ATP 250/500/1000 only (no Challengers)
+  5. JeffSackmann/tennis_atp CSV             — covers ALL ATP + Challengers, but only past years
+                                                (current-year file isn't published by the repo yet)
 
 Run daily in GitHub Actions BEFORE generate_html.py.
 """
@@ -13,11 +19,13 @@ import io
 import json
 import logging
 import os
+import re
 from datetime import datetime, timedelta, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
 
 import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -165,12 +173,98 @@ def _get_active_atp_sport_keys() -> list[str]:
             s["key"] for s in resp.json()
             if s.get("key", "").startswith("tennis_atp") and s.get("active")
         ]
-        _atp_sport_keys_cache = keys or ["tennis_atp"]
+        _atp_sport_keys_cache = keys
         logger.info("[odds-scores] active ATP keys: %s", _atp_sport_keys_cache)
     except Exception as exc:
         logger.warning("[odds-scores] sport keys fetch failed: %s", exc)
-        _atp_sport_keys_cache = ["tennis_atp"]
+        _atp_sport_keys_cache = []
     return _atp_sport_keys_cache
+
+
+def _te_player_matches(player: str, te_name: str) -> bool:
+    """True if `te_name` (tennisexplorer's "Lastname F." format) is `player`.
+
+    `player` comes from The Odds API and is always "Lastname, Firstname".
+    """
+    if "," in player:
+        last, first = (p.strip() for p in player.split(",", 1))
+    else:
+        parts = player.strip().split()
+        if len(parts) < 2:
+            return False
+        first, last = parts[0], parts[-1]
+
+    m = re.match(r"^(.+?)\s+([A-Za-z])\.?$", te_name.strip())
+    if not m:
+        return False
+    te_last, te_initial = m.group(1), m.group(2)
+    return last.lower() == te_last.lower() and first[:1].lower() == te_initial.lower()
+
+
+def _fetch_tennisexplorer_result(player: str, pred_date_str: str) -> str | None:
+    """Scrape tennisexplorer.com's daily results pages.
+
+    Covers ATP/Challenger/Futures/ITF (unlike ESPN, which is ATP-tour-only) and, unlike
+    Sofascore, is not blanket-blocked for datacenter/cloud IPs — verified reachable from
+    both GitHub Actions runners and residential connections.
+    """
+    pred_date  = datetime.fromisoformat(pred_date_str).replace(tzinfo=timezone.utc)
+    cutoff_end = pred_date + timedelta(days=6)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
+    day = pred_date
+    while day <= cutoff_end:
+        url = (
+            f"https://www.tennisexplorer.com/results/"
+            f"?type=all&year={day.year}&month={day.month}&day={day.day}"
+        )
+        try:
+            resp = requests.get(url, headers=headers, timeout=20)
+            resp.raise_for_status()
+        except Exception as exc:
+            logger.warning("[tennisexplorer] fetch failed for %s: %s", day.date(), exc)
+            day += timedelta(days=1)
+            continue
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        groups: dict[str, list] = {}
+        for row in soup.select("tr[id^='r']"):
+            row_id = row.get("id", "")
+            base_id = row_id[:-1] if row_id.endswith("b") else row_id
+            groups.setdefault(base_id, []).append(row)
+
+        for pair in groups.values():
+            if len(pair) != 2:
+                continue
+            entries = []
+            for row in pair:
+                name_el = row.select_one("td.t-name a")
+                result_el = row.select_one("td.result")
+                if name_el is None or result_el is None:
+                    entries = []
+                    break
+                txt = result_el.get_text(strip=True)
+                if not txt.isdigit():
+                    entries = []
+                    break
+                entries.append((name_el.get_text(strip=True), int(txt)))
+            if len(entries) != 2:
+                continue
+            (name1, score1), (name2, score2) = entries
+            if score1 == score2:
+                continue
+            for name, score, other in ((name1, score1, score2), (name2, score2, score1)):
+                if _te_player_matches(player, name):
+                    result = "won" if score > other else "lost"
+                    logger.info("[tennisexplorer] %s → %s (%s)", player, result.upper(), day.date())
+                    return result
+
+        day += timedelta(days=1)
+
+    return None
 
 
 def _fetch_sofascore_result(player: str, pred_date_str: str) -> str | None:
@@ -383,7 +477,12 @@ def fetch_player_result(player: str, pred_date_str: str, tournament: str = "ATP 
     if result is not None:
         return result
 
-    # --- Source 2: Sofascore (full ATP history, typically not blocked) ---
+    # --- Source 2: Tennisexplorer (ATP/Challenger/Futures/ITF, not IP-blocked) ---
+    result = _fetch_tennisexplorer_result(player, pred_date_str)
+    if result is not None:
+        return result
+
+    # --- Source 3: Sofascore (full ATP history, but blanket-blocks cloud/datacenter IPs) ---
     result = _fetch_sofascore_result(player, pred_date_str)
     if result is not None:
         return result

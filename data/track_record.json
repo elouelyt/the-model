@@ -532,10 +532,10 @@
               ],
               "stake_odds": null,
               "best_odds": 1.843,
-              "won": null
+              "won": false
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "27": {
           "parlays": [
@@ -700,10 +700,10 @@
               ],
               "stake_odds": 2.18,
               "best_odds": 2.18,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     },
@@ -829,10 +829,10 @@
               ],
               "stake_odds": 1.99,
               "best_odds": 1.99,
-              "won": null
+              "won": true
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "18": {
           "parlays": [
@@ -842,11 +842,11 @@
               ],
               "stake_odds": 1.74,
               "best_odds": 1.74,
-              "won": null,
+              "won": true,
               "opponent": "Monteiro, Thiago"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "19": {
           "parlays": [
