@@ -104,7 +104,23 @@ def fetch_rankings(sess: requests.Session) -> dict[str, dict]:
     return rankings
 
 
+def _already_updated_today() -> bool:
+    """True if rankings_cache.json's timestamp is already from today (UTC)."""
+    if not CACHE_PATH.exists():
+        return False
+    try:
+        cached = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
+        cached_date = datetime.fromisoformat(cached["timestamp"]).date()
+    except Exception:
+        return False
+    return cached_date == datetime.now(timezone.utc).date()
+
+
 def main() -> None:
+    if "--force" not in sys.argv and _already_updated_today():
+        logger.info("rankings_cache.json already updated today (UTC) — skipping")
+        return
+
     sess = _session()
     rankings = fetch_rankings(sess)
     logger.info("Built rankings for %d players", len(rankings))
