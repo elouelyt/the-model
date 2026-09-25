@@ -875,6 +875,20 @@
             }
           ],
           "resolved": false
+        },
+        "25": {
+          "parlays": [
+            {
+              "legs": [
+                "Valentin Vacherot"
+              ],
+              "stake_odds": 1.8,
+              "best_odds": 1.8,
+              "won": null,
+              "opponent": "Lloyd Harris"
+            }
+          ],
+          "resolved": false
         }
       }
     }

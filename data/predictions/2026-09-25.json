@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-25",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Valentin Vacherot",
+          "rank": 19,
+          "points": 2250,
+          "opponent": "Lloyd Harris",
+          "opponent_rank": 136,
+          "model_prob": 0.7663,
+          "raw_implied": 0.5556,
+          "edge": 0.2107,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.8,
+          "stake_price": 1.8,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "September 26, 2026: Valentin Vacherot vs Lloyd Harris: Set 1 Winner Tennis Prediction Market - robinhood.com",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Vacherot's significant model edge (+21.1%) is driven by his superior ranking (#19 vs #136) and strong recent form, suggesting the market is undervaluing his current hard-court prowess despite no H2H data.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.8,
+      "total_odds": 1.8
+    }
+  ]
+}
