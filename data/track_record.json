@@ -870,11 +870,11 @@
               ],
               "stake_odds": 1.75,
               "best_odds": 1.75,
-              "won": null,
+              "won": false,
               "opponent": "Lloyd Harris"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "25": {
           "parlays": [
@@ -884,11 +884,11 @@
               ],
               "stake_odds": 1.8,
               "best_odds": 1.8,
-              "won": null,
+              "won": false,
               "opponent": "Lloyd Harris"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
