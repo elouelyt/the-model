@@ -889,6 +889,20 @@
             }
           ],
           "resolved": true
+        },
+        "28": {
+          "parlays": [
+            {
+              "legs": [
+                "Matteo Arnaldi"
+              ],
+              "stake_odds": 1.73,
+              "best_odds": 1.73,
+              "won": null,
+              "opponent": "Rei Sakamoto"
+            }
+          ],
+          "resolved": false
         }
       }
     }

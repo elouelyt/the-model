@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-28",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Matteo Arnaldi",
+          "rank": 37,
+          "points": 1349,
+          "opponent": "Rei Sakamoto",
+          "opponent_rank": 133,
+          "model_prob": 0.6869,
+          "raw_implied": 0.4975,
+          "edge": 0.1894,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.73,
+          "stake_price": 1.73,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": "Matteo Arnaldi vs Rei Sakamoto - Match ATP - Kinoshita Group Japan Open Tennis Championships 1970 - Third round - tennismajors.com",
+            "withdrawn": true,
+            "withdrawal_headline": "Matteo Arnaldi: Had to withdraw after night of vomiting - ESPN"
+          },
+          "recommendation": "Arnaldi's significant model edge (+18.9%) is driven by his superior ranking (#37 vs #133) and overall hard court performance, suggesting the market is undervaluing his baseline consistency and power on this surface.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.73,
+      "total_odds": 1.73
+    }
+  ]
+}
