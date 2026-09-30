@@ -82,6 +82,23 @@ def _fetch_fighter(ref: str) -> dict | None:
     finish_rate = round(total_finishes / wins, 4) if wins > 0 else 0.0
     win_rate = round(wins / (wins + losses), 4) if (wins + losses) > 0 else 0.5
 
+    # Career striking/grappling accuracy from ESPN's per-athlete statistics endpoint.
+    # NB: ESPN's MMA stats only cover offense (strikeAccuracy, takedownAccuracy) - there
+    # is no defensive equivalent (strikeDefense/takedownDefense) and no reach anywhere in
+    # this API, so sig_str_def/td_def/reach_cm stay unavailable regardless.
+    sig_str_acc = None
+    td_acc = None
+    stats_ref = detail.get("statistics")
+    if isinstance(stats_ref, dict) and "$ref" in stats_ref:
+        stats_data = _get(stats_ref["$ref"], sess)
+        if stats_data:
+            for cat in stats_data.get("splits", {}).get("categories", []):
+                for st in cat.get("stats", []):
+                    if st["name"] == "strikeAccuracy" and st.get("value") is not None:
+                        sig_str_acc = round(st["value"] / 100.0, 4)
+                    elif st["name"] == "takedownAccuracy" and st.get("value") is not None:
+                        td_acc = round(st["value"] / 100.0, 4)
+
     return {
         "name": name,
         "espn_id": espn_id,
@@ -95,6 +112,8 @@ def _fetch_fighter(ref: str) -> dict | None:
         "submissions": subs,
         "finish_rate": finish_rate,
         "win_rate": win_rate,
+        "sig_str_acc": sig_str_acc,
+        "td_acc": td_acc,
     }
 
 

@@ -1083,6 +1083,14 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
 
     stats_map = fetch_stats_fn(all_names)
     rankings_map = fetch_rankings_fn(all_names)
+    finish_rates = {name: s["finish_rate"] for name, s in stats_map.items() if s.get("finish_rate") is not None}
+
+    # Features other than height/age that actually carry signal when present. Fights where
+    # ESPN has no striking/grappling/finish data for either fighter reduce the model to just
+    # "younger + taller wins" - too thin to trust, so those never get flagged as a value bet
+    # even if the raw edge number looks big (a model near 50% will look like it has huge edge
+    # on any market underdog purely because it has no real read on the fight).
+    _RICHNESS_KEYS = ("reach_diff", "sig_str_acc_diff", "sig_str_def_diff", "td_acc_diff", "td_def_diff", "finish_rate_diff")
 
     enriched = []
     for f in fights:
@@ -1092,8 +1100,9 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
         r1 = rankings_map.get(n1, {})
         r2 = rankings_map.get(n2, {})
 
-        pred = predict_fn(s1, s2, f1_name=n1, f2_name=n2)
+        pred = predict_fn(s1, s2, f1_name=n1, f2_name=n2, finish_rates=finish_rates)
         has_real_model = pred.get("model_used") and bool(s1) and bool(s2)
+        data_rich = any(abs(pred.get("features", {}).get(k, 0.0)) > 1e-9 for k in _RICHNESS_KEYS)
 
         if has_real_model:
             edge1 = edge_fn(pred["prob_f1"], f["odds1"])
@@ -1102,7 +1111,21 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
             best_fighter = n1 if edge1 >= edge2 else n2
             best_odds = f["odds1"] if edge1 >= edge2 else f["odds2"]
             best_prob = pred["prob_f1"] if edge1 >= edge2 else pred["prob_f2"]
-            signal = "value_bet" if best_edge >= 0.07 else ("marginal" if best_edge >= 0.03 else "no_bet")
+            # At long odds, a tiny absolute error in the model's probability estimate
+            # reads as a huge relative edge (e.g. at 5.00/20% implied, a 5pp model error
+            # already looks like +25% edge) - exactly the pattern behind the historical
+            # losing picks. The model still lacks reach/defensive-stats data and its
+            # training features are career-to-date snapshots (not point-in-time), so
+            # until it's proven on real results, cap how far out on the tail we trust it.
+            _MAX_VALUE_BET_ODDS = 3.50
+            if not data_rich:
+                # Only height/age available - never enough to call it a value bet.
+                signal = "marginal" if best_edge >= 0.03 else "no_bet"
+            elif best_odds > _MAX_VALUE_BET_ODDS:
+                # Capped to "marginal" at best, however large the computed edge looks.
+                signal = "marginal" if best_edge >= 0.03 else "no_bet"
+            else:
+                signal = "value_bet" if best_edge >= 0.07 else ("marginal" if best_edge >= 0.03 else "no_bet")
         else:
             edge1 = edge2 = best_edge = 0.0
             best_fighter = n1 if f["odds1"] < f["odds2"] else n2
