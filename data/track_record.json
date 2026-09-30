@@ -898,11 +898,11 @@
               ],
               "stake_odds": 1.73,
               "best_odds": 1.73,
-              "won": null,
+              "won": true,
               "opponent": "Rei Sakamoto"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "29": {
           "parlays": [
@@ -912,8 +912,22 @@
               ],
               "stake_odds": 2.04,
               "best_odds": 2.04,
-              "won": null,
+              "won": true,
               "opponent": "Rei Sakamoto"
+            }
+          ],
+          "resolved": true
+        },
+        "30": {
+          "parlays": [
+            {
+              "legs": [
+                "Flavio Cobolli"
+              ],
+              "stake_odds": 1.8,
+              "best_odds": 1.8,
+              "won": null,
+              "opponent": "Roman Safiullin"
             }
           ],
           "resolved": false
