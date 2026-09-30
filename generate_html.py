@@ -1072,7 +1072,7 @@ def _strategy_html() -> str:
 """
 
 
-def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, edge_fn) -> list:
+def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, edge_fn, elo_predict_fn) -> list:
     """Add model predictions, rankings and edge to each MMA fight dict."""
     if not fights:
         return []
@@ -1085,12 +1085,26 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
     rankings_map = fetch_rankings_fn(all_names)
     finish_rates = {name: s["finish_rate"] for name, s in stats_map.items() if s.get("finish_rate") is not None}
 
+    # Same "win rate over the last 5 fights" feature the model was trained on (see
+    # scripts/ufc_train_model.py) - computed on demand from the fight history so live
+    # predictions use the exact same definition as training, not a different proxy.
+    recent_win_rates: dict[str, float] = {}
+    _fights_history_path = Path("data/ufc_fights_history.json")
+    if _fights_history_path.exists():
+        try:
+            sys.path.insert(0, str(Path("scripts").resolve()))
+            from ufc_train_model import _build_recent_win_rate
+            _history = json.loads(_fights_history_path.read_text(encoding="utf-8"))
+            recent_win_rates = _build_recent_win_rate(_history.get("fights", []))
+        except Exception as exc:
+            logger.warning("Could not compute recent_win_rates: %s", exc)
+
     # Features other than height/age that actually carry signal when present. Fights where
     # ESPN has no striking/grappling/finish data for either fighter reduce the model to just
     # "younger + taller wins" - too thin to trust, so those never get flagged as a value bet
     # even if the raw edge number looks big (a model near 50% will look like it has huge edge
     # on any market underdog purely because it has no real read on the fight).
-    _RICHNESS_KEYS = ("reach_diff", "sig_str_acc_diff", "sig_str_def_diff", "td_acc_diff", "td_def_diff", "finish_rate_diff")
+    _RICHNESS_KEYS = ("reach_diff", "sig_str_acc_diff", "sig_str_def_diff", "td_acc_diff", "td_def_diff", "finish_rate_diff", "recent_win_rate_diff")
 
     enriched = []
     for f in fights:
@@ -1100,7 +1114,12 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
         r1 = rankings_map.get(n1, {})
         r2 = rankings_map.get(n2, {})
 
-        pred = predict_fn(s1, s2, f1_name=n1, f2_name=n2, finish_rates=finish_rates)
+        elo1 = elo_predict_fn(n1, n2)
+        elo_diff = elo1.get("elo_f1", 1500.0) - elo1.get("elo_f2", 1500.0)
+        pred = predict_fn(
+            s1, s2, f1_name=n1, f2_name=n2, finish_rates=finish_rates,
+            recent_win_rates=recent_win_rates, elo_diff=elo_diff,
+        )
         has_real_model = pred.get("model_used") and bool(s1) and bool(s2)
         data_rich = any(abs(pred.get("features", {}).get(k, 0.0)) > 1e-9 for k in _RICHNESS_KEYS)
         # Both fighters must have real (scraped, not default-filled) striking/TD accuracy -
@@ -1454,9 +1473,12 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     from src.agents.mma_stats_agent import fetch_fighter_stats
     from src.agents.mma_ranking_agent import fetch_ufc_rankings
     from src.agents.mma_model_agent import predict_fight, compute_edge
+    from src.agents.mma_elo_agent import predict_elo
 
     mma_fights_raw = fetch_mma_odds()
-    mma_fights = _enrich_mma_fights(mma_fights_raw, fetch_fighter_stats, fetch_ufc_rankings, predict_fight, compute_edge)
+    mma_fights = _enrich_mma_fights(
+        mma_fights_raw, fetch_fighter_stats, fetch_ufc_rankings, predict_fight, compute_edge, predict_elo,
+    )
     mma_html = _mma_section_html(mma_fights)
 
     return f"""<!DOCTYPE html>

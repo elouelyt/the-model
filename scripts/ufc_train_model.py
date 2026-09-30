@@ -9,7 +9,15 @@ Output: data/ufc_model.json  (coefficients + scaler params, no sklearn at infere
 Features per fight (symmetric — each fight generates 2 rows):
   reach_diff, height_diff, age_diff,
   sig_str_acc_diff, sig_str_def_diff, td_acc_diff, td_def_diff,
-  finish_rate_diff, recent_win_rate_diff
+  finish_rate_diff, recent_win_rate_diff, elo_diff
+
+elo_diff is computed point-in-time (see src/agents/mma_elo_agent.py): fights
+are replayed in chronological order and each fight's elo_diff is captured
+BEFORE that fight's result updates the ratings, same discipline as
+scripts/ufc_walkforward_backtest.py. Every other feature above is a
+today's-snapshot stat applied uniformly to all historical fights (a known,
+documented limitation - see CLAUDE.md "lookahead bias" notes) - elo_diff is
+the one feature in this model that doesn't share that flaw.
 """
 
 import json
@@ -30,8 +38,15 @@ FEATURE_NAMES = [
     "reach_diff", "height_diff", "age_diff",
     "sig_str_acc_diff", "sig_str_def_diff",
     "td_acc_diff", "td_def_diff",
-    "finish_rate_diff",
+    "finish_rate_diff", "recent_win_rate_diff", "elo_diff",
 ]
+
+ELO_INITIAL = 1500.0
+ELO_BASE_K = 32.0
+ELO_ADAPTIVE_K_SCHEDULE = [(5, 64.0), (10, 48.0)]
+
+L2_LAMBDA = 0.5  # ridge penalty — shrinks weights toward 0, guards against a single
+                 # sparse/noisy feature (e.g. finish_rate) dominating the model
 
 
 def _finish(method: str) -> bool:
@@ -67,7 +82,44 @@ def _build_recent_win_rate(fights: list[dict]) -> dict[str, float]:
     return result
 
 
-def _features(f1: dict, f2: dict, finish_rate: dict, recent_wr: dict, name1: str, name2: str) -> list[float]:
+def _pointintime_elo_diffs(fights_sorted: list[dict]) -> list[float]:
+    """elo(winner) - elo(loser) captured BEFORE each fight updates the ratings.
+
+    fights_sorted must already be in chronological order. Mirrors
+    src/agents/mma_elo_agent.py's update rule exactly, so this is the same
+    point-in-time discipline as scripts/ufc_walkforward_backtest.py - no
+    fight's feature depends on any fight that happens later in time.
+    """
+    def k_for(count: int) -> float:
+        for threshold, k in ELO_ADAPTIVE_K_SCHEDULE:
+            if count < threshold:
+                return k
+        return ELO_BASE_K
+
+    def expected(r_a: float, r_b: float) -> float:
+        return 1.0 / (1.0 + 10 ** ((r_b - r_a) / 400.0))
+
+    ratings: dict[str, float] = {}
+    counts: dict[str, int] = {}
+    diffs: list[float] = []
+    for fight in fights_sorted:
+        w, l = fight["winner"], fight["loser"]
+        r_w, r_l = ratings.get(w, ELO_INITIAL), ratings.get(l, ELO_INITIAL)
+        diffs.append(r_w - r_l)
+
+        exp_w = expected(r_w, r_l)
+        k_w, k_l = k_for(counts.get(w, 0)), k_for(counts.get(l, 0))
+        ratings[w] = r_w + k_w * (1.0 - exp_w)
+        ratings[l] = r_l + k_l * (0.0 - (1.0 - exp_w))
+        counts[w] = counts.get(w, 0) + 1
+        counts[l] = counts.get(l, 0) + 1
+    return diffs
+
+
+def _features(
+    f1: dict, f2: dict, finish_rate: dict, recent_wr: dict, name1: str, name2: str,
+    elo_diff: float = 0.0,
+) -> list[float]:
     def diff(key: str) -> float:
         a = f1.get(key) or 0.0
         b = f2.get(key) or 0.0
@@ -82,6 +134,8 @@ def _features(f1: dict, f2: dict, finish_rate: dict, recent_wr: dict, name1: str
         diff("td_acc"),
         diff("td_def"),
         (finish_rate.get(name1, 0.5) - finish_rate.get(name2, 0.5)),
+        (recent_wr.get(name1, 0.5) - recent_wr.get(name2, 0.5)),
+        elo_diff,
     ]
 
 
@@ -105,7 +159,17 @@ def _standardize(X: list[list[float]]) -> tuple[list[list[float]], list[float], 
     return Xs, means, stds
 
 
-def _train_lr(X: list[list[float]], y: list[int], lr: float = 0.1, epochs: int = 200) -> list[float]:
+def _train_lr(
+    X: list[list[float]], y: list[int], lr: float = 0.1, epochs: int = 200,
+    l2: float = 0.0,
+) -> tuple[list[float], float]:
+    """L2-regularized (ridge) logistic regression via batch gradient descent.
+
+    The ridge penalty shrinks weights toward 0 - without it a single sparse or
+    noisy feature (e.g. finish_rate, which only has ~1900/4110 fighters with
+    real underlying data) can end up with a disproportionately large weight
+    that dominates every prediction.
+    """
     n, m = len(X), len(X[0])
     w = [0.0] * m
     b = 0.0
@@ -118,9 +182,41 @@ def _train_lr(X: list[list[float]], y: list[int], lr: float = 0.1, epochs: int =
             for j in range(m):
                 dw[j] += err * X[i][j]
             db += err
-        w = [w[j] - lr * dw[j] / n for j in range(m)]
+        # Bias term is never regularized.
+        w = [w[j] - lr * (dw[j] / n + l2 * w[j]) for j in range(m)]
         b -= lr * db / n
     return w, b
+
+
+def _kfold_accuracy(X: list[list[float]], y: list[int], k: int = 5, l2: float = 0.0) -> tuple[float, float]:
+    """k-fold cross-validated accuracy (mean, std) - more robust than a single 80/20 split.
+
+    X/y alternate (winner-row, loser-row) per fight - fold boundaries are kept aligned to
+    fight pairs (even indices) so a single match's two mirrored rows never split across
+    train/test (that would leak the same match's outcome into the fold that's supposed to
+    be unseen).
+    """
+    n_fights = len(X) // 2
+    fold_size = n_fights // k
+    accs = []
+    for fold in range(k):
+        f_start = fold * fold_size
+        f_end = (fold + 1) * fold_size if fold < k - 1 else n_fights
+        start, end = f_start * 2, f_end * 2
+        X_test, y_test = X[start:end], y[start:end]
+        X_train = X[:start] + X[end:]
+        y_train = y[:start] + y[end:]
+        if not X_train or not X_test:
+            continue
+        w, b = _train_lr(X_train, y_train, lr=0.05, epochs=300, l2=l2)
+        correct = sum(
+            1 for i in range(len(X_test))
+            if ((_sigmoid(_dot(w, X_test[i]) + b) >= 0.5) == bool(y_test[i]))
+        )
+        accs.append(correct / len(X_test))
+    mean_acc = sum(accs) / len(accs)
+    std_acc = math.sqrt(sum((a - mean_acc) ** 2 for a in accs) / len(accs))
+    return mean_acc, std_acc
 
 
 def main() -> None:
@@ -133,8 +229,17 @@ def main() -> None:
 
     fights_data = json.loads(_FIGHTS_FILE.read_text(encoding="utf-8"))
     fighters_data = json.loads(_FIGHTERS_FILE.read_text(encoding="utf-8"))
-    fights = fights_data["fights"]
     fighters = fighters_data["fighters"]
+
+    # Chronological order is required for elo_diff to be point-in-time honest
+    # (see _pointintime_elo_diffs). This also makes the k-fold CV below fold
+    # over contiguous TIME windows rather than arbitrary file order, which is
+    # closer in spirit to a walk-forward split.
+    fights = sorted(
+        (f for f in fights_data["fights"] if f.get("winner") and f.get("loser") and f.get("date")),
+        key=lambda f: f["date"],
+    )
+    elo_diffs = _pointintime_elo_diffs(fights)
 
     logger.info("Loaded %d fights, %d fighters", len(fights), len(fighters))
 
@@ -144,7 +249,7 @@ def main() -> None:
     X_raw, y = [], []
     skipped = 0
 
-    for fight in fights:
+    for fight, elo_diff in zip(fights, elo_diffs):
         w_name, l_name = fight["winner"], fight["loser"]
         wf = fighters.get(w_name)
         lf = fighters.get(l_name)
@@ -153,28 +258,23 @@ def main() -> None:
             continue
 
         # Winner as fighter1 (label=1)
-        feats_w = _features(wf, lf, finish_rate, recent_wr, w_name, l_name)
+        feats_w = _features(wf, lf, finish_rate, recent_wr, w_name, l_name, elo_diff=elo_diff)
         X_raw.append(feats_w)
         y.append(1)
 
         # Mirror: loser as fighter1 (label=0)
-        feats_l = _features(lf, wf, finish_rate, recent_wr, l_name, w_name)
+        feats_l = _features(lf, wf, finish_rate, recent_wr, l_name, w_name, elo_diff=-elo_diff)
         X_raw.append(feats_l)
         y.append(0)
 
     logger.info("Training on %d samples (%d fights skipped — no stats)", len(X_raw), skipped)
 
     Xs, means, stds = _standardize(X_raw)
-    weights, bias = _train_lr(Xs, y, lr=0.05, epochs=300)
 
-    # Cross-validate accuracy (last 20% as holdout)
-    split = int(len(Xs) * 0.8)
-    correct = sum(
-        1 for i in range(split, len(Xs))
-        if ((_sigmoid(_dot(weights, Xs[i]) + bias) >= 0.5) == bool(y[i]))
-    )
-    acc = correct / max(len(Xs) - split, 1)
-    logger.info("Holdout accuracy: %.1f%%", acc * 100)
+    cv_mean, cv_std = _kfold_accuracy(Xs, y, k=5, l2=L2_LAMBDA)
+    logger.info("5-fold CV accuracy: %.1f%% +/- %.1f%%", cv_mean * 100, cv_std * 100)
+
+    weights, bias = _train_lr(Xs, y, lr=0.05, epochs=300, l2=L2_LAMBDA)
 
     model = {
         "feature_names": FEATURE_NAMES,
@@ -182,11 +282,13 @@ def main() -> None:
         "bias": bias,
         "scaler_mean": means,
         "scaler_std": stds,
-        "holdout_accuracy": round(acc, 4),
+        "holdout_accuracy": round(cv_mean, 4),
+        "cv_accuracy_std": round(cv_std, 4),
+        "l2_lambda": L2_LAMBDA,
         "trained_on": len(X_raw),
     }
     _MODEL_OUT.write_text(json.dumps(model, indent=2), encoding="utf-8")
-    logger.info("Model saved to %s (accuracy %.1f%%)", _MODEL_OUT, acc * 100)
+    logger.info("Model saved to %s (5-fold CV accuracy %.1f%%)", _MODEL_OUT, cv_mean * 100)
 
 
 if __name__ == "__main__":

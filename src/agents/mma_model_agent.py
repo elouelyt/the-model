@@ -49,14 +49,21 @@ def predict_fight(
     f1_name: str = "",
     f2_name: str = "",
     finish_rates: dict | None = None,
+    recent_win_rates: dict | None = None,
+    elo_diff: float = 0.0,
 ) -> dict:
     """Predict P(fighter1 wins) given their stats.
 
     Args:
         f1_stats: Fighter 1 stats dict (from mma_stats_agent).
         f2_stats: Fighter 2 stats dict.
-        f1_name, f2_name: Names for finish rate lookup.
+        f1_name, f2_name: Names for finish rate / recent form lookup.
         finish_rates: dict mapping fighter name → finish rate (0-1).
+        recent_win_rates: dict mapping fighter name → win rate in last 5 fights (0-1).
+        elo_diff: elo(f1) - elo(f2) from mma_elo_agent.predict_elo() — the one
+            feature in this model that's point-in-time honest by construction
+            (see mma_elo_agent.py / ufc_walkforward_backtest.py). Caller's
+            responsibility to compute; defaults to 0 (no signal) if omitted.
 
     Returns:
         {"prob_f1": float, "prob_f2": float, "model_used": bool}
@@ -66,6 +73,7 @@ def predict_fight(
         return {"prob_f1": 0.5, "prob_f2": 0.5, "model_used": False}
 
     fr = finish_rates or {}
+    rwr = recent_win_rates or {}
 
     def get(stats: dict, key: str, default: float = 0.0) -> float:
         v = stats.get(key)
@@ -80,6 +88,8 @@ def predict_fight(
         get(f1_stats, "td_acc", 0.35) - get(f2_stats, "td_acc", 0.35),
         get(f1_stats, "td_def", 0.60) - get(f2_stats, "td_def", 0.60),
         fr.get(f1_name, 0.5) - fr.get(f2_name, 0.5),
+        rwr.get(f1_name, 0.5) - rwr.get(f2_name, 0.5),
+        elo_diff,
     ]
 
     means = model["scaler_mean"]
