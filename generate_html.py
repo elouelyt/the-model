@@ -1103,6 +1103,12 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
         pred = predict_fn(s1, s2, f1_name=n1, f2_name=n2, finish_rates=finish_rates)
         has_real_model = pred.get("model_used") and bool(s1) and bool(s2)
         data_rich = any(abs(pred.get("features", {}).get(k, 0.0)) > 1e-9 for k in _RICHNESS_KEYS)
+        # Both fighters must have real (scraped, not default-filled) striking/TD accuracy -
+        # otherwise half the comparison is one real fighter vs a fabricated "average fighter",
+        # which can manufacture a confident-looking edge off data that's half made up.
+        both_sides_real_data = all(
+            s.get("sig_str_acc") is not None and s.get("td_acc") is not None for s in (s1, s2)
+        )
 
         if has_real_model:
             edge1 = edge_fn(pred["prob_f1"], f["odds1"])
@@ -1118,8 +1124,9 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
             # training features are career-to-date snapshots (not point-in-time), so
             # until it's proven on real results, cap how far out on the tail we trust it.
             _MAX_VALUE_BET_ODDS = 3.50
-            if not data_rich:
-                # Only height/age available - never enough to call it a value bet.
+            if not data_rich or not both_sides_real_data:
+                # Only height/age available, or one side's striking/TD stats are fabricated
+                # defaults rather than real data - never enough to call it a value bet.
                 signal = "marginal" if best_edge >= 0.03 else "no_bet"
             elif best_odds > _MAX_VALUE_BET_ODDS:
                 # Capped to "marginal" at best, however large the computed edge looks.
