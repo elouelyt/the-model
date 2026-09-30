@@ -11,7 +11,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -2327,10 +2327,33 @@ def _save_track_record(track_record: dict) -> None:
     track_file.write_text(json.dumps(track_record, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _pick_already_pending(player: str, track_record: dict, lookback_days: int = 6) -> bool:
+    """True if `player` already has an unresolved (won=None) single-bet entry logged
+    within the last `lookback_days` — i.e. it's still the same real-world match that
+    hasn't been played yet, not a new pick. Matches check_results.py's resolution window.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(days=lookback_days)
+    for month_str, month_data in track_record.get("months", {}).items():
+        for day_key, day_data in month_data.get("days", {}).items():
+            try:
+                day_date = datetime.strptime(f"{month_str}-{int(day_key):02d}", "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            except ValueError:
+                continue
+            if day_date < cutoff:
+                continue
+            for parl in day_data.get("parlays", []):
+                if parl.get("won") is None and parl.get("legs") == [player]:
+                    return True
+    return False
+
+
 def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     """Add today's daily_pick as a pending single bet entry.
 
     Only runs if no entry exists for today — manual entries via log_bet.py take precedence.
+    Also skipped if this same player is already logged pending from a previous day (the
+    match just hasn't been played yet and is still today's top pick — logging it again
+    would double-count the same real-world bet once it resolves).
     Also saves a minimal prediction file so check_results.py can resolve the result tomorrow.
     """
     today = datetime.now(timezone.utc)
@@ -2344,6 +2367,10 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
 
     if day_key in days:
         return  # already logged — don't overwrite
+
+    if _pick_already_pending(pick["player"], track_record):
+        logger.info("Daily pick %s already pending from a previous day — skipping duplicate log", pick["player"])
+        return
 
     stake_odds = pick.get("stake_price")
     best_odds  = pick.get("best_price") or stake_odds

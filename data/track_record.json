@@ -737,20 +737,6 @@
           ],
           "resolved": true
         },
-        "3": {
-          "parlays": [
-            {
-              "legs": [
-                "Luciano Darderi"
-              ],
-              "stake_odds": 1.66,
-              "best_odds": 1.66,
-              "won": true,
-              "opponent": "Dalibor Svrcina"
-            }
-          ],
-          "resolved": true
-        },
         "4": {
           "parlays": [
             {
@@ -801,20 +787,6 @@
               ],
               "stake_odds": 1.65,
               "best_odds": 1.65,
-              "won": true,
-              "opponent": "Ben Shelton"
-            }
-          ],
-          "resolved": true
-        },
-        "13": {
-          "parlays": [
-            {
-              "legs": [
-                "Alexander Zverev"
-              ],
-              "stake_odds": 1.68,
-              "best_odds": 1.68,
               "won": true,
               "opponent": "Ben Shelton"
             }
@@ -876,20 +848,6 @@
           ],
           "resolved": true
         },
-        "25": {
-          "parlays": [
-            {
-              "legs": [
-                "Valentin Vacherot"
-              ],
-              "stake_odds": 1.8,
-              "best_odds": 1.8,
-              "won": false,
-              "opponent": "Lloyd Harris"
-            }
-          ],
-          "resolved": true
-        },
         "28": {
           "parlays": [
             {
@@ -898,20 +856,6 @@
               ],
               "stake_odds": 1.73,
               "best_odds": 1.73,
-              "won": true,
-              "opponent": "Rei Sakamoto"
-            }
-          ],
-          "resolved": true
-        },
-        "29": {
-          "parlays": [
-            {
-              "legs": [
-                "Matteo Arnaldi"
-              ],
-              "stake_odds": 2.04,
-              "best_odds": 2.04,
               "won": true,
               "opponent": "Rei Sakamoto"
             }
