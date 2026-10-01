@@ -1204,6 +1204,7 @@ def _mma_section_html(fights: list) -> str:
         mma_pick_html = f"""
 <div class="mma-pick-card">
   <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">🥊 PICK DEL DÍA MMA</div>
+  <div style="font-size:11px;color:#10b981;font-weight:700;letter-spacing:0.3px;margin-bottom:2px;">✓ APOSTAR A GANADOR:</div>
   <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">{pick["best_fighter"]}</div>
   <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">vs {pick["fighter2"] if pick["best_fighter"]==pick["fighter1"] else pick["fighter1"]} · {pick["commence_dt"].strftime("%d/%m %H:%M UTC")}</div>
   <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
@@ -1250,11 +1251,29 @@ def _mma_section_html(fights: list) -> str:
         edge_badge1 = f'<span style="font-size:10px;color:{c1_color};font-weight:600;">{e1*100:+.1f}%</span>' if f.get("model_used") else ""
         edge_badge2 = f'<span style="font-size:10px;color:{c2_color};font-weight:600;">{e2*100:+.1f}%</span>' if f.get("model_used") else ""
 
+        # Explicit "bet this one" marker - the colored odds/edge number alone is too
+        # subtle to tell at a glance which side (if either) is the actual recommendation,
+        # especially scanning a grid of many fight cards.
+        picked_meta = _SIGNAL_META.get(sig) if sig in ("value_bet", "marginal") else None
+        pick_badge1 = pick_badge2 = ""
+        if picked_meta and f.get("best_fighter") == n1:
+            pick_badge1 = (
+                f'<div style="margin-top:4px;font-size:10px;font-weight:700;color:{picked_meta["color"]};">'
+                f'&#9679; APUESTA: {picked_meta["label"]}</div>'
+            )
+        elif picked_meta and f.get("best_fighter") == n2:
+            pick_badge2 = (
+                f'<div style="margin-top:4px;font-size:10px;font-weight:700;color:{picked_meta["color"]};">'
+                f'&#9679; APUESTA: {picked_meta["label"]}</div>'
+            )
+        card_bg1 = f'background:{picked_meta["bg"]};border-radius:6px;padding:4px 6px;margin:-4px -6px 0;' if pick_badge1 else ""
+        card_bg2 = f'background:{picked_meta["bg"]};border-radius:6px;padding:4px 6px;margin:-4px -6px 0;' if pick_badge2 else ""
+
         rows += f"""
         <div class="mma-fight-card" style="border-color:{border_color};">
           <div class="mma-fight-date">{date_str} UTC {f'· <span style="font-size:10px;color:var(--muted);">{f["division1"] or ""}</span>' if f.get("division1") else ""}</div>
           <div class="mma-fighters">
-            <div class="mma-fighter">
+            <div class="mma-fighter" style="{card_bg1}">
               <span class="mma-name">{n1} <span style="color:var(--muted);font-size:10px;">{rank1_str}</span></span>
               {stats_row1}
               <div style="display:flex;align-items:baseline;gap:6px;">
@@ -1262,9 +1281,10 @@ def _mma_section_html(fights: list) -> str:
                 <span class="mma-impl">{p1*100:.0f}%</span>
                 {edge_badge1}
               </div>
+              {pick_badge1}
             </div>
             <div class="mma-vs">vs</div>
-            <div class="mma-fighter" style="text-align:right;">
+            <div class="mma-fighter" style="text-align:right;{card_bg2}">
               <span class="mma-name">{n2} <span style="color:var(--muted);font-size:10px;">{rank2_str}</span></span>
               {stats_row2}
               <div style="display:flex;align-items:baseline;gap:6px;justify-content:flex-end;">
@@ -1272,6 +1292,7 @@ def _mma_section_html(fights: list) -> str:
                 <span class="mma-impl">{p2*100:.0f}%</span>
                 <span class="mma-odds" style="color:{c2_color};">{o2:.2f}</span>
               </div>
+              {pick_badge2}
             </div>
           </div>
         </div>"""
