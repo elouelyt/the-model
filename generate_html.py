@@ -2324,6 +2324,36 @@ def main() -> None:
 
     track_record = _load_track_record()
 
+    # The pipeline runs several times a day (cron + manual triggers) and
+    # select_daily_pick() recomputes fresh every time - if the market moves,
+    # a LATER run can elect a different top-edge player than the one that
+    # was already locked in and logged earlier today. Left alone, the
+    # prominent "APUESTA DEL DÍA" card would silently show that newer player
+    # while data/track_record.json (the public, "no cherry-picking" ledger)
+    # still only has the FIRST one - two different picks under one claimed
+    # single daily pick, with no visible link between them.
+    #
+    # If today's pick is already locked in, keep showing that SAME player -
+    # re-fetch their current numbers from this run's fresh results (so odds/
+    # model% stay live) rather than the stale snapshot, but never swap WHO is
+    # being shown once a day's player is committed to the public record.
+    if results:
+        today = datetime.now(timezone.utc)
+        locked_day = track_record.get("months", {}).get(today.strftime("%Y-%m"), {}) \
+            .get("days", {}).get(str(today.day))
+        if locked_day and not locked_day.get("resolved"):
+            locked_parlays = locked_day.get("parlays", [])
+            if len(locked_parlays) == 1 and len(locked_parlays[0].get("legs", [])) == 1:
+                locked_player = locked_parlays[0]["legs"][0]
+                if daily_pick is None or daily_pick["player"] != locked_player:
+                    from src.agents.single_bet_agent import select_pick_for_player
+                    refreshed = select_pick_for_player(results, locked_player)
+                    if refreshed:
+                        daily_pick = refreshed
+                    # else: that player's match is no longer in today's results
+                    # (started/finished) - keep whatever daily_pick already is
+                    # rather than show a swapped-in player with nothing logged.
+
     # Auto-log daily pick (single bet) as pending so check_results.py resolves it tomorrow.
     # Only singles (daily_pick) are logged — parlays/combinadas are never auto-logged.
     if daily_pick:

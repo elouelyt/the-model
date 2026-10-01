@@ -157,3 +157,53 @@ def select_daily_pick(results: list[dict]) -> dict | None:
         " [struggling]" if pick["is_struggling"] else "",
     )
     return pick
+
+
+def select_pick_for_player(results: list[dict], player: str) -> dict | None:
+    """Re-run the same candidate-building logic as select_daily_pick(), but
+    return whichever candidate matches `player` by name instead of the
+    highest-edge one.
+
+    Used to keep the displayed "APUESTA DEL DÍA" card showing the SAME player
+    already locked in as today's tracked pick (see
+    generate_html.py's _log_daily_pick_to_track_record), even though this
+    function recomputes fresh on every pipeline run and the top-edge player
+    can drift as odds move through the day. Returns None if that player no
+    longer has a qualifying candidate row in today's `results` (their match
+    started/finished, or their numbers no longer clear the filters) - the
+    caller falls back to the freshly-selected top pick in that case.
+    """
+    struggling = _load_struggling_players()
+    for match in results:
+        if "error" in match or not match.get("players"):
+            continue
+        home, away = match["home"], match["away"]
+        for p in match["players"]:
+            if p["player"] != player:
+                continue
+            best_price = p.get("stake_price") or 0
+            if not best_price:
+                bks = p.get("bookmakers", [])
+                best_price = max((b["price"] for b in bks), default=0)
+            opponent = away if p["player"] == home else home
+            opponent_rank = next(
+                (q.get("rank") for q in match["players"] if q["player"] == opponent),
+                None,
+            )
+            is_struggling = any(s.lower() in p["player"].lower() for s in struggling)
+            return {
+                "player": p["player"], "rank": p["rank"], "points": p["points"],
+                "opponent": opponent, "opponent_rank": opponent_rank,
+                "model_prob": p["model_prob"], "raw_implied": p["raw_implied"],
+                "edge": p["edge"], "signal": p["signal"],
+                "surface": match.get("surface", "hard"), "sport_title": match.get("sport_title", ""),
+                "best_price": round(best_price, 3), "stake_price": p.get("stake_price"),
+                "best_bookmaker": (
+                    "Stake" if p.get("stake_price") else
+                    (max(p.get("bookmakers", []), key=lambda b: b["price"], default={})
+                     .get("bookmaker_title", ""))
+                ),
+                "sentiment": p.get("sentiment", {}), "recommendation": p.get("recommendation", ""),
+                "is_struggling": is_struggling,
+            }
+    return None
