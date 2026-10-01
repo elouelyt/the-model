@@ -49,26 +49,6 @@ L2_LAMBDA = 0.5  # ridge penalty — shrinks weights toward 0, guards against a 
                  # sparse/noisy feature (e.g. finish_rate) dominating the model
 
 
-def _finish(method: str) -> bool:
-    m = method.upper()
-    return any(x in m for x in ("KO", "TKO", "SUB", "SUBMISSION"))
-
-
-def _build_finish_rate(fights: list[dict]) -> dict[str, float]:
-    """Fighter → fraction of wins that were finishes."""
-    wins = defaultdict(int)
-    finish_wins = defaultdict(int)
-    for f in fights:
-        w = f["winner"]
-        wins[w] += 1
-        if _finish(f.get("method", "")):
-            finish_wins[w] += 1
-    return {
-        name: finish_wins[name] / wins[name] if wins[name] else 0.5
-        for name in wins
-    }
-
-
 def _build_recent_win_rate(fights: list[dict]) -> dict[str, float]:
     """Fighter → win rate in last 5 fights."""
     history: dict[str, list[int]] = defaultdict(list)
@@ -117,13 +97,18 @@ def _pointintime_elo_diffs(fights_sorted: list[dict]) -> list[float]:
 
 
 def _features(
-    f1: dict, f2: dict, finish_rate: dict, recent_wr: dict, name1: str, name2: str,
+    f1: dict, f2: dict, recent_wr: dict, name1: str, name2: str,
     elo_diff: float = 0.0,
 ) -> list[float]:
     def diff(key: str) -> float:
         a = f1.get(key) or 0.0
         b = f2.get(key) or 0.0
         return a - b
+
+    def diff_default(key: str, default: float) -> float:
+        a = f1.get(key)
+        b = f2.get(key)
+        return (a if a is not None else default) - (b if b is not None else default)
 
     return [
         diff("reach_cm"),
@@ -133,7 +118,16 @@ def _features(
         diff("sig_str_def"),
         diff("td_acc"),
         diff("td_def"),
-        (finish_rate.get(name1, 0.5) - finish_rate.get(name2, 0.5)),
+        # f1/f2 ARE the fighters-cache dicts, which already carry a real,
+        # ESPN-sourced finish_rate (tkos+subs/wins) - read it directly instead
+        # of rebuilding it from fight_history.json's method field. That field
+        # is "UNK" for all 4110 rows (the scraper never captured it), which
+        # made the old _build_finish_rate() helper detect 0 finishes out of
+        # 4110 fights and train this weight against near-constant noise while
+        # inference applied it to real numbers - a train/inference mismatch
+        # that was very likely the actual reason this feature kept dominating
+        # predictions in a counterintuitive direction.
+        diff_default("finish_rate", 0.5),
         (recent_wr.get(name1, 0.5) - recent_wr.get(name2, 0.5)),
         elo_diff,
     ]
@@ -243,8 +237,7 @@ def main() -> None:
 
     logger.info("Loaded %d fights, %d fighters", len(fights), len(fighters))
 
-    finish_rate = _build_finish_rate(fights)
-    recent_wr   = _build_recent_win_rate(fights)
+    recent_wr = _build_recent_win_rate(fights)
 
     X_raw, y = [], []
     skipped = 0
@@ -258,12 +251,12 @@ def main() -> None:
             continue
 
         # Winner as fighter1 (label=1)
-        feats_w = _features(wf, lf, finish_rate, recent_wr, w_name, l_name, elo_diff=elo_diff)
+        feats_w = _features(wf, lf, recent_wr, w_name, l_name, elo_diff=elo_diff)
         X_raw.append(feats_w)
         y.append(1)
 
         # Mirror: loser as fighter1 (label=0)
-        feats_l = _features(lf, wf, finish_rate, recent_wr, l_name, w_name, elo_diff=-elo_diff)
+        feats_l = _features(lf, wf, recent_wr, l_name, w_name, elo_diff=-elo_diff)
         X_raw.append(feats_l)
         y.append(0)
 
