@@ -59,9 +59,30 @@ class EloRatingSystem:
     def __init__(self):
         self.ratings: dict[str, float] = {}
         self.fight_counts: dict[str, int] = {}
+        # Running sum/count of OPPONENTS' ratings at fight time, per fighter -
+        # a strength-of-schedule proxy. Elo itself already partly captures this
+        # (beating a weak opponent earns little), but the logistic model's
+        # other stat features (td_acc, sig_str_acc, finish_rate...) are raw
+        # career rates with NO opponent-quality adjustment at all - a 10-0
+        # record built against weak competition posts the same gaudy stats as
+        # one built against elite competition. This gives those features a
+        # companion signal that says which record to trust more.
+        self._opp_elo_sum: dict[str, float] = {}
+        self._opp_elo_count: dict[str, int] = {}
 
     def get_rating(self, fighter: str) -> float:
         return self.ratings.get(fighter, INITIAL_RATING)
+
+    def avg_opponent_elo(self, fighter: str) -> float:
+        """Mean Elo of everyone this fighter has faced, at the time they faced them.
+
+        Defaults to INITIAL_RATING for a fighter with no recorded opponents -
+        "unknown schedule strength" should read as neutral, not as weak or strong.
+        """
+        n = self._opp_elo_count.get(fighter, 0)
+        if n == 0:
+            return INITIAL_RATING
+        return self._opp_elo_sum[fighter] / n
 
     def update(self, winner: str, loser: str, k_mult: float = 1.0) -> None:
         r_w, r_l = self.get_rating(winner), self.get_rating(loser)
@@ -69,6 +90,14 @@ class EloRatingSystem:
 
         k_w = _k_for(self.fight_counts.get(winner, 0)) * k_mult
         k_l = _k_for(self.fight_counts.get(loser, 0)) * k_mult
+
+        # Opponent-quality bookkeeping uses each side's rating BEFORE this
+        # fight's result is applied - a fighter's resume records who they
+        # actually faced at the time, not a rating inflated by this result.
+        self._opp_elo_sum[winner] = self._opp_elo_sum.get(winner, 0.0) + r_l
+        self._opp_elo_count[winner] = self._opp_elo_count.get(winner, 0) + 1
+        self._opp_elo_sum[loser] = self._opp_elo_sum.get(loser, 0.0) + r_w
+        self._opp_elo_count[loser] = self._opp_elo_count.get(loser, 0) + 1
 
         self.ratings[winner] = r_w + k_w * (1.0 - exp_w)
         self.ratings[loser] = r_l + k_l * (0.0 - (1.0 - exp_w))
@@ -104,11 +133,17 @@ def _load_elo() -> EloRatingSystem:
 
 
 def predict_elo(fighter1: str, fighter2: str) -> dict:
-    """Return {"prob_f1": float, "prob_f2": float, "elo_f1": float, "elo_f2": float}."""
+    """Return elo ratings/probabilities plus each fighter's strength-of-schedule
+    proxy (avg_opp_elo_f*: mean Elo of everyone they've faced)."""
     elo = _load_elo()
     r1, r2 = elo.get_rating(fighter1), elo.get_rating(fighter2)
     p1 = expected_score(r1, r2)
-    return {"prob_f1": round(p1, 4), "prob_f2": round(1 - p1, 4), "elo_f1": round(r1, 1), "elo_f2": round(r2, 1)}
+    return {
+        "prob_f1": round(p1, 4), "prob_f2": round(1 - p1, 4),
+        "elo_f1": round(r1, 1), "elo_f2": round(r2, 1),
+        "avg_opp_elo_f1": round(elo.avg_opponent_elo(fighter1), 1),
+        "avg_opp_elo_f2": round(elo.avg_opponent_elo(fighter2), 1),
+    }
 
 
 def save_ratings_snapshot() -> None:

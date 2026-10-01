@@ -51,6 +51,7 @@ def predict_fight(
     finish_rates: dict | None = None,
     recent_win_rates: dict | None = None,
     elo_diff: float = 0.0,
+    opp_quality_diff: float = 0.0,
 ) -> dict:
     """Predict P(fighter1 wins) given their stats.
 
@@ -60,10 +61,14 @@ def predict_fight(
         f1_name, f2_name: Names for finish rate / recent form lookup.
         finish_rates: dict mapping fighter name → finish rate (0-1).
         recent_win_rates: dict mapping fighter name → win rate in last 5 fights (0-1).
-        elo_diff: elo(f1) - elo(f2) from mma_elo_agent.predict_elo() — the one
-            feature in this model that's point-in-time honest by construction
-            (see mma_elo_agent.py / ufc_walkforward_backtest.py). Caller's
-            responsibility to compute; defaults to 0 (no signal) if omitted.
+        elo_diff: elo(f1) - elo(f2) from mma_elo_agent.predict_elo() — point-in-time
+            honest by construction (see mma_elo_agent.py / ufc_walkforward_backtest.py).
+        opp_quality_diff: avg_opp_elo(f1) - avg_opp_elo(f2) from the same call —
+            strength-of-schedule gap. A fighter's other stats (td_acc, sig_str_acc,
+            finish_rate...) carry no opponent-quality adjustment at all, so a record
+            built against unrated competition looks identical to one built against
+            elite fighters; this tells the model which record to trust more.
+            Both default to 0 (no signal) if the caller omits them.
 
     Returns:
         {"prob_f1": float, "prob_f2": float, "model_used": bool}
@@ -90,6 +95,7 @@ def predict_fight(
         fr.get(f1_name, 0.5) - fr.get(f2_name, 0.5),
         rwr.get(f1_name, 0.5) - rwr.get(f2_name, 0.5),
         elo_diff,
+        opp_quality_diff,
     ]
 
     means = model["scaler_mean"]

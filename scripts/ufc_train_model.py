@@ -9,15 +9,26 @@ Output: data/ufc_model.json  (coefficients + scaler params, no sklearn at infere
 Features per fight (symmetric — each fight generates 2 rows):
   reach_diff, height_diff, age_diff,
   sig_str_acc_diff, sig_str_def_diff, td_acc_diff, td_def_diff,
-  finish_rate_diff, recent_win_rate_diff, elo_diff
+  finish_rate_diff, recent_win_rate_diff, elo_diff, opp_quality_diff
 
-elo_diff is computed point-in-time (see src/agents/mma_elo_agent.py): fights
-are replayed in chronological order and each fight's elo_diff is captured
-BEFORE that fight's result updates the ratings, same discipline as
-scripts/ufc_walkforward_backtest.py. Every other feature above is a
-today's-snapshot stat applied uniformly to all historical fights (a known,
-documented limitation - see CLAUDE.md "lookahead bias" notes) - elo_diff is
-the one feature in this model that doesn't share that flaw.
+elo_diff and opp_quality_diff are computed point-in-time (see
+src/agents/mma_elo_agent.py): fights are replayed in chronological order and
+each fight's value is captured BEFORE that fight's result updates the
+ratings, same discipline as scripts/ufc_walkforward_backtest.py. Every other
+feature above is a today's-snapshot stat applied uniformly to all historical
+fights (a known, documented limitation - see CLAUDE.md "lookahead bias"
+notes) - these two are the only features in this model that don't share that
+flaw.
+
+opp_quality_diff is the strength-of-schedule gap: mean Elo of everyone each
+fighter has actually faced (at the time they faced them), diffed. Elo itself
+partly captures this already (beating a nobody earns little rating), but
+every OTHER feature here (td_acc, sig_str_acc, finish_rate...) is a raw
+career rate with zero opponent-quality adjustment - a gaudy record built
+against unrated competition posts the same numbers as one built against
+elite UFC fighters. A fighter with no recorded opponents in our fight
+history gets the neutral 1500 default, not a penalty - unknown schedule
+strength is unknown, not weak.
 """
 
 import json
@@ -38,7 +49,7 @@ FEATURE_NAMES = [
     "reach_diff", "height_diff", "age_diff",
     "sig_str_acc_diff", "sig_str_def_diff",
     "td_acc_diff", "td_def_diff",
-    "finish_rate_diff", "recent_win_rate_diff", "elo_diff",
+    "finish_rate_diff", "recent_win_rate_diff", "elo_diff", "opp_quality_diff",
 ]
 
 ELO_INITIAL = 1500.0
@@ -62,13 +73,18 @@ def _build_recent_win_rate(fights: list[dict]) -> dict[str, float]:
     return result
 
 
-def _pointintime_elo_diffs(fights_sorted: list[dict]) -> list[float]:
-    """elo(winner) - elo(loser) captured BEFORE each fight updates the ratings.
+def _pointintime_elo_diffs(fights_sorted: list[dict]) -> tuple[list[float], list[float]]:
+    """(elo_diff, opp_quality_diff) per fight, both captured BEFORE that fight
+    updates the ratings/opponent-quality bookkeeping.
 
     fights_sorted must already be in chronological order. Mirrors
     src/agents/mma_elo_agent.py's update rule exactly, so this is the same
     point-in-time discipline as scripts/ufc_walkforward_backtest.py - no
     fight's feature depends on any fight that happens later in time.
+
+    opp_quality_diff: mean Elo of everyone each side has faced SO FAR, diffed.
+    A fighter with no prior fights in this dataset reads as the neutral 1500
+    default (unknown schedule strength, not weak).
     """
     def k_for(count: int) -> float:
         for threshold, k in ELO_ADAPTIVE_K_SCHEDULE:
@@ -81,11 +97,25 @@ def _pointintime_elo_diffs(fights_sorted: list[dict]) -> list[float]:
 
     ratings: dict[str, float] = {}
     counts: dict[str, int] = {}
-    diffs: list[float] = []
+    opp_elo_sum: dict[str, float] = {}
+    opp_elo_count: dict[str, int] = {}
+
+    def avg_opp_elo(name: str) -> float:
+        n = opp_elo_count.get(name, 0)
+        return opp_elo_sum[name] / n if n else ELO_INITIAL
+
+    elo_diffs: list[float] = []
+    opp_quality_diffs: list[float] = []
     for fight in fights_sorted:
         w, l = fight["winner"], fight["loser"]
         r_w, r_l = ratings.get(w, ELO_INITIAL), ratings.get(l, ELO_INITIAL)
-        diffs.append(r_w - r_l)
+        elo_diffs.append(r_w - r_l)
+        opp_quality_diffs.append(avg_opp_elo(w) - avg_opp_elo(l))
+
+        opp_elo_sum[w] = opp_elo_sum.get(w, 0.0) + r_l
+        opp_elo_count[w] = opp_elo_count.get(w, 0) + 1
+        opp_elo_sum[l] = opp_elo_sum.get(l, 0.0) + r_w
+        opp_elo_count[l] = opp_elo_count.get(l, 0) + 1
 
         exp_w = expected(r_w, r_l)
         k_w, k_l = k_for(counts.get(w, 0)), k_for(counts.get(l, 0))
@@ -93,12 +123,12 @@ def _pointintime_elo_diffs(fights_sorted: list[dict]) -> list[float]:
         ratings[l] = r_l + k_l * (0.0 - (1.0 - exp_w))
         counts[w] = counts.get(w, 0) + 1
         counts[l] = counts.get(l, 0) + 1
-    return diffs
+    return elo_diffs, opp_quality_diffs
 
 
 def _features(
     f1: dict, f2: dict, recent_wr: dict, name1: str, name2: str,
-    elo_diff: float = 0.0,
+    elo_diff: float = 0.0, opp_quality_diff: float = 0.0,
 ) -> list[float]:
     def diff(key: str) -> float:
         a = f1.get(key) or 0.0
@@ -130,6 +160,7 @@ def _features(
         diff_default("finish_rate", 0.5),
         (recent_wr.get(name1, 0.5) - recent_wr.get(name2, 0.5)),
         elo_diff,
+        opp_quality_diff,
     ]
 
 
@@ -233,7 +264,7 @@ def main() -> None:
         (f for f in fights_data["fights"] if f.get("winner") and f.get("loser") and f.get("date")),
         key=lambda f: f["date"],
     )
-    elo_diffs = _pointintime_elo_diffs(fights)
+    elo_diffs, opp_quality_diffs = _pointintime_elo_diffs(fights)
 
     logger.info("Loaded %d fights, %d fighters", len(fights), len(fighters))
 
@@ -242,7 +273,7 @@ def main() -> None:
     X_raw, y = [], []
     skipped = 0
 
-    for fight, elo_diff in zip(fights, elo_diffs):
+    for fight, elo_diff, opp_q_diff in zip(fights, elo_diffs, opp_quality_diffs):
         w_name, l_name = fight["winner"], fight["loser"]
         wf = fighters.get(w_name)
         lf = fighters.get(l_name)
@@ -251,12 +282,12 @@ def main() -> None:
             continue
 
         # Winner as fighter1 (label=1)
-        feats_w = _features(wf, lf, recent_wr, w_name, l_name, elo_diff=elo_diff)
+        feats_w = _features(wf, lf, recent_wr, w_name, l_name, elo_diff=elo_diff, opp_quality_diff=opp_q_diff)
         X_raw.append(feats_w)
         y.append(1)
 
         # Mirror: loser as fighter1 (label=0)
-        feats_l = _features(lf, wf, recent_wr, l_name, w_name, elo_diff=-elo_diff)
+        feats_l = _features(lf, wf, recent_wr, l_name, w_name, elo_diff=-elo_diff, opp_quality_diff=-opp_q_diff)
         X_raw.append(feats_l)
         y.append(0)
 

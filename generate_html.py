@@ -1116,9 +1116,10 @@ def _enrich_mma_fights(fights, fetch_stats_fn, fetch_rankings_fn, predict_fn, ed
 
         elo1 = elo_predict_fn(n1, n2)
         elo_diff = elo1.get("elo_f1", 1500.0) - elo1.get("elo_f2", 1500.0)
+        opp_quality_diff = elo1.get("avg_opp_elo_f1", 1500.0) - elo1.get("avg_opp_elo_f2", 1500.0)
         pred = predict_fn(
             s1, s2, f1_name=n1, f2_name=n2, finish_rates=finish_rates,
-            recent_win_rates=recent_win_rates, elo_diff=elo_diff,
+            recent_win_rates=recent_win_rates, elo_diff=elo_diff, opp_quality_diff=opp_quality_diff,
         )
         has_real_model = pred.get("model_used") and bool(s1) and bool(s2)
         data_rich = any(abs(pred.get("features", {}).get(k, 0.0)) > 1e-9 for k in _RICHNESS_KEYS)
