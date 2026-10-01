@@ -870,8 +870,26 @@
               ],
               "stake_odds": 1.8,
               "best_odds": 1.8,
-              "won": null,
+              "won": false,
               "opponent": "Roman Safiullin"
+            }
+          ],
+          "resolved": true
+        }
+      }
+    },
+    "2026-10": {
+      "days": {
+        "1": {
+          "parlays": [
+            {
+              "legs": [
+                "Valentin Vacherot"
+              ],
+              "stake_odds": 2.37,
+              "best_odds": 2.37,
+              "won": null,
+              "opponent": "Stefanos Tsitsipas"
             }
           ],
           "resolved": false

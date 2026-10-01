@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-01",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Valentin Vacherot",
+          "rank": 18,
+          "points": 2250,
+          "opponent": "Stefanos Tsitsipas",
+          "opponent_rank": 44,
+          "model_prob": 0.6264,
+          "raw_implied": 0.4215,
+          "edge": 0.2049,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 2.37,
+          "stake_price": 2.37,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Kinoshita Group Japan Open Tennis Championships - tennismajors.com",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Vacherot's significant model edge (+20.5%) is driven by his superior ranking (#18 vs #44) and strong recent form, suggesting the market is underestimating his current hard-court prowess against Tsitsipas.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 2.37,
+      "total_odds": 2.37
+    }
+  ]
+}
