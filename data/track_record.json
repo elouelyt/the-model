@@ -888,8 +888,22 @@
               ],
               "stake_odds": 2.37,
               "best_odds": 2.37,
-              "won": null,
+              "won": true,
               "opponent": "Stefanos Tsitsipas"
+            }
+          ],
+          "resolved": true
+        },
+        "2": {
+          "parlays": [
+            {
+              "legs": [
+                "Andrey Rublev"
+              ],
+              "stake_odds": 1.67,
+              "best_odds": 1.67,
+              "won": null,
+              "opponent": "Roman Safiullin"
             }
           ],
           "resolved": false

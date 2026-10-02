@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-02",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Andrey Rublev",
+          "rank": 24,
+          "points": 2085,
+          "opponent": "Roman Safiullin",
+          "opponent_rank": 84,
+          "model_prob": 0.6956,
+          "raw_implied": 0.5913,
+          "edge": 0.1043,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.67,
+          "stake_price": 1.67,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Andrey Rublev has special words for Medvedev after losing Hangzhou final - Tennis World USA",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Rublev's significant model edge (+10.4%) is driven by his superior ranking (#24 vs #84) and strong recent form, suggesting the market undervalues his hard-court prowess despite no H2H data.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.67,
+      "total_odds": 1.67
+    }
+  ]
+}
