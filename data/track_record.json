@@ -902,11 +902,11 @@
               ],
               "stake_odds": 1.67,
               "best_odds": 1.67,
-              "won": null,
+              "won": true,
               "opponent": "Roman Safiullin"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
