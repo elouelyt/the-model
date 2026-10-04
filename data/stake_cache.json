@@ -1,22 +1,14 @@
 {
-  "timestamp": "2026-10-03T16:00:17.978997+00:00",
-  "player_count": 16,
+  "timestamp": "2026-10-04T16:00:34.664594+00:00",
+  "player_count": 8,
   "odds": {
-    "Jaume Munar": 1.63,
-    "Kyrian Jacquet": 2.24,
     "Carlos Alcaraz": 1.1,
-    "Denis Shapovalov": 6.6,
-    "Hubert Hurkacz": 2.17,
-    "Karen Khachanov": 1.67,
-    "Alex de Minaur": 1.72,
-    "Andrey Rublev": 2.09,
-    "Valentin Vacherot": 4.1,
-    "Arthur Fils": 1.22,
-    "Jiri Lehecka": 1.39,
-    "Adolfo Daniel Vallejo": 2.95,
-    "Daniil Medvedev": 1.37,
-    "Francisco Cerundolo": 3.0,
-    "Alexander Zverev": 1.3,
-    "Novak Djokovic": 3.45
+    "Jaume Munar": 6.8,
+    "Alex de Minaur": 1.66,
+    "Hubert Hurkacz": 2.19,
+    "Jiri Lehecka": 1.51,
+    "Valentin Vacherot": 2.5,
+    "Novak Djokovic": 2.21,
+    "Daniil Medvedev": 1.65
   }
 }
