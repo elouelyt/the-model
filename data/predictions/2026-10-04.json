@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-04",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alex de Minaur",
+          "rank": 10,
+          "points": 3150,
+          "opponent": "Hubert Hurkacz",
+          "opponent_rank": 39,
+          "model_prob": 0.6722,
+          "raw_implied": 0.5957,
+          "edge": 0.0765,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.66,
+          "stake_price": 1.66,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "ATP Beijing Quarterfinal Predictions Including Novak Djokovic vs Alexander Zverev - Last Word On Sports",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "De Minaur's significant model edge (+7.6%) is driven by his superior ranking (#10 vs #39) and current positive hard-court form, which the market appears to undervalue against Hurkacz despite no H2H history.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.66,
+      "total_odds": 1.66
+    }
+  ]
+}

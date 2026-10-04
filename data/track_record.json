@@ -907,6 +907,20 @@
             }
           ],
           "resolved": true
+        },
+        "4": {
+          "parlays": [
+            {
+              "legs": [
+                "Alex de Minaur"
+              ],
+              "stake_odds": 1.66,
+              "best_odds": 1.66,
+              "won": null,
+              "opponent": "Hubert Hurkacz"
+            }
+          ],
+          "resolved": false
         }
       }
     }
