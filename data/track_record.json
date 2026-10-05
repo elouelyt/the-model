@@ -916,11 +916,11 @@
               ],
               "stake_odds": 1.66,
               "best_odds": 1.66,
-              "won": null,
+              "won": true,
               "opponent": "Hubert Hurkacz"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
