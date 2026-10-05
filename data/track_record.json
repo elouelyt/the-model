@@ -921,6 +921,20 @@
             }
           ],
           "resolved": true
+        },
+        "5": {
+          "parlays": [
+            {
+              "legs": [
+                "Luca Van Assche"
+              ],
+              "stake_odds": 2.55,
+              "best_odds": 2.55,
+              "won": null,
+              "opponent": "Bu Yunchaokete"
+            }
+          ],
+          "resolved": false
         }
       }
     }

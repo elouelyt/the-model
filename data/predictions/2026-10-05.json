@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-05",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Luca Van Assche",
+          "rank": 43,
+          "points": 1180,
+          "opponent": "Bu Yunchaokete",
+          "opponent_rank": 104,
+          "model_prob": 0.6109,
+          "raw_implied": 0.4039,
+          "edge": 0.207,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 2.55,
+          "stake_price": 2.55,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Van Assche stuns Rublev for landmark win, Darderi denies Faria SF berth in Estoril - ATP Tour",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Van Assche's significant model edge (+20.7%) is driven by his superior ranking (#43 vs #104) and recent positive form, suggesting he is undervalued on hard court despite no H2H history. The market likely overestimates Bu's chances, overlooking Van Assche's consistent performance at a higher level.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 2.55,
+      "total_odds": 2.55
+    }
+  ]
+}
