@@ -935,6 +935,20 @@
             }
           ],
           "resolved": false
+        },
+        "7": {
+          "parlays": [
+            {
+              "legs": [
+                "Francisco Cerundolo"
+              ],
+              "stake_odds": 1.92,
+              "best_odds": 1.92,
+              "won": null,
+              "opponent": "Roman Safiullin"
+            }
+          ],
+          "resolved": false
         }
       }
     }
