@@ -930,11 +930,11 @@
               ],
               "stake_odds": 2.55,
               "best_odds": 2.55,
-              "won": null,
+              "won": false,
               "opponent": "Bu Yunchaokete"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "7": {
           "parlays": [
@@ -944,6 +944,20 @@
               ],
               "stake_odds": 1.92,
               "best_odds": 1.92,
+              "won": true,
+              "opponent": "Roman Safiullin"
+            }
+          ],
+          "resolved": true
+        },
+        "8": {
+          "parlays": [
+            {
+              "legs": [
+                "Francisco Cerundolo"
+              ],
+              "stake_odds": 1.91,
+              "best_odds": 1.91,
               "won": null,
               "opponent": "Roman Safiullin"
             }
