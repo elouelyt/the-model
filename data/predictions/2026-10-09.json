@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-09",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Casper Ruud",
+          "rank": 24,
+          "points": 2145,
+          "opponent": "Bu Yunchaokete",
+          "opponent_rank": 93,
+          "model_prob": 0.708,
+          "raw_implied": 0.5883,
+          "edge": 0.1197,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.68,
+          "stake_price": 1.68,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "concern",
+            "label": "Form concern",
+            "headline": "Casper Ruud withdraws from US Open with back injury - ESPN",
+            "withdrawn": true,
+            "withdrawal_headline": "Casper Ruud withdraws from US Open with back injury - ESPN"
+          },
+          "recommendation": "Casper Ruud's positive model edge (70.8% vs 58.8% market) is supported by his significantly higher ranking (#24) and greater experience on hard courts, suggesting the market might be overreacting to his recent 'out of form' sentiment. His overall career pedigree on this surface against players outside the top 50 still makes him a strong favorite.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.68,
+      "total_odds": 1.68
+    }
+  ]
+}

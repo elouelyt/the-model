@@ -958,8 +958,22 @@
               ],
               "stake_odds": 1.91,
               "best_odds": 1.91,
-              "won": null,
+              "won": true,
               "opponent": "Roman Safiullin"
+            }
+          ],
+          "resolved": true
+        },
+        "9": {
+          "parlays": [
+            {
+              "legs": [
+                "Casper Ruud"
+              ],
+              "stake_odds": 1.68,
+              "best_odds": 1.68,
+              "won": null,
+              "opponent": "Bu Yunchaokete"
             }
           ],
           "resolved": false
