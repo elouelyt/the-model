@@ -972,8 +972,22 @@
               ],
               "stake_odds": 1.68,
               "best_odds": 1.68,
-              "won": null,
+              "won": true,
               "opponent": "Bu Yunchaokete"
+            }
+          ],
+          "resolved": true
+        },
+        "10": {
+          "parlays": [
+            {
+              "legs": [
+                "Frances Tiafoe"
+              ],
+              "stake_odds": 1.9,
+              "best_odds": 1.9,
+              "won": null,
+              "opponent": "Alejandro Davidovich Fokina"
             }
           ],
           "resolved": false

@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-10",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Frances Tiafoe",
+          "rank": 10,
+          "points": 3380,
+          "opponent": "Alejandro Davidovich Fokina",
+          "opponent_rank": 26,
+          "model_prob": 0.6115,
+          "raw_implied": 0.5245,
+          "edge": 0.087,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.9,
+          "stake_price": 1.9,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": null,
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Tiafoe's positive model edge indicates he is undervalued, likely due to his superior ranking (#10) and stronger hard court performance compared to Davidovich Fokina. Despite a 'neutral' sentiment, his higher ranking and points total support the model's confidence in his ability to outperform market expectations on this surface.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.9,
+      "total_odds": 1.9
+    }
+  ]
+}
