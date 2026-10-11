@@ -986,11 +986,11 @@
               ],
               "stake_odds": 1.9,
               "best_odds": 1.9,
-              "won": null,
+              "won": true,
               "opponent": "Alejandro Davidovich Fokina"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
