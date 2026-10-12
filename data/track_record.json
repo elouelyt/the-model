@@ -991,6 +991,20 @@
             }
           ],
           "resolved": true
+        },
+        "12": {
+          "parlays": [
+            {
+              "legs": [
+                "Alex de Minaur"
+              ],
+              "stake_odds": 1.81,
+              "best_odds": 1.81,
+              "won": null,
+              "opponent": "Karen Khachanov"
+            }
+          ],
+          "resolved": false
         }
       }
     }

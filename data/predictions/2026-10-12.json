@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-12",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Alex de Minaur",
+          "rank": 9,
+          "points": 3430,
+          "opponent": "Karen Khachanov",
+          "opponent_rank": 27,
+          "model_prob": 0.6167,
+          "raw_implied": 0.5541,
+          "edge": 0.0626,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.81,
+          "stake_price": 1.81,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": "Alex de Minaur has words for Novak Djokovic following China Open final - Tennis World USA",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model favors de Minaur due to his significantly higher ranking (#9 vs #27) and strong hard court form, suggesting his current level is undervalued despite no H2H data. His consistent baseline play and speed on hard courts likely contribute to this edge.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.81,
+      "total_odds": 1.81
+    }
+  ]
+}
