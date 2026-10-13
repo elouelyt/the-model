@@ -1000,11 +1000,11 @@
               ],
               "stake_odds": 1.81,
               "best_odds": 1.81,
-              "won": null,
+              "won": true,
               "opponent": "Karen Khachanov"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
