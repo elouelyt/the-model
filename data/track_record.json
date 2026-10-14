@@ -1005,6 +1005,20 @@
             }
           ],
           "resolved": true
+        },
+        "14": {
+          "parlays": [
+            {
+              "legs": [
+                "Alejandro Davidovich Fokina"
+              ],
+              "stake_odds": 1.81,
+              "best_odds": 1.81,
+              "won": null,
+              "opponent": "Arthur Gea"
+            }
+          ],
+          "resolved": false
         }
       }
     }
