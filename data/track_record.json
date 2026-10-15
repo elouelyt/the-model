@@ -1014,11 +1014,11 @@
               ],
               "stake_odds": 1.81,
               "best_odds": 1.81,
-              "won": null,
+              "won": true,
               "opponent": "Arthur Gea"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
