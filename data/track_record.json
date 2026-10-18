@@ -1019,6 +1019,20 @@
             }
           ],
           "resolved": true
+        },
+        "18": {
+          "parlays": [
+            {
+              "legs": [
+                "Tomas Martin Etcheverry"
+              ],
+              "stake_odds": 1.83,
+              "best_odds": 1.83,
+              "won": null,
+              "opponent": "Bellucci, Mattia"
+            }
+          ],
+          "resolved": false
         }
       }
     }

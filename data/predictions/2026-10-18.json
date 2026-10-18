@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-18",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Tomas Martin Etcheverry",
+          "rank": 31,
+          "points": 1590,
+          "opponent": "Bellucci, Mattia",
+          "opponent_rank": 86,
+          "model_prob": 0.6442,
+          "raw_implied": 0.5464,
+          "edge": 0.0978,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.83,
+          "stake_price": 1.83,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Tomas Martin Etcheverry: First-Time Winner Spotlight - ATP Tour",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Etcheverry's positive model edge indicates he is undervalued by the market, likely due to his significantly higher ranking (#31 vs #86) and strong overall performance, even if Bellucci has shown recent hard court form.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.83,
+      "total_odds": 1.83
+    }
+  ]
+}
