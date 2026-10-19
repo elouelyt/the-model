@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-19",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Raphael Collignon",
+          "rank": 55,
+          "points": 978,
+          "opponent": "Nishesh Basavareddy",
+          "opponent_rank": 134,
+          "model_prob": 0.6372,
+          "raw_implied": 0.4608,
+          "edge": 0.1764,
+          "signal": "value_bet",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 2.17,
+          "stake_price": 2.17,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Tsitsipas books first final in 16 months, Collignon awaits in Gstaad - ATP Tour",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Collignon presents a strong positive edge for the model, indicating he is undervalued by the market, likely due to his higher ranking (#55) and positive recent form. With no H2H, his superior ranking on hard courts likely drives the model's confidence, suggesting he should be a stronger favorite than current odds imply.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 2.17,
+      "total_odds": 2.17
+    }
+  ]
+}

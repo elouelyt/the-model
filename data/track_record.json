@@ -1033,6 +1033,20 @@
             }
           ],
           "resolved": false
+        },
+        "19": {
+          "parlays": [
+            {
+              "legs": [
+                "Raphael Collignon"
+              ],
+              "stake_odds": 2.17,
+              "best_odds": 2.17,
+              "won": null,
+              "opponent": "Nishesh Basavareddy"
+            }
+          ],
+          "resolved": false
         }
       }
     }
