@@ -1028,11 +1028,11 @@
               ],
               "stake_odds": 1.83,
               "best_odds": 1.83,
-              "won": null,
+              "won": false,
               "opponent": "Bellucci, Mattia"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "19": {
           "parlays": [
@@ -1042,8 +1042,22 @@
               ],
               "stake_odds": 2.17,
               "best_odds": 2.17,
-              "won": null,
+              "won": true,
               "opponent": "Nishesh Basavareddy"
+            }
+          ],
+          "resolved": true
+        },
+        "21": {
+          "parlays": [
+            {
+              "legs": [
+                "Daniel Altmaier"
+              ],
+              "stake_odds": 2.07,
+              "best_odds": 2.07,
+              "won": null,
+              "opponent": "Borna Gojo"
             }
           ],
           "resolved": false

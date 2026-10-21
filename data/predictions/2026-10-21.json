@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-21",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Daniel Altmaier",
+          "rank": 65,
+          "points": 849,
+          "opponent": "Borna Gojo",
+          "opponent_rank": 148,
+          "model_prob": 0.6273,
+          "raw_implied": 0.4831,
+          "edge": 0.1442,
+          "signal": "value_bet",
+          "surface": "clay",
+          "sport_title": "",
+          "best_price": 2.07,
+          "stake_price": 2.07,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "October 22, 2026: Borna Gojo vs Daniel Altmaier: Set 2 Winner Tennis Prediction Market - Robinhood",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Altmaier presents a strong model edge (+14.4%) due to his superior ranking (#65) and positive form, which the market seems to be undervaluing against a lower-ranked opponent with no prior H2H on this surface.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 2.07,
+      "total_odds": 2.07
+    }
+  ]
+}
