@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-22",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Flavio Cobolli",
+          "rank": 6,
+          "points": 3640,
+          "opponent": "Stan Wawrinka",
+          "opponent_rank": 140,
+          "model_prob": 0.807,
+          "raw_implied": 0.7576,
+          "edge": 0.0494,
+          "signal": "marginal",
+          "surface": "clay",
+          "sport_title": "",
+          "best_price": 1.32,
+          "stake_price": 1.32,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "October 22, 2026: Flavio Cobolli vs Stan Wawrinka: Set 1 Winner Tennis Prediction Market - Robinhood",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Cobolli's significant model edge stems from his superior ranking (#6 vs #140) and strong recent form, suggesting he's significantly undervalued despite the market already favoring him on his preferred clay surface.",
+          "is_struggling": true
+        }
+      ],
+      "stake_total_odds": 1.32,
+      "total_odds": 1.32
+    }
+  ]
+}

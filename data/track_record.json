@@ -1056,8 +1056,22 @@
               ],
               "stake_odds": 2.07,
               "best_odds": 2.07,
-              "won": null,
+              "won": true,
               "opponent": "Borna Gojo"
+            }
+          ],
+          "resolved": true
+        },
+        "22": {
+          "parlays": [
+            {
+              "legs": [
+                "Flavio Cobolli"
+              ],
+              "stake_odds": 1.32,
+              "best_odds": 1.32,
+              "won": null,
+              "opponent": "Stan Wawrinka"
             }
           ],
           "resolved": false
