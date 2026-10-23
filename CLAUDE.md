@@ -121,7 +121,7 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 
 ## NBA player props (value finder) — IN PROGRESS
 
-Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel sin margen vs cuota de Stake, misma línea; regla del vídeo: se listan los lados con prob. justa de FanDuel ≥ 54,34 % (equilibrio del flex de 5/6), ordenados por probabilidad, y solo si la cuota de Stake supera la justa (EV > 0). No "mejorar" el método: el usuario quiere copiar el del vídeo.
+Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel sin margen vs cuota de Stake, misma línea; regla copiada de su feed (capturas de Derek): se listan todos los lados con EV positivo (≥0,3 %), ordenados por EV% de mayor a menor, mostrando Win% (prob. justa de FanDuel sin margen) y EV% = Win% × cuota Stake − 1, misma línea en ambas casas. El 54,34 % era solo el equilibrio del boleto de PrizePicks, NO un corte para Stake. El usuario quiere copiar su método, no "mejorarlo".
 - `scripts/nba_stake_scraper.py` — Stake vía CDP (`slugFixture → swishGameCompetitorTeams → players → markets(statTypes:[player])`, endpoint `/_api/v1/graphql`). Necesita Chrome abierto en stake.com.
 - `scripts/nba_fanduel.py` — FanDuel vía **Firecrawl** (`FIRECRAWL_API_KEY`), solo los partidos que Stake lista. Hay que desplegar los acordeones (`div[role=button][aria-expanded=false]` por `aria-label`) con una acción `executeJavascript`.
 - `scripts/nba_ev.py` → `data/nba_picks.json`; `scripts/nba_publish.py` encadena todo, cifra las apuestas en `data/nba_picks.enc` (openssl + `DASHBOARD_PASSWORD`) y hace push; el workflow `panel.yml` reconstruye `panel.html`. Los datos en bruto no se suben nunca.

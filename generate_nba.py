@@ -40,18 +40,17 @@ def build(doc: dict) -> str:
     )
     rows = "".join(
         f'<tr data-s="{escape(p["stat"])}">'
-        f'<td class="num ev">{p["fair_prob"]:.1%}</td>'
-        f'<td><b>{escape(p["player"])}</b><small>{escape(p["team"])}</small></td>'
-        f'<td>{"Más de" if p["side"] == "Over" else "Menos de"} {p["line"]:g} <small>{escape(STAT_ES.get(p["stat"], p["stat"]))}</small></td>'
-        f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>equilibrio {1 / p["stake_odds"]:.0%}</small></td>'
-        f'<td class="num muted">{p["ev"]:+.1%}</td>'
-        f'<td class="num muted">{p["fair_odds"]:.2f}</td>'
-        f'<td class="num muted">{escape(p["fanduel"])}</td>'
-        f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td></tr>'
+        f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td>'
+        f'<td><span class="tag">{escape(STAT_ES.get(p["stat"], p["stat"]))}</span>'
+        f'<b>{escape(p["player"])} {"Más de" if p["side"] == "Over" else "Menos de"} {p["line"]:g}</b></td>'
+        f'<td class="num"><span class="pill">{p["fair_prob"]:.1%}</span></td>'
+        f'<td class="num ev">{p["ev"]:+.2%}<i class="meter"><u style="width:{min(p["ev"] / 0.12, 1) * 100:.0f}%"></u></i></td>'
+        f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
+        f'<td class="num muted">{escape(p["fanduel"])}</td></tr>'
         for p in picks
-    ) or '<tr><td colspan="8" class="empty">Ninguna apuesta supera el mínimo ahora mismo.</td></tr>'
+    ) or '<tr><td colspan="6" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
     best = picks[0] if picks else None
-    best_html = (f'<b class="ev">{best["fair_prob"]:.1%}</b><small>{escape(best["player"])} · '
+    best_html = (f'<b class="ev">{best["ev"]:+.1%}</b><small>{escape(best["player"])} · '
                  f'{escape(STAT_ES.get(best["stat"], best["stat"]))}</small>') if best else '<b>—</b>'
     warn = ('<p class="warn">Datos de hace más de 4 horas: vuelve a lanzar la actualización antes de apostar.</p>'
             if stale else "")
@@ -77,30 +76,33 @@ h1 {{ font-size:1.5rem; margin:8px 0 0; }}
 .chip.on {{ color:var(--text); border-color:var(--orange); }}
 .chip:focus-visible {{ outline:2px solid var(--orange); outline-offset:2px; }}
 .card {{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 16px 10px; overflow-x:auto; }}
-table {{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; min-width:720px; }}
+table {{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; min-width:680px; }}
 th {{ text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; padding:12px 10px 8px 0; }}
 td {{ padding:10px 10px 10px 0; border-top:1px solid var(--border); vertical-align:top; }}
 td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 .num {{ text-align:right; }} th.num {{ text-align:right; }}
 .ev {{ color:var(--green); font-weight:700; }}
 .muted {{ color:var(--muted); }}
+.tag {{ display:inline-block; background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:1px 7px; font-size:.72rem; color:var(--muted); margin-right:8px; }}
+.pill {{ background:var(--surface-2); border-radius:5px; padding:3px 8px; }}
+.meter {{ display:block; height:4px; background:var(--surface-2); border-radius:2px; margin:4px 0 0 auto; width:80px; overflow:hidden; }}
+.meter u {{ display:block; height:100%; background:var(--green); }}
 .empty {{ color:var(--muted); text-align:center; padding:28px; }}
 .note {{ color:var(--muted); font-size:.8rem; margin-top:18px; }}
 </style>
 <main>
 <h1>NBA · apuestas a jugadores con valor</h1>
-<p class="sub">Lados más favorecidos por FanDuel (sin margen) que Stake paga por encima de su cuota justa · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
+<p class="sub">Cuota justa de FanDuel (sin margen) frente a la cuota de Stake · mismo método de Beat the Sportsbooks · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
 {warn}
 <div class="kpis">
-  <div class="kpi"><span>Apuestas</span><b>{len(picks)}</b><small>probabilidad justa de {doc['min_prob']:.1%} o más</small></div>
-  <div class="kpi"><span>Más probable</span>{best_html}</div>
+  <div class="kpi"><span>Apuestas</span><b>{len(picks)}</b><small>con EV positivo, de mayor a menor</small></div>
+  <div class="kpi"><span>Mejor EV</span>{best_html}</div>
 </div>
 <div class="chips">{chips}</div>
 <div class="card"><table>
-<tr><th class="num">Prob. justa</th><th>Jugador</th><th>Apuesta</th><th class="num">Stake</th><th class="num">Valor esp.</th><th class="num">Cuota justa</th><th class="num">FanDuel</th><th>Partido</th></tr>
+<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">FanDuel</th></tr>
 {rows}</table></div>
-<p class="note">Se muestran los lados con probabilidad justa de FanDuel igual o superior al 54,34 % (el equilibrio de un flex de 5 o 6, el mínimo del método), de más a menos probable. Valor esperado = probabilidad × cuota de Stake − 1, con la misma línea en las dos casas.
-Apuesta cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas. Una cuota de Stake por debajo de la "justa" no tiene valor.</p>
+<p class="note">Win% = probabilidad justa según FanDuel sin margen. EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
 </main>
 <script>
 document.querySelectorAll('.chip').forEach(function(b) {{

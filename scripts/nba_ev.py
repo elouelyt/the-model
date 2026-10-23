@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Compare Stake NBA player props with FanDuel no-vig fair odds and list +EV bets.
 
-Rule (as in the source video): keep sides whose FanDuel no-vig probability is >= 54.34%,
-sorted by probability; EV = fair_prob * stake_odds - 1 must be positive. Same line on both books.
+Rule (as in the source video's feed): list every side with positive EV, sorted by EV% descending;
+EV = fair_prob * stake_odds - 1 with FanDuel's no-vig probability, same line on both books.
 Output: data/nba_picks.json
 """
 
@@ -14,8 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MIN_PROB = 0.5434  # break-even of the 5/6-pick flex: the video's minimum hit rate per leg
-MIN_EV = 0.0       # Stake price must beat the fair price
+MIN_PROB = 0.0     # his feed shows win% from ~53%; no probability cut-off
+MIN_EV = 0.003     # his feed lists +EV down to ~0.3%
 OUT = ROOT / "data" / "nba_picks.json"
 
 
@@ -57,7 +57,7 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV) -> list[dict
                     "fanduel": f"O {f['over_american']:+d} / U {f['under_american']:+d}",
                     "game": " vs ".join(teams), "start": start,
                 })
-    picks.sort(key=lambda p: p["fair_prob"], reverse=True)
+    picks.sort(key=lambda p: p["ev"], reverse=True)
     return picks
 
 
@@ -67,7 +67,7 @@ def main() -> None:
     OUT.write_text(json.dumps({"timestamp": datetime.now(timezone.utc).isoformat(),
                                "min_prob": min_prob, "min_ev": MIN_EV, "picks": picks}, ensure_ascii=False, indent=1),
                    encoding="utf-8")
-    print(f"{len(picks)} picks with fair prob >= {min_prob:.1%} and EV > 0")
+    print(f"{len(picks)} picks with EV >= {MIN_EV:.1%}")
     for p in picks[:25]:
         print(f"{p['fair_prob']:6.1%} EV {p['ev']:+6.1%}  {p['player']:<22} {p['stat']:<24} {p['side']:<5} {p['line']:<5} "
               f"stake {p['stake_odds']:<6} fair {p['fair_odds']:<6} FD {p['fanduel']}")
