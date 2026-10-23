@@ -1,6 +1,6 @@
 """Build the private track-record dashboard (plain HTML, to be encrypted with staticrypt).
 
-Flat 1-unit stake per parlay, always priced at the Stake odds.
+Flat 15 EUR stake per parlay, always priced at the Stake odds.
 Usage: python generate_dashboard.py [output_path]
 """
 
@@ -14,6 +14,7 @@ ROOT = Path(__file__).parent
 TRACK = ROOT / "data" / "track_record.json"
 DEFAULT_OUT = ROOT / "build" / "panel_src.html"
 
+STAKE = 15.0
 BUCKETS = [("< 1.50", 0, 1.5), ("1.50 – 1.99", 1.5, 2.0), ("≥ 2.00", 2.0, 99)]
 MONTHS_ES = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
@@ -38,7 +39,7 @@ def load_bets() -> list[dict]:
 
 
 def profit(b: dict) -> float:
-    return b["odds"] - 1 if b["won"] else -1.0
+    return STAKE * (b["odds"] - 1) if b["won"] else -STAKE
 
 
 def summarize(bets: list[dict]) -> dict:
@@ -50,13 +51,13 @@ def summarize(bets: list[dict]) -> dict:
         "wins": wins,
         "hit": wins / n if n else 0.0,
         "profit": total,
-        "roi": total / n if n else 0.0,
+        "roi": total / (n * STAKE) if n else 0.0,
         "avg_odds": sum(b["odds"] for b in bets) / n if n else 0.0,
     }
 
 
 def fmt(x: float, signed: bool = True) -> str:
-    return f"{x:+.2f}" if signed else f"{x:.2f}"
+    return f"{x:+,.2f}" if signed else f"{x:,.2f}"
 
 
 def cls(x: float) -> str:
@@ -85,26 +86,26 @@ def curve_svg(bets: list[dict]) -> str:
 
     line = " ".join(f"{X(i):.1f},{Y(v):.1f}" for i, v in pts)
     area = f"{X(0):.1f},{Y(0):.1f} {line} {X(n):.1f},{Y(0):.1f}"
-    step = 5 if span > 25 else 2 if span > 10 else 1
+    step = next(c for c in (10, 20, 50, 100, 200, 500) if span / c <= 7)
     ticks = ""
     t = int(lo // step) * step
     while t <= hi:
         if lo <= t <= hi:
             ticks += (f'<line x1="{pl}" x2="{w - pr}" y1="{Y(t):.1f}" y2="{Y(t):.1f}" class="grid{" zero" if t == 0 else ""}"/>'
-                      f'<text x="{pl - 8}" y="{Y(t) + 4:.1f}" class="axis" text-anchor="end">{t:+d}</text>')
+                      f'<text x="{pl - 8}" y="{Y(t) + 4:.1f}" class="axis" text-anchor="end">{t:+d} €</text>')
         t += step
     end_i, end_v = pts[-1]
     color = "var(--green)" if end_v >= 0 else "var(--red)"
     dots = "".join(
-        f'<circle cx="{X(i):.1f}" cy="{Y(v):.1f}" r="9" fill="transparent"><title>Apuesta {i}: {v:+.2f} u</title></circle>'
+        f'<circle cx="{X(i):.1f}" cy="{Y(v):.1f}" r="9" fill="transparent"><title>Apuesta {i}: {v:+.2f} €</title></circle>'
         for i, v in pts[1:]
     )
     return (
-        f'<svg viewBox="0 0 {w} {h}" role="img" aria-label="Beneficio acumulado en unidades">{ticks}'
+        f'<svg viewBox="0 0 {w} {h}" role="img" aria-label="Beneficio acumulado en euros">{ticks}'
         f'<polygon points="{area}" fill="{color}" opacity="0.10"/>'
         f'<polyline points="{line}" fill="none" stroke="{color}" stroke-width="2" stroke-linejoin="round"/>'
         f'<circle cx="{X(end_i):.1f}" cy="{Y(end_v):.1f}" r="4.5" fill="{color}" stroke="var(--surface)" stroke-width="2"/>'
-        f'<text x="{X(end_i) - 8:.1f}" y="{Y(end_v) - 10:.1f}" class="axis end" text-anchor="end">{end_v:+.2f} u</text>'
+        f'<text x="{X(end_i) - 8:.1f}" y="{Y(end_v) - 10:.1f}" class="axis end" text-anchor="end">{end_v:+.0f} €</text>'
         f'<text x="{pl}" y="{h - 8}" class="axis">Apuesta 1</text>'
         f'<text x="{w - pr}" y="{h - 8}" class="axis" text-anchor="end">Apuesta {n}</text>{dots}</svg>'
     )
@@ -112,7 +113,7 @@ def curve_svg(bets: list[dict]) -> str:
 
 def monthly_svg(rows: list[tuple[str, float]]) -> str:
     """Zero-based bars of monthly profit, anchored to the baseline."""
-    w, h, pt, pb = 360, 220, 28, 30
+    w, h, pt, pb = 360, 230, 28, 44
     m = max(abs(v) for _, v in rows) or 1
     base = pt + (h - pt - pb) * (m / (2 * m))
     half = (h - pt - pb) / 2
@@ -124,8 +125,8 @@ def monthly_svg(rows: list[tuple[str, float]]) -> str:
         y = base - bh if v >= 0 else base
         color = "var(--green)" if v >= 0 else "var(--red)"
         ty = y - 6 if v >= 0 else y + bh + 14
-        out += (f'<rect x="{cx - bw / 2:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{max(bh, 1):.1f}" rx="3" fill="{color}"><title>{label}: {v:+.2f} u</title></rect>'
-                f'<text x="{cx:.1f}" y="{ty:.1f}" class="axis val" text-anchor="middle">{v:+.1f}</text>'
+        out += (f'<rect x="{cx - bw / 2:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{max(bh, 1):.1f}" rx="3" fill="{color}"><title>{label}: {v:+.2f} €</title></rect>'
+                f'<text x="{cx:.1f}" y="{ty:.1f}" class="axis val" text-anchor="middle">{v:+.0f}</text>'
                 f'<text x="{cx:.1f}" y="{h - 8}" class="axis" text-anchor="middle">{label}</text>')
     return f'<svg viewBox="0 0 {w} {h}" role="img" aria-label="Beneficio por mes">{out}</svg>'
 
@@ -150,7 +151,7 @@ def build(bets: list[dict]) -> str:
             f'<tr><td>{label}</td><td class="num">{bs["n"]}</td>'
             f'<td class="num">{bs["hit"]:.0%}</td>'
             f'<td class="num"><span class="bar"><i style="width:{bs["hit"] * 100:.0f}%"></i></span></td>'
-            f'<td class="num {cls(bs["profit"])}">{fmt(bs["profit"])} u</td>'
+            f'<td class="num {cls(bs["profit"])}">{fmt(bs["profit"])} €</td>'
             f'<td class="num {cls(bs["roi"])}">{bs["roi"]:+.0%}</td></tr>'
         )
 
@@ -207,14 +208,14 @@ li:first-child {{ border-top:0; }} li small {{ color:var(--muted); }} li.empty {
 </style>
 <main>
 <h1>Panel del modelo</h1>
-<p class="sub">{first:%d/%m/%Y} – {last:%d/%m/%Y} · 1 unidad por apuesta · cuotas de Stake</p>
+<p class="sub">{first:%d/%m/%Y} – {last:%d/%m/%Y} · 15 € por apuesta · cuotas de Stake</p>
 <div class="kpis">
-  <div class="kpi"><span>Beneficio</span><b class="{cls(s['profit'])}">{fmt(s['profit'])} u</b><small>{s['n']} apuestas resueltas</small></div>
-  <div class="kpi"><span>ROI</span><b class="{cls(s['roi'])}">{s['roi']:+.1%}</b><small>beneficio por unidad apostada</small></div>
+  <div class="kpi"><span>Beneficio</span><b class="{cls(s['profit'])}">{fmt(s['profit'])} €</b><small>{s['n']} apuestas resueltas</small></div>
+  <div class="kpi"><span>ROI</span><b class="{cls(s['roi'])}">{s['roi']:+.1%}</b><small>beneficio por euro apostado</small></div>
   <div class="kpi"><span>Aciertos</span><b>{s['hit']:.0%}</b><small>{s['wins']} ganadas · {s['n'] - s['wins']} perdidas</small></div>
   <div class="kpi"><span>Cuota media</span><b>{s['avg_odds']:.2f}</b><small>acierto mínimo para cubrir: {1 / s['avg_odds']:.0%}</small></div>
 </div>
-<section class="card"><h2>Beneficio acumulado (unidades)</h2>{curve_svg(resolved)}</section>
+<section class="card"><h2>Beneficio acumulado (€)</h2>{curve_svg(resolved)}</section>
 <div class="two">
   <section class="card"><h2>Acierto por rango de cuota</h2><div class="scroll"><table>
     <tr><th>Cuota</th><th class="num">Apuestas</th><th class="num">Acierto</th><th></th><th class="num">Beneficio</th><th class="num">ROI</th></tr>{bucket_html}</table></div></section>
