@@ -119,6 +119,18 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 
 **Key lesson:** `staticrypt` pide confirmación interactiva si la contraseña tiene menos de 14 caracteres y se cuelga en CI — usar siempre `--short`. Fijar `--salt` para que "recordar contraseña" no caduque cada día.
 
+## NBA player props (value finder) — IN PROGRESS
+
+Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel sin margen vs cuota de Stake, misma línea; valor esperado = prob_justa × cuota_stake − 1; se listan las de +3 % o más.
+- `scripts/nba_stake_scraper.py` — Stake vía CDP (`slugFixture → swishGameCompetitorTeams → players → markets(statTypes:[player])`, endpoint `/_api/v1/graphql`). Necesita Chrome abierto en stake.com.
+- `scripts/nba_fanduel.py` — FanDuel vía **Firecrawl** (`FIRECRAWL_API_KEY`), solo los partidos que Stake lista. Hay que desplegar los acordeones (`div[role=button][aria-expanded=false]` por `aria-label`) con una acción `executeJavascript`.
+- `scripts/nba_ev.py` → `data/nba_picks.json`; `generate_nba.py` → página; `scripts/nba_publish.py` encadena todo, cifra con staticrypt y publica solo `nba.html` (los datos en bruto no se suben).
+- Plan gratuito de Firecrawl: 1.000 créditos/mes; vigilar el gasto (`app.get_credit_usage()`).
+
+**Key lesson:** al scrapear con Firecrawl una SPA, el contenido plegado no sale en el markdown: hay que ejecutar JS para desplegarlo; un selector inexistente aborta toda la llamada (`Element not found`), y `executeJavascript` no admite `
+` literales (usar `String.fromCharCode(10)`).
+**Key lesson:** no inventes alias de equipos: FanDuel usa `los-angeles-clippers`, un alias `la-clippers` rompió el emparejamiento.
+
 ## Sprint 6+ (Planned) — Data Enrichment & Model Upgrade
 
 **Goal:** Improve prediction quality with richer data sources. Improvements go live immediately since the app is already deployed.

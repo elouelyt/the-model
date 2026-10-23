@@ -14,6 +14,7 @@ TEMPLATE = """<!doctype html>
 <style>
 body{{margin:0;background:#080808;color:#ececec;font:14px system-ui,sans-serif}}
 nav{{position:sticky;top:0;z-index:5;display:flex;gap:8px;padding:10px 16px;background:#080808;border-bottom:1px solid #242424}}
+nav a{{background:#111;color:#8a8a8a;border:1px solid #242424;border-radius:6px;padding:7px 14px;text-decoration:none;margin-left:auto}}
 nav button{{background:#111;color:#8a8a8a;border:1px solid #242424;border-radius:6px;padding:7px 14px;font:inherit;cursor:pointer}}
 nav button[aria-selected=true]{{color:#ececec;border-color:#f97316}}
 nav button:focus-visible{{outline:2px solid #f97316;outline-offset:2px}}
@@ -23,6 +24,7 @@ iframe[hidden]{{display:none}}
 <nav role="tablist">
 <button role="tab" aria-selected="true" data-t="0">Recomendaciones</button>
 <button role="tab" aria-selected="false" data-t="1">Rendimiento</button>
+<a href="nba.html">NBA →</a>
 </nav>
 <iframe id="f0" srcdoc="{site}"></iframe>
 <iframe id="f1" srcdoc="{dash}" hidden></iframe>
