@@ -121,7 +121,7 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 
 ## NBA player props (value finder) — IN PROGRESS
 
-Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel sin margen vs cuota de Stake, misma línea; valor esperado = prob_justa × cuota_stake − 1; se listan las de +3 % o más.
+Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel sin margen vs cuota de Stake, misma línea; regla del vídeo: se listan los lados con prob. justa de FanDuel ≥ 54,34 % (equilibrio del flex de 5/6), ordenados por probabilidad, y solo si la cuota de Stake supera la justa (EV > 0). No "mejorar" el método: el usuario quiere copiar el del vídeo.
 - `scripts/nba_stake_scraper.py` — Stake vía CDP (`slugFixture → swishGameCompetitorTeams → players → markets(statTypes:[player])`, endpoint `/_api/v1/graphql`). Necesita Chrome abierto en stake.com.
 - `scripts/nba_fanduel.py` — FanDuel vía **Firecrawl** (`FIRECRAWL_API_KEY`), solo los partidos que Stake lista. Hay que desplegar los acordeones (`div[role=button][aria-expanded=false]` por `aria-label`) con una acción `executeJavascript`.
 - `scripts/nba_ev.py` → `data/nba_picks.json`; `generate_nba.py` → página; `scripts/nba_publish.py` encadena todo, cifra con staticrypt y publica solo `nba.html` (los datos en bruto no se suben).

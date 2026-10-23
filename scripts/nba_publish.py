@@ -39,7 +39,7 @@ def main() -> None:
     if "--skip-fetch" not in sys.argv:  # rebuild the page from the last data without spending credits
         run(py, "scripts/nba_stake_scraper.py")
         run(py, "scripts/nba_fanduel.py")
-    run(py, "scripts/nba_ev.py", *sys.argv[1:2] if len(sys.argv) > 1 and sys.argv[1][0].isdigit() else ())
+    run(py, "scripts/nba_ev.py")
     run(py, "generate_nba.py", "build/nba_src.html")
 
     npx = shutil.which("npx.cmd") or shutil.which("npx")
