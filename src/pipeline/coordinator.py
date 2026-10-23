@@ -100,7 +100,52 @@ def fetch_odds_node(state: PipelineState) -> PipelineState:
 
     df = filter_upcoming(flatten_odds(raw)) if raw else None
 
-    # Tier 3: manual odds — data/manual_odds.json added via scripts/add_match.py
+    # Tier 3: stake_cache.json written locally by scripts/stake_scraper.py (CDP)
+    if df is None or df.empty:
+        import json
+        from pathlib import Path
+        cache_path = Path(__file__).parent.parent.parent / "data" / "stake_cache.json"
+        if cache_path.exists():
+            try:
+                cache = json.loads(cache_path.read_text(encoding="utf-8"))
+                matches = cache.get("matches", [])
+                if matches:
+                    from datetime import datetime, timezone, timedelta
+                    now = datetime.now(timezone.utc)
+                    cutoff = now + timedelta(hours=36)
+                    stake_events = []
+                    for m in matches:
+                        if not m.get("home_odds") or not m.get("away_odds"):
+                            continue
+                        # Parse start_time; default to now+6h if missing
+                        st_str = m.get("start_time", "")
+                        try:
+                            ct = datetime.fromisoformat(st_str.replace("Z", "+00:00")) if st_str else now + timedelta(hours=6)
+                        except ValueError:
+                            ct = now + timedelta(hours=6)
+                        if ct <= now or ct > cutoff:
+                            continue
+                        stake_events.append({
+                            "id": m.get("fixture_id", m["home"] + m["away"]),
+                            "sport_key": "tennis_atp_" + m.get("tournament", "").lower().replace(" ", "_")[:20],
+                            "sport_title": m.get("tournament", "Tennis"),
+                            "commence_time": ct.isoformat(),
+                            "home_team": m["home"],
+                            "away_team": m["away"],
+                            "bookmakers": [{"key": "stake", "title": "Stake", "markets": [{"key": "h2h", "outcomes": [
+                                {"name": m["home"], "price": m["home_odds"]},
+                                {"name": m["away"], "price": m["away_odds"]},
+                            ]}]}],
+                        })
+                    if stake_events:
+                        logger.info("[coordinator] tier 3: stake_cache.json — %d matches (cached %s)", len(stake_events), cache.get("timestamp", "?")[:16])
+                        raw = stake_events
+                        source = "stake_cache"
+                        df = filter_upcoming(flatten_odds(raw))
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("[coordinator] stake_cache.json load failed: %s", exc)
+
+    # Tier 4: manual odds — data/manual_odds.json added via scripts/add_match.py
     if df is None or df.empty:
         import json
         from pathlib import Path
