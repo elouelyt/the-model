@@ -173,23 +173,6 @@ def main() -> None:
     if len(rankings) < 100:
         raise ValueError(f"Too few ATP players ({len(rankings)}) — something went wrong")
 
-    # WTA rankings — different endpoint structure
-    try:
-        wta_resp = _get("https://site.api.espn.com/apis/site/v2/sports/tennis/wta/rankings", sess)
-        wta: dict[str, dict] = {}
-        for entry in (wta_resp or {}).get("rankings", [{}])[0].get("ranks", []):
-            rank = entry.get("current")
-            points = int(entry.get("points", 0))
-            name = (entry.get("athlete") or {}).get("displayName", "")
-            if rank and name:
-                wta[name] = {"rank": rank, "points": points}
-        logger.info("Built WTA rankings for %d players", len(wta))
-        for name, d in wta.items():
-            if name not in rankings:
-                rankings[name] = d
-        logger.info("Combined: %d players (ATP + WTA)", len(rankings))
-    except Exception as exc:
-        logger.warning("WTA rankings failed (non-fatal): %s", exc)
 
     # sanity check
     top5 = sorted([(n, d) for n, d in rankings.items()], key=lambda x: x[1]["rank"])[:5]

@@ -104,7 +104,7 @@ SCRAPE_JS = r"""
     };
   }
 
-  const cats = ["wta", "atp", "davis-cup", "challenger"];
+  const cats = ["atp", "davis-cup", "challenger"];
   const allSlugs = [];
   for (const cat of cats) {
     const d = await gql({sport: "tennis", cat}, QUERY_CAT);
