@@ -15,6 +15,7 @@ TRACK = ROOT / "data" / "track_record.json"
 DEFAULT_OUT = ROOT / "build" / "panel_src.html"
 
 STAKE = 15.0
+FIRST_MONTH = "2026-08"  # July used a different bet type, so it is excluded
 BUCKETS = [("< 1.50", 0, 1.5), ("1.50 – 1.99", 1.5, 2.0), ("≥ 2.00", 2.0, 99)]
 MONTHS_ES = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
@@ -24,6 +25,8 @@ def load_bets() -> list[dict]:
     data = json.loads(TRACK.read_text(encoding="utf-8"))
     bets = []
     for month, mdata in data["months"].items():
+        if month < FIRST_MONTH:
+            continue
         year, mon = (int(x) for x in month.split("-"))
         for day, d in mdata["days"].items():
             for p in d["parlays"]:
