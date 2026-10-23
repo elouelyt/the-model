@@ -36,19 +36,19 @@ jobs:
       - name: Health check
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
-          THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 }}
+          THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 || secrets.THE_ODDS_API_KEY2 }}
         run: python scripts/daily_health_check.py
 
       - name: Check yesterday's results
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
-          THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 }}
+          THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 || secrets.THE_ODDS_API_KEY2 }}
         run: python scripts/check_results.py
 
       - name: Run prediction pipeline
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
-          THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 }}
+          THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 || secrets.THE_ODDS_API_KEY2 }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python generate_html.py
 
