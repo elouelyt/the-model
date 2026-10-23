@@ -88,7 +88,6 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 .note {{ color:var(--muted); font-size:.8rem; margin-top:18px; }}
 </style>
 <main>
-<a class="back" href="panel.html">← Panel</a>
 <h1>NBA · apuestas a jugadores con valor</h1>
 <p class="sub">Lados más favorecidos por FanDuel (sin margen) que Stake paga por encima de su cuota justa · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
 {warn}
