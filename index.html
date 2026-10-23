@@ -780,7 +780,7 @@
   </div>
   <div class="header-right">
     <span class="header-tag">ATP · Pre-match</span>
-    <span class="updated" id="last-updated-label">Updated 2026-10-23 10:07 UTC</span>
+    <span class="updated" id="last-updated-label">Updated 2026-10-23 10:18 UTC</span>
     <span id="stale-badge" style="display:none;margin-left:8px;background:#f87171;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.03em;">⚠ DESACTUALIZADA</span>
   </div>
 </header>
@@ -789,9 +789,240 @@
   
         <div class="summary-bar">
             <span class="summary-matches"><strong>31</strong> matches</span>
-            <span class="summary-pills"><span class="pill pill-green"><strong>3</strong> value bets</span><span class="pill pill-amber"><strong>4</strong> marginals</span></span>
+            <span class="summary-pills"><span class="pill pill-green"><strong>6</strong> value bets</span><span class="pill pill-amber"><strong>4</strong> marginals</span></span>
         </div>
   
+<div class="daily-pick-card">
+    <div class="dp-eyebrow">APUESTA DEL DÍA</div>
+    <div class="dp-main">
+        <div class="dp-player">
+            <div class="dp-player-name">Francisco Cerundolo</div>
+            <div class="dp-player-meta">
+                Rank <strong>#21</strong>
+                &nbsp;·&nbsp; vs Clement Chidekh #152
+                &nbsp;·&nbsp; <span style="color:#2563eb;font-weight:600;">Hard</span>
+                &nbsp;·&nbsp;<span class="dp-sent" style="color:#10b981;">↑ In form</span>
+            </div>
+        </div>
+        <div class="dp-odds-block">
+            <div class="dp-odds-value">1.52</div>
+            <div class="dp-odds-label">mejor cuota <span class="dp-bk">@ Stake</span></div>
+            <div class="dp-stake"><span class="dp-stake-logo">S</span><span class="dp-stake-label">Stake</span><span class="dp-stake-price">1.52</span></div>
+        </div>
+    </div>
+    <div class="dp-bars">
+        <div class="dp-bar-row">
+            <span class="dp-bar-label">Modelo</span>
+            <div class="dp-bar-track">
+                <div class="dp-bar-fill dp-model-fill" style="width:76.4%;"></div>
+            </div>
+            <span class="dp-bar-val">76.4%</span>
+        </div>
+        <div class="dp-bar-row">
+            <span class="dp-bar-label">Mercado</span>
+            <div class="dp-bar-track">
+                <div class="dp-bar-fill dp-mkt-fill" style="width:65.8%;"></div>
+            </div>
+            <span class="dp-bar-val">65.8%</span>
+        </div>
+    </div>
+    <div class="dp-edge-row">
+        <span class="dp-edge-label">Edge sobre mercado</span>
+        <span class="dp-edge-val">+10.6 pp</span>
+    </div>
+    <div class="dp-firstset">
+        <div class="dp-firstset-badge">STAKE · PRIMER SET</div>
+        <div class="dp-firstset-text">
+            Apostar como <strong>Ganador del 1er Set</strong> en Stake.
+            Si el jugador gana el primer set, la apuesta se cobra —
+            aunque pierda el 2º set o el partido.
+            La probabilidad de ganar el primer set es mayor que ganar el partido
+            (~70% vs ~63%), lo que mejora el EV real de la apuesta.
+        </div>
+    </div>
+    
+</div>
+<style>
+.daily-pick-card {
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-left: 4px solid var(--green);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+.dp-eyebrow {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 12px;
+}
+.dp-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.dp-player-name {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+.dp-player-meta {
+    font-size: 12px;
+    color: var(--muted);
+}
+.dp-player-meta strong { color: var(--text); }
+.dp-odds-block {
+    text-align: right;
+    flex-shrink: 0;
+}
+.dp-odds-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.dp-odds-label {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+.dp-bk {
+    color: var(--orange);
+    font-size: 10px;
+}
+.dp-stake {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    background: rgba(0,168,107,0.12);
+    border: 1px solid rgba(0,168,107,0.3);
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+.dp-stake-logo {
+    font-size: 10px;
+    font-weight: 800;
+    color: #00a86b;
+}
+.dp-stake-label {
+    font-size: 10px;
+    color: var(--muted);
+}
+.dp-stake-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #00a86b;
+    font-variant-numeric: tabular-nums;
+}
+.dp-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.dp-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.dp-bar-label {
+    font-size: 10px;
+    color: var(--muted);
+    width: 52px;
+    flex-shrink: 0;
+}
+.dp-bar-track {
+    flex: 1;
+    height: 5px;
+    background: var(--surface-3);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.dp-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+.dp-model-fill { background: var(--orange); }
+.dp-mkt-fill { background: var(--muted); }
+.dp-bar-val {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.dp-edge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.18);
+    border-radius: 5px;
+}
+.dp-edge-label {
+    font-size: 11px;
+    color: var(--muted);
+}
+.dp-edge-val {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+}
+.dp-sent {
+    font-size: 11px;
+    font-weight: 500;
+}
+.dp-firstset {
+    margin-top: 12px;
+    background: rgba(0,168,107,0.08);
+    border: 1px solid rgba(0,168,107,0.25);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.dp-firstset-badge {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+}
+.dp-firstset-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+.dp-firstset-text strong {
+    color: var(--text);
+    font-weight: 600;
+}
+.dp-warn {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--amber);
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+</style>
   
   
     <details class="parlays-section">
@@ -805,31 +1036,31 @@
             <div class="parlay-card-header">
                 <div class="parlay-legs">2-leg parlay</div>
                 <div class="parlay-header-right">
-                    <span class="risk-badge" style="color:#f87171;background:rgba(248,113,113,0.10);border:1px solid rgba(248,113,113,0.25);">HIGH</span>
-                    <span class="parlay-stake-odds">S&nbsp;1.70</span>
-                    <span class="parlay-odds">1.70</span>
+                    <span class="risk-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);">MEDIUM</span>
+                    <span class="parlay-stake-odds">S&nbsp;1.82</span>
+                    <span class="parlay-odds">1.82</span>
                 </div>
             </div>
             <div class="parlay-picks">
                 <div class="parlay-pick">
-                    <span class="parlay-pick-name">Jiri Lehecka</span>
+                    <span class="parlay-pick-name">Francisco Cerundolo</span>
                     <span class="parlay-pick-meta">
-                        #20 <span style="color:var(--muted);font-size:10px;">vs #60</span> &nbsp;·&nbsp;
+                        #21 <span style="color:var(--muted);font-size:10px;">vs #152</span> &nbsp;·&nbsp;
                         <span style="color:#2563eb;font-weight:600;">Hard</span> &nbsp;·&nbsp;
-                        69% model &nbsp;·&nbsp;
-                        1.35
-                        &nbsp;<span style="color:#00a86b;font-weight:700;">S 1.35</span>
+                        76% model &nbsp;·&nbsp;
+                        1.52
+                        &nbsp;<span style="color:#00a86b;font-weight:700;">S 1.52</span>
                         &nbsp;<span style="color:#10b981;font-size:10px;">↑</span>
                     </span>
                 </div>
                 <div class="parlay-pick">
-                    <span class="parlay-pick-name">Tommy Paul</span>
+                    <span class="parlay-pick-name">Taylor Fritz</span>
                     <span class="parlay-pick-meta">
-                        #15 <span style="color:var(--muted);font-size:10px;">vs #94</span> &nbsp;·&nbsp;
+                        #14 <span style="color:var(--muted);font-size:10px;">vs #65</span> &nbsp;·&nbsp;
                         <span style="color:#ea580c;font-weight:600;">Clay</span> &nbsp;·&nbsp;
-                        76% model &nbsp;·&nbsp;
-                        1.26
-                        &nbsp;<span style="color:#00a86b;font-weight:700;">S 1.26</span>
+                        78% model &nbsp;·&nbsp;
+                        1.20
+                        &nbsp;<span style="color:#00a86b;font-weight:700;">S 1.20</span>
                         &nbsp;<span style="color:#10b981;font-size:10px;">↑</span>
                     </span>
                 </div></div>
@@ -837,13 +1068,13 @@
                 <div class="rating-row">
                     <span class="rating-label">Gemini</span>
                     <div class="rating-track">
-                        <div class="rating-fill" style="width:40%;background:#f87171;"></div>
+                        <div class="rating-fill" style="width:70%;background:#10b981;"></div>
                     </div>
-                    <span class="rating-val">4/10</span>
+                    <span class="rating-val">7/10</span>
                 </div>
-                <div class="parlay-cum-prob">Cumulative model prob: <strong>53.1%</strong></div>
+                <div class="parlay-cum-prob">Cumulative model prob: <strong>59.8%</strong></div>
             </div>
-            <div class="parlay-summary">This parlay has a negative edge for both picks, indicating poor value despite positive form signals. The different surfaces offer some independence, but the overall model probability is low for the combined odds.</div>
+            <div class="parlay-summary">This parlay offers good value with Cerundolo's significant edge, despite Fritz being slightly overvalued. Both players are in good form, and the outcomes are independent, making it a reasonable bet.</div>
         </div></div>
     </details>
   
@@ -900,7 +1131,7 @@
                 </div>
                 <div class="parlay-cum-prob">Cumulative model prob: <strong>59.7%</strong></div>
             </div>
-            <div class="parlay-summary">This parlay features two in-form players with high market and model implied probabilities on clay, suggesting a strong chance for both legs to win. The lack of H2H data is a minor concern, but their current form and surface consistency support the picks.</div>
+            <div class="parlay-summary">This parlay features two in-form players on clay with high market and model implied probabilities, suggesting a strong chance of success for a compounder strategy. The lack of H2H data isn't a major concern given their current form and ranking advantage.</div>
         </div>
         <div class="parlay-card">
             <div class="parlay-card-header">
@@ -944,13 +1175,13 @@
                 </div>
                 <div class="parlay-cum-prob">Cumulative model prob: <strong>56.1%</strong></div>
             </div>
-            <div class="parlay-summary">This parlay offers a good balance of high implied probabilities from bookmakers and strong model predictions for both legs. The main concern for a daily compounder strategy is the inconsistency across surfaces, with one pick on grass and the other on clay, which could introduce variability.</div>
+            <div class="parlay-summary">This parlay offers a solid 56.1% cumulative model probability, aligning well with a daily compounder strategy focused on high win probability. The picks are consistent with market sentiment, though on different surfaces, and Taylor Fritz is in good form.</div>
         </div>
         <div class="parlay-card">
             <div class="parlay-card-header">
                 <div class="parlay-legs">2-leg parlay </div>
                 <div class="parlay-header-right">
-                    <span class="risk-badge" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);">LOW</span>
+                    <span class="risk-badge" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);">MEDIUM</span>
                     <span class="parlay-stake-odds">S&nbsp;1.62</span>
                     <span class="parlay-odds">1.62</span>
                 </div>
@@ -988,7 +1219,7 @@
                 </div>
                 <div class="parlay-cum-prob">Cumulative model prob: <strong>54.4%</strong></div>
             </div>
-            <div class="parlay-summary">This parlay offers a good balance for a compounder strategy, with both picks having high implied and model probabilities. Consistency across surfaces is a slight concern, but both players are in good form.</div>
+            <div class="parlay-summary">This parlay offers a good balance for a compounder strategy with high implied probabilities for both legs. The main concern is the surface inconsistency, with one player on hard and the other on clay, which could introduce variability.</div>
         </div>
         <div class="parlay-card">
             <div class="parlay-card-header">
@@ -1032,7 +1263,7 @@
                 </div>
                 <div class="parlay-cum-prob">Cumulative model prob: <strong>54.8%</strong></div>
             </div>
-            <div class="parlay-summary">While both picks have high implied probabilities, the cumulative model probability is only 54.8%, indicating a significant risk for a compounder strategy. The surface inconsistency (grass and clay) adds another layer of uncertainty, despite Tommy Paul's positive form.</div>
+            <div class="parlay-summary">While both picks have high implied probabilities, the overall parlay probability is moderate. The surface inconsistency (grass and clay) adds a slight layer of unpredictability, though Paul's form is a positive.</div>
         </div>
         <div class="parlay-card">
             <div class="parlay-card-header">
@@ -1076,7 +1307,7 @@
                 </div>
                 <div class="parlay-cum-prob">Cumulative model prob: <strong>49.9%</strong></div>
             </div>
-            <div class="parlay-summary">This parlay offers a decent foundation for a compounder strategy given the high implied probabilities, though the cumulative model probability is just under 50%. The picks are on different surfaces, which adds a layer of variability but also diversifies risk.</div>
+            <div class="parlay-summary">This parlay offers decent value with both picks having high implied probabilities, though the cumulative model probability is just under 50%. The surface difference (grass/hard) adds a slight layer of inconsistency, but both players are favored.</div>
         </div></div>
     </details>
   
@@ -1679,7 +1910,7 @@
 <div class="month-panel" id="panel-2026-10" style="display:block;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
     <span style="font-size:12px;color:var(--muted);">Octubre 2026</span>
-    <span style="font-size:13px;font-weight:700;color:#10b981;">+124.35€ &nbsp; ROI +59.2%</span>
+    <span style="font-size:13px;font-weight:700;color:#10b981;">+124.35€ &nbsp; ROI +55.3%</span>
   </div>
   
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -1875,15 +2106,28 @@
             <td style="color:#10b981;">+4.80€</td>
             <td style="color:#f87171;">0.00€</td>
             <td style="color:#10b981;font-weight:700;">+4.80€</td>
-        </tr><tr class="tr-empty"><td>23</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>24</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>25</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>26</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>27</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>28</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>29</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>30</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>31</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
+        </tr><tr>
+            <td style="font-weight:600;">23</td>
+            <td><details style="margin:0;">
+            <summary style="cursor:pointer;list-style:none;color:var(--accent);">▸ 0/1 <span style="color:var(--muted);font-size:10px;">+1 pend.</span></summary>
+            <table style="margin-top:6px;width:100%;font-size:11px;">
+                <thead><tr><th>#</th><th>Parlay</th><th>Cuota</th><th>Resultado</th></tr></thead>
+                <tbody><tr><td style="color:var(--muted);font-size:11px;">#1</td><td style="font-size:11px;">Francisco Cerundolo vs Clement Chidekh</td><td style="font-size:11px;">1.52</td><td><span style="color:var(--muted);">pending</span></td></tr></tbody>
+            </table>
+        </details></td>
+            <td style="color:var(--muted);">15€</td>
+            <td style="color:#10b981;">0.00€</td>
+            <td style="color:#f87171;">0.00€</td>
+            <td style="color:#10b981;font-weight:700;">+0.00€</td>
+        </tr><tr class="tr-empty"><td>24</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>25</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>26</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>27</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>28</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>29</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>30</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr class="tr-empty"><td>31</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
       <tfoot>
         <tr style="border-top:1px solid var(--border);font-weight:700;">
           <td style="padding:8px;">TOTAL</td>
           <td></td>
-          <td style="color:var(--muted);">210€</td>
+          <td style="color:var(--muted);">225€</td>
           <td style="color:#10b981;">+154.35€</td>
           <td style="color:#f87171;">-30.00€</td>
-          <td style="color:#10b981;">+124.35€ (+59.2%)</td>
+          <td style="color:#10b981;">+124.35€ (+55.3%)</td>
         </tr>
       </tfoot>
     </table>
@@ -2725,7 +2969,7 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Valerio Aboian <span class="vs">vs</span> Miguel Tobon</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Valerio Aboian, Miguel Tobon</div>
     </div>
@@ -2733,23 +2977,126 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Andrea Pellegrino <span class="vs">vs</span> Svyatoslav Gulin</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Svyatoslav Gulin</div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #10b981; --card-glow: #10b981;">
         <div class="match-header">
             <span class="match-teams">Clement Chidekh <span class="vs">vs</span> Francisco Cerundolo</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Clement Chidekh</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Clement Chidekh <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Clément Chidekh vs Francisco Cerúndolo · Quarterfinal · ATP Brussels - Tennis.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#152</strong> &nbsp;·&nbsp; 371 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:21.9%;"></div>
+                </div>
+                <span class="prob-val">21.9%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:41.1%;"></div>
+                </div>
+                <span class="prob-val">41.1%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">2.43</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-19.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-2.7%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">The model's negative edge on Chidekh stems from his significantly lower ranking (#152 vs #21) and the market likely overvaluing his recent 'in form' sentiment, which may not translate against top-tier opposition on hard courts.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.43</td><td class="bk-implied">41.1%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #10b981;">
+            <div class="player-name">Francisco Cerundolo <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="October 23, 2026: Clement Chidekh vs Francisco Cerundolo: Set 2 Winner Tennis Prediction Market - Robinhood">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#21</strong> &nbsp;·&nbsp; 2,220 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:76.4%;"></div>
+                </div>
+                <span class="prob-val">76.4%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:65.8%;"></div>
+                </div>
+                <span class="prob-val">65.8%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.52</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+10.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-4.3%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b98120;">
+                <span class="signal-dot" style="background:#10b981;"></span>VALUE BET
+            </div>
+            <div class="recommendation">Cerundolo's positive model edge is driven by his superior ranking and proven hard court ability, suggesting the market is underestimating his true win probability despite Chidekh's recent positive sentiment. The lack of H2H means this is a fresh matchup where ranking and surface proficiency are key.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.52</td><td class="bk-implied">65.8%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
     <div class="match-card" style="border-left: 3px solid #10b981; --card-glow: #10b981;">
         <div class="match-header">
             <span class="match-teams">Flavio Cobolli <span class="vs">vs</span> Brandon Nakashima</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -2788,7 +3135,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b98120;">
                 <span class="signal-dot" style="background:#10b981;"></span>VALUE BET
             </div>
-            <div class="recommendation">Cobolli's significant model edge (+19.1%) is driven by his strong clay form and higher ranking (#6 vs #17), suggesting the market undervalues his current performance on this surface despite no prior H2H.</div>
+            <div class="recommendation">Cobolli's significant model edge (+19.1%) is driven by his superior ranking (#6 vs #17) and strong recent form, suggesting the market is undervaluing his current clay court prowess despite no H2H history.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -2838,7 +3185,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Nakashima's large negative edge (-21.6%) indicates the market overvalues him, likely due to his generally positive sentiment, but the model discounts him given his lower ranking and Cobolli's superior clay court prowess.</div>
+            <div class="recommendation">Nakashima's negative model edge (-21.6%) indicates the market is overestimating him, likely due to his own positive form, but the model sees his lower ranking and less established clay game as a disadvantage against a higher-ranked, in-form opponent.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -2860,7 +3207,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #10b981; --card-glow: #10b981;">
         <div class="match-header">
             <span class="match-teams">Marco Trungelliti <span class="vs">vs</span> Matej Dodig</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -2899,7 +3246,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">The model's negative edge on Trungelliti suggests his market implied probability is inflated, likely overvaluing his higher ranking (#90) without considering his potentially weaker grass court form compared to Dodig.</div>
+            <div class="recommendation">The model's negative edge on Trungelliti suggests the market is overvaluing his overall ranking, potentially overlooking his limited grass court experience or recent form on the surface. His 71.7% model probability indicates he's still a strong favorite, but not as dominant as the market implies.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -2949,7 +3296,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b98120;">
                 <span class="signal-dot" style="background:#10b981;"></span>VALUE BET
             </div>
-            <div class="recommendation">Dodig's positive model edge indicates his market odds are undervalued, supported by his 'in form' sentiment which might translate to a stronger performance on grass despite his lower ranking (#138) and lack of H2H data against Trungelliti.</div>
+            <div class="recommendation">Dodig's positive edge stems from the market underestimating his current form and potential on grass, despite his lower ranking. The model sees value in him as a significant underdog, indicating his recent play might be better suited for this surface than his overall ranking suggests.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -2971,31 +3318,31 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Tristan Schoolkate <span class="vs">vs</span> Jie Cui</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Tristan Schoolkate, Jie Cui</div>
+        <div class="error-msg">⚠ Rankings not found for: Jie Cui</div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Cezar Cretu <span class="vs">vs</span> Jakub Filip</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Cezar Cretu, Jakub Filip</div>
+        <div class="error-msg">⚠ Rankings not found for: Jakub Filip</div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Filip Misolic <span class="vs">vs</span> Michele Ribecai</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Filip Misolic, Michele Ribecai</div>
+        <div class="error-msg">⚠ Rankings not found for: Filip Misolic</div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Gustavo Heide <span class="vs">vs</span> Santiago Rodriguez Taverna</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Santiago Rodriguez Taverna</div>
     </div>
@@ -3003,7 +3350,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Tallon Griekspoor <span class="vs">vs</span> Jiri Lehecka</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3042,7 +3389,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Griekspoor's model probability aligns with the market, suggesting fair value despite his lower ranking. His current positive form on hard courts likely contributes to this equilibrium.</div>
+            <div class="recommendation">Griekspoor's current positive form is accurately reflected by the market, aligning with the model's assessment given his lower ranking compared to Lehecka.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3092,7 +3439,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Lehecka's significant model edge discrepancy (-4.6%) against the market, despite his higher ranking and positive form, indicates the market might be overvaluing him. The lack of H2H data means this is a fresh matchup on hard.</div>
+            <div class="recommendation">Despite Lehecka's strong #20 ranking and positive form, the market has overvalued him by 4.6% compared to the model, suggesting his implied probability is too high for this hard court matchup.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3114,15 +3461,15 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Mees Rottgering <span class="vs">vs</span> Darwin Blanch</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Mees Rottgering, Darwin Blanch</div>
+        <div class="error-msg">⚠ Rankings not found for: Mees Rottgering</div>
     </div>
 
     <div class="match-card" style="border-left: 3px solid #f59e0b; --card-glow: #f59e0b;">
         <div class="match-header">
             <span class="match-teams">Daniil Medvedev <span class="vs">vs</span> Terence Atmane</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3161,7 +3508,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Medvedev's market implied probability is significantly higher than the model's, suggesting the market might be overvaluing his recent form against a lower-ranked opponent, creating a negative edge despite his strong hard court record.</div>
+            <div class="recommendation">Medvedev's market implied probability is significantly higher than the model's, creating a negative edge. While his #5 ranking and strong hard court form support a high win probability, the market may be overestimating his dominance against an in-form opponent.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3178,7 +3525,7 @@ function switchMonth(m) {
             </details>
         </div>
         <div class="player-card" style="border-top: 2px solid #f59e0b;">
-            <div class="player-name">Terence Atmane <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="“It's a new Térence”: Atmane reaches the quarterfinals in Almaty - TennisTemple">↑ In form</span></div>
+            <div class="player-name">Terence Atmane <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="ATP Almaty Quarterfinal Predictions Including Daniil Medvedev vs Terence Atmane - Last Word On Sports">↑ In form</span></div>
             <div class="player-meta">Rank <strong>#98</strong> &nbsp;·&nbsp; 616 pts</div>
             
         <div class="prob-bars">
@@ -3211,7 +3558,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b20;">
                 <span class="signal-dot" style="background:#f59e0b;"></span>MARGINAL
             </div>
-            <div class="recommendation">Atmane's positive edge arises because the market is underestimating his chances compared to the model, potentially overlooking his current positive sentiment and recent form, even though he faces a top-5 player with no H2H history.</div>
+            <div class="recommendation">Atmane's positive edge suggests the market is underestimating him. Despite the significant ranking gap and no H2H, his recent positive form might allow him to perform better than expected against a top player like Medvedev, especially if Medvedev isn't at his absolute peak.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3230,18 +3577,121 @@ function switchMonth(m) {
         </div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #10b981; --card-glow: #10b981;">
         <div class="match-header">
             <span class="match-teams">Iva Jovic <span class="vs">vs</span> Diana Shnaider</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Iva Jovic, Diana Shnaider</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Iva Jovic <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Breaking down the quarterfinal matchups in Ningbo - WTA Tennis">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#12</strong> &nbsp;·&nbsp; 2,931 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:53.3%;"></div>
+                </div>
+                <span class="prob-val">53.3%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:64.5%;"></div>
+                </div>
+                <span class="prob-val">64.5%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.55</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-11.2%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-4.3%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Jovic's negative edge suggests the market is overvaluing her current positive form, potentially overlooking Shnaider's similar ranking and strong hard court play, especially with no H2H to justify such a large favorite status.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.55</td><td class="bk-implied">64.5%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #10b981;">
+            <div class="player-name">Diana Shnaider <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Iva Jovic vs Diana Shnaider - Match WTA - AUX Ningbo Open 1970 - Quarter-final - tennismajors.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#13</strong> &nbsp;·&nbsp; 2,663 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:48.0%;"></div>
+                </div>
+                <span class="prob-val">48.0%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:42.5%;"></div>
+                </div>
+                <span class="prob-val">42.5%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">2.35</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+5.4%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-2.8%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b98120;">
+                <span class="signal-dot" style="background:#10b981;"></span>VALUE BET
+            </div>
+            <div class="recommendation">Shnaider's positive edge indicates the market might be underestimating her chances against a similarly ranked opponent on hard court, with her own positive form suggesting she can challenge Jovic despite the market's strong lean.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.35</td><td class="bk-implied">42.5%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Matthew William Donald <span class="vs">vs</span> Filippo Romano</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Matthew William Donald, Filippo Romano</div>
     </div>
@@ -3249,7 +3699,7 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Jenson Brooksby <span class="vs">vs</span> Patrick Maloney</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Patrick Maloney</div>
     </div>
@@ -3257,7 +3707,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #10b981; --card-glow: #10b981;">
         <div class="match-header">
             <span class="match-teams">Jan-Lennard Struff <span class="vs">vs</span> Zizou Bergs</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3296,7 +3746,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b98120;">
                 <span class="signal-dot" style="background:#10b981;"></span>VALUE BET
             </div>
-            <div class="recommendation">Struff's model edge (+7.4%) likely stems from his recent positive form, suggesting his current hard court level is undervalued by the market despite his lower ranking compared to Bergs.</div>
+            <div class="recommendation">Struff's model edge (+7.4%) likely stems from his recent positive form, suggesting his current performance is undervalued by the market despite his lower ranking compared to Bergs. The absence of H2H data means the model relies more heavily on individual player metrics and recent results on hard court.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3346,7 +3796,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Bergs' negative edge (-11.5%) indicates the market may be overvaluing his recent positive form and higher ranking. The model sees less value in him at current odds, possibly due to a perceived tougher matchup against Struff's current hard court game.</div>
+            <div class="recommendation">Bergs' negative edge (-11.5%) indicates the market may be overvaluing his strong ranking (#41) and positive sentiment, potentially not fully accounting for Struff's recent surge or a slight dip in Bergs' hard court efficiency that the model has identified.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3368,7 +3818,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #f87171; --card-glow: #f87171;">
         <div class="match-header">
             <span class="match-teams">Luca Van Assche <span class="vs">vs</span> Lorenzo Musetti</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="withdrawal-alert"><span class="withdrawal-icon">⚠</span><strong>WITHDRAWAL REPORTED</strong> &mdash; Lorenzo Musetti: &ldquo;Lorenzo Musetti releases statement after withdrawing from the Japan Open, ‘I’m very disappointed’ - Yahoo Sports&rdquo;</div>
         <div class="players-row">
@@ -3407,7 +3857,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b20;">
                 <span class="signal-dot" style="background:#f59e0b;"></span>MARGINAL
             </div>
-            <div class="recommendation">Van Assche's model edge (+3.6%) likely stems from his positive recent form, suggesting he's playing above his #48 ranking and the market might be underestimating his current clay prowess.</div>
+            <div class="recommendation">Van Assche's positive model edge (+3.6%) suggests his recent 'in form' play on clay is undervalued, especially against a higher-ranked opponent he's never faced. His current form might be closing the ranking gap more than the market implies.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3457,7 +3907,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Musetti's significant negative edge (-8.0%) indicates the market may be overvaluing his #26 ranking and positive sentiment, potentially not fully accounting for Van Assche's recent surge or a slight dip in Musetti's own peak performance on clay.</div>
+            <div class="recommendation">Musetti's negative model edge (-8.0%) indicates the market might be overpricing his chances, potentially due to his higher ranking. Despite his 'in form' sentiment, the model sees less value at the current price, perhaps anticipating a tougher challenge from Van Assche's recent clay form.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3476,18 +3926,121 @@ function switchMonth(m) {
         </div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #10b981; --card-glow: #10b981;">
         <div class="match-header">
             <span class="match-teams">Juan Manuel La Serna <span class="vs">vs</span> Matheus Pucinelli de Almeida</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Juan Manuel La Serna, Matheus Pucinelli de Almeida</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #10b981;">
+            <div class="player-name">Juan Manuel La Serna <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Thiago Seyboth Wild vs Juan Manuel La Serna · Semifinal · ATP Challenger Piracicaba - Tennis.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#253</strong> &nbsp;·&nbsp; 216 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:47.8%;"></div>
+                </div>
+                <span class="prob-val">47.8%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:35.7%;"></div>
+                </div>
+                <span class="prob-val">35.7%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">2.80</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#10b981;">+12.1%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-2.7%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#10b981;background:rgba(16,185,129,0.10);border:1px solid #10b98120;">
+                <span class="signal-dot" style="background:#10b981;"></span>VALUE BET
+            </div>
+            <div class="recommendation">La Serna's significant model edge (+12.1%) likely stems from his current positive form, which the market might be underestimating given his slightly lower ranking on a surface where they have no H2H history.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.80</td><td class="bk-implied">35.7%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Matheus Pucinelli de Almeida <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Samuel Heredia vs Matheus Pucinelli de Almeida · Semifinal · ATP Challenger Quito - Tennis.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#240</strong> &nbsp;·&nbsp; 232 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:57.1%;"></div>
+                </div>
+                <span class="prob-val">57.1%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:72.5%;"></div>
+                </div>
+                <span class="prob-val">72.5%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.38</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-15.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-5.5%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Pucinelli de Almeida's negative edge (-15.3%) suggests the market is overvaluing his slightly higher ranking and current positive form on grass, potentially overlooking La Serna's recent improvements or a perceived weakness on this surface for Pucinelli de Almeida.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.38</td><td class="bk-implied">72.5%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
     <div class="match-card" style="border-left: 3px solid #f59e0b; --card-glow: #f59e0b;">
         <div class="match-header">
             <span class="match-teams">Arthur Fils <span class="vs">vs</span> Alex Michelsen</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3526,7 +4079,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b20;">
                 <span class="signal-dot" style="background:#f59e0b;"></span>MARGINAL
             </div>
-            <div class="recommendation">Fils' slight model edge (+0.4%) is primarily driven by his significantly higher ranking (World #10 vs #37) and strong recent form, suggesting he's undervalued despite the market already favoring him. However, the lack of H2H data means this is their first encounter, adding a small unknown.</div>
+            <div class="recommendation">Fils' slight model edge stems from his significantly higher ranking (#10 vs #37) and strong recent form, suggesting he's undervalued despite the market already favoring him on hard court.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3576,7 +4129,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Michelsen's significant negative edge (-7.4%) indicates the market is overvaluing him compared to the model, likely due to his own positive sentiment and recent form, but his much lower ranking on hard court against a top-10 opponent justifies the model's skepticism.</div>
+            <div class="recommendation">Michelsen's negative edge is driven by his much lower ranking and the market overestimating his chances, likely due to his own positive recent form, but he lacks a head-to-head history to challenge Fils' superior hard court credentials.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3595,26 +4148,232 @@ function switchMonth(m) {
         </div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Elmer Moller <span class="vs">vs</span> Henrique Rocha</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Elmer Moller</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Elmer Moller <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Croat gets the better of Elmer Moller in Challenger tournament final in Braga - Flashscore.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#163</strong> &nbsp;·&nbsp; 353 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:42.4%;"></div>
+                </div>
+                <span class="prob-val">42.4%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:44.2%;"></div>
+                </div>
+                <span class="prob-val">44.2%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">2.26</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-1.9%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-3.3%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Moller's model edge is negative despite positive sentiment, likely due to his lower ranking (#163 vs #105) and lack of grass court experience against higher-ranked opponents, which the market may be overvaluing.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.26</td><td class="bk-implied">44.2%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Henrique Rocha</div>
+            <div class="player-meta">Rank <strong>#105</strong> &nbsp;·&nbsp; 582 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:58.1%;"></div>
+                </div>
+                <span class="prob-val">58.1%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:63.7%;"></div>
+                </div>
+                <span class="prob-val">63.7%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.57</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-5.6%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-4.7%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Rocha's significant negative edge suggests the market is overestimating his chances, potentially due to his higher ranking and neutral sentiment, without sufficient consideration for his unproven grass court form or the lack of H2H data against Moller.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.57</td><td class="bk-implied">63.7%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Elena Rybakina <span class="vs">vs</span> Katarzyna Kawa</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Elena Rybakina, Katarzyna Kawa</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Elena Rybakina <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="WTA Ningbo Quarterfinal Predictions Including Elena Rybakina vs Katarzyna Kawa - Last Word On Sports">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#1</strong> &nbsp;·&nbsp; 9,196 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:93.5%;"></div>
+                </div>
+                <span class="prob-val">93.5%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:95.2%;"></div>
+                </div>
+                <span class="prob-val">95.2%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.05</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-1.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-6.6%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Rybakina's negative edge suggests the market might be slightly overvaluing her, despite her world #1 ranking and strong hard court form. While her dominance is clear, the model sees a minuscule opportunity for a slight market correction.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.05</td><td class="bk-implied">95.2%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Katarzyna Kawa <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Kawa stuns Bencic in Ningbo to score first career Top 20 win - WTA Tennis">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#128</strong> &nbsp;·&nbsp; 586 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:11.7%;"></div>
+                </div>
+                <span class="prob-val">11.7%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:12.2%;"></div>
+                </div>
+                <span class="prob-val">12.2%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">8.20</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-0.5%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-0.8%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Kawa's positive sentiment and recent form are unlikely to overcome the massive ranking disparity against Rybakina on hard court, explaining her low model probability. The market's slight overvaluation of Kawa's chances, despite her lower ranking, indicates a minor discrepancy.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">8.20</td><td class="bk-implied">12.2%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Francesco Forti <span class="vs">vs</span> Oriol Roca Batalla</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Francesco Forti, Oriol Roca Batalla</div>
     </div>
@@ -3622,7 +4381,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Alexander Bublik <span class="vs">vs</span> Karen Khachanov</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3661,7 +4420,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">The model's negative edge on Bublik (52.6% vs 57.8% market) suggests the market might be overvaluing his recent 'in form' sentiment; despite his higher ranking, the lack of H2H data means his hard court prowess against Khachanov is unproven.</div>
+            <div class="recommendation">The model sees negative edge on Bublik despite his higher ranking and positive form, suggesting the market may be overvaluing his recent performance on hard courts.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3711,7 +4470,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Khachanov's negative edge (-1.6%) indicates the market is slightly overvaluing him, but his 'in form' sentiment and comparable ranking to Bublik suggest a closer match than the market implies, especially with no H2H to differentiate their hard court performance.</div>
+            <div class="recommendation">Khachanov's negative edge is smaller, indicating the market is more aligned with the model's assessment of his chances, likely due to his consistent hard court play even if he's the slight underdog by ranking.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3733,7 +4492,7 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Alexander Maarten Jong <span class="vs">vs</span> Aidan Mayo</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Alexander Maarten Jong, Aidan Mayo</div>
     </div>
@@ -3741,7 +4500,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Corentin Moutet <span class="vs">vs</span> Tommy Paul</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3780,7 +4539,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Moutet's positive sentiment and recent form on clay are likely driving his market implied probability slightly above the model's, despite the significant ranking difference.</div>
+            <div class="recommendation">Moutet's positive sentiment and recent form on clay are not enough to overcome the significant ranking disparity against Paul, leading to a negative model edge despite the market slightly underestimating him. His lack of H2H experience against top-15 players on this surface further complicates his chances.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3830,7 +4589,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Paul's strong ranking (15 vs 94) and positive sentiment make him a clear favorite, but the model sees slightly less value than the market, possibly due to Moutet's clay court prowess.</div>
+            <div class="recommendation">Paul's strong ranking and positive form suggest he should be a heavy favorite, but the market's implied probability is even higher than the model's, resulting in a negative edge. While he's a superior player, the clay surface can sometimes neutralize power, and his lack of H2H against Moutet adds a slight unknown.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3852,39 +4611,245 @@ function switchMonth(m) {
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Felipe Alves <span class="vs">vs</span> Carlos Maria Zarate</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Felipe Alves, Carlos Maria Zarate</div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Ann Li <span class="vs">vs</span> Ashlyn Krueger</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#2563eb;background:rgba(37,99,235,0.12);">Hard</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Ann Li, Ashlyn Krueger</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Ann Li <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Ann Li vs Lilli Tagger · Quarterfinal · WTA Osaka - Tennis.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#25</strong> &nbsp;·&nbsp; 1,833 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:60.1%;"></div>
+                </div>
+                <span class="prob-val">60.1%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:62.9%;"></div>
+                </div>
+                <span class="prob-val">62.9%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.59</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-2.8%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-4.6%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">The model's negative edge on Li suggests the market might be overvaluing her current positive sentiment, possibly overlooking the lack of H2H data against Krueger or a slight dip in recent hard court performance not fully captured by her #25 ranking.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.59</td><td class="bk-implied">62.9%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Ashlyn Krueger <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Talia Gibson vs Ashlyn Krueger · Quarterfinal · WTA Osaka - Tennis.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#55</strong> &nbsp;·&nbsp; 1,072 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:40.1%;"></div>
+                </div>
+                <span class="prob-val">40.1%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:45.1%;"></div>
+                </div>
+                <span class="prob-val">45.1%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">2.22</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-5.0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-3.3%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Krueger's negative edge indicates the market is likely overestimating her chances, potentially due to her own positive sentiment and recent form, despite her significantly lower #55 ranking compared to Li on this hard court surface.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.22</td><td class="bk-implied">45.1%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Alexander Ritschard <span class="vs">vs</span> Sumit Nagal</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Alexander Ritschard, Sumit Nagal</div>
+        <div class="error-msg">⚠ Rankings not found for: Alexander Ritschard</div>
     </div>
 
-    <div class="match-card match-error">
+    <div class="match-card" style="border-left: 3px solid #2a2a2a; --card-glow: transparent;">
         <div class="match-header">
             <span class="match-teams">Coleman Wong <span class="vs">vs</span> Yi Zhou</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
-        <div class="error-msg">⚠ Rankings not found for: Coleman Wong, Yi Zhou</div>
+        
+        <div class="players-row">
+            
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Coleman Wong <span class='sentiment-sep'>·</span> <span class="sentiment-flag" style="color:#10b981;" title="Coleman Wong vs Kasidit Samrej · Round 2 · ATP Challenger Guangzhou, China - Tennis.com">↑ In form</span></div>
+            <div class="player-meta">Rank <strong>#92</strong> &nbsp;·&nbsp; 642 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:66.1%;"></div>
+                </div>
+                <span class="prob-val">66.1%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:69.4%;"></div>
+                </div>
+                <span class="prob-val">69.4%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">1.44</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-3.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-5.5%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">The model's negative edge on Wong suggests the market may be overvaluing his recent positive form, especially without any H2H data or specific grass court history to validate such a high implied probability against a lower-ranked opponent.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">1.44</td><td class="bk-implied">69.4%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        <div class="player-card" style="border-top: 2px solid #374151;">
+            <div class="player-name">Yi Zhou</div>
+            <div class="player-meta">Rank <strong>#280</strong> &nbsp;·&nbsp; 193 pts</div>
+            
+        <div class="prob-bars">
+            <div class="prob-row">
+                <span class="prob-label">Model</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-model" style="width:34.9%;"></div>
+                </div>
+                <span class="prob-val">34.9%</span>
+            </div>
+            <div class="prob-row">
+                <span class="prob-label">Mkt</span>
+                <div class="prob-track">
+                    <div class="prob-fill prob-mkt" style="width:39.2%;"></div>
+                </div>
+                <span class="prob-val">39.2%</span>
+            </div>
+        </div>
+            <div class="stake-badge"><span class="stake-logo">S</span><span class="stake-label">Stake</span><span class="stake-price">2.55</span></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Edge</span>
+                    <span class="stat-value" style="color:#6b7280;">-4.3%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Vig</span>
+                    <span class="stat-value" style="color:var(--small);">-3.1%</span>
+                </div>
+            </div>
+            <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
+                <span class="signal-dot" style="background:#6b7280;"></span>NO BET
+            </div>
+            <div class="recommendation">Zhou's negative edge indicates the market is likely overestimating his chances, given his significantly lower ranking and neutral sentiment, with no H2H or strong surface-specific data to justify the implied probability.</div>
+            
+            <details class="odds-details">
+                <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
+                <table class="odds-table">
+                    <thead>
+                        <tr>
+                            <th>Bookmaker</th>
+                            <th>Price</th>
+                            <th>Implied</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr><td class="bk-name">Stake</td><td class="bk-price" style="color:#10b981;font-weight:700;">2.55</td><td class="bk-implied">39.2%</td></tr></tbody>
+                </table>
+            </details>
+        </div>
+        </div>
     </div>
 
     <div class="match-card match-error">
         <div class="match-header">
             <span class="match-teams">Gabriel Debru <span class="vs">vs</span> Erik Arutiunian</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#16a34a;background:rgba(22,163,74,0.12);">Grass</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         <div class="error-msg">⚠ Rankings not found for: Gabriel Debru, Erik Arutiunian</div>
     </div>
@@ -3892,7 +4857,7 @@ function switchMonth(m) {
     <div class="match-card" style="border-left: 3px solid #f59e0b; --card-glow: #f59e0b;">
         <div class="match-header">
             <span class="match-teams">Daniel Altmaier <span class="vs">vs</span> Taylor Fritz</span>
-            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:06 UTC</span></span>
+            <span class="match-meta"><span class="surface-badge" style="color:#ea580c;background:rgba(234,88,12,0.12);">Clay</span><span class="match-time">Fri 23 Oct · 16:18 UTC</span></span>
         </div>
         
         <div class="players-row">
@@ -3931,7 +4896,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#f59e0b;background:rgba(245,158,11,0.10);border:1px solid #f59e0b20;">
                 <span class="signal-dot" style="background:#f59e0b;"></span>MARGINAL
             </div>
-            <div class="recommendation">Altmaier's positive model edge on clay is supported by his recent form on the surface, suggesting he is undervalued despite the significant ranking gap with Fritz.</div>
+            <div class="recommendation">Altmaier's positive model edge on clay is likely due to his recent form on the surface, which the market may be underestimating given his lower ranking compared to Fritz.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -3981,7 +4946,7 @@ function switchMonth(m) {
             <div class="signal-pill" style="color:#6b7280;background:rgba(107,114,128,0.10);border:1px solid #37415120;">
                 <span class="signal-dot" style="background:#6b7280;"></span>NO BET
             </div>
-            <div class="recommendation">Fritz's negative model edge indicates the market might be overestimating his clay court prowess, as his strong overall ranking and form are less dominant on this surface compared to his hard court performance.</div>
+            <div class="recommendation">Fritz's negative model edge suggests the market might be overvaluing his overall ranking on clay, a surface where he historically performs less dominantly than hard courts, despite his current positive sentiment.</div>
             
             <details class="odds-details">
                 <summary class="odds-summary">Odds by bookmaker <span class="odds-count">(1)</span></summary>
@@ -4010,7 +4975,7 @@ function switchMonth(m) {
 
 <script>
 (function() {
-  var generated = new Date("2026-10-23T10:07:01Z");
+  var generated = new Date("2026-10-23T10:18:57Z");
   var ageH = (Date.now() - generated.getTime()) / 3600000;
   if (ageH > 26) {
     var badge = document.getElementById('stale-badge');

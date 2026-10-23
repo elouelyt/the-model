@@ -24,7 +24,11 @@ logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).parent.parent
 CACHE_PATH = ROOT / "data" / "rankings_cache.json"
-_BASE = "https://sports.core.api.espn.com/v2/sports/tennis/leagues/atp"
+_BASES = {
+    "atp": "https://sports.core.api.espn.com/v2/sports/tennis/leagues/atp",
+    "wta": "https://sports.core.api.espn.com/v2/sports/tennis/leagues/wta",
+}
+_BASE = _BASES["atp"]  # kept for backwards compat
 _YEAR = datetime.now().year
 
 
@@ -67,18 +71,66 @@ def _athlete_name(ref: str, sess: requests.Session) -> str | None:
 
 
 def fetch_rankings(sess: requests.Session) -> dict[str, dict]:
+    """Fetch ATP rankings from atptour.com (top 300) via cloudscraper."""
+    try:
+        import cloudscraper
+        from bs4 import BeautifulSoup
+    except ImportError:
+        logger.warning("cloudscraper/beautifulsoup4 not installed — falling back to ESPN (150 players)")
+        return _fetch_rankings_espn(sess)
+
+    scraper = cloudscraper.create_scraper()
+    url = "https://www.atptour.com/en/rankings/singles"
+    try:
+        r = scraper.get(url, params={"rankRange": "1-300"}, timeout=25)
+        r.raise_for_status()
+    except Exception as exc:
+        logger.warning("atptour.com fetch failed: %s — falling back to ESPN", exc)
+        return _fetch_rankings_espn(sess)
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    tables = soup.find_all("table")
+    if len(tables) < 2:
+        logger.warning("atptour.com table not found — falling back to ESPN")
+        return _fetch_rankings_espn(sess)
+
+    rankings: dict[str, dict] = {}
+    for row in tables[1].find_all("tr"):
+        cells = row.find_all("td")
+        if len(cells) < 4:
+            continue
+        rank_text = cells[0].get_text(strip=True).lstrip("+-").lstrip("0123456789").strip()
+        rank_num_text = re.sub(r"[^\d]", "", cells[0].get_text(strip=True))
+        if not rank_num_text:
+            continue
+        rank = int(rank_num_text[:4])
+        name_raw = cells[1].get_text(strip=True)
+        # remove leading digits (age shown inline) and clean
+        name = re.sub(r"^\d+", "", name_raw).strip()
+        pts_text = re.sub(r"[^\d]", "", cells[3].get_text(strip=True))
+        points = int(pts_text) if pts_text else 0
+        if name:
+            rankings[name] = {"rank": rank, "points": points}
+
+    logger.info("Built ATP rankings for %d players (atptour.com)", len(rankings))
+    if len(rankings) < 100:
+        logger.warning("Too few ATP players (%d) from atptour.com — falling back to ESPN", len(rankings))
+        return _fetch_rankings_espn(sess)
+    return rankings
+
+
+def _fetch_rankings_espn(sess: requests.Session) -> dict[str, dict]:
+    """ESPN fallback — only returns top 150 ATP."""
     url = _latest_rankings_url(sess)
     if not url:
         raise ValueError("Could not find latest rankings URL")
-    logger.info("Fetching rankings from %s", url)
+    logger.info("Fetching ATP rankings from ESPN %s", url)
 
     data = _get(url, sess, params={"limit": 1000})
     if not data:
         raise ValueError("Empty response from rankings endpoint")
 
     ranks = data.get("ranks", [])
-    logger.info("Got %d ranked entries", len(ranks))
-
     rankings: dict[str, dict] = {}
     for entry in ranks:
         rank = entry.get("current")
@@ -86,19 +138,13 @@ def fetch_rankings(sess: requests.Session) -> dict[str, dict]:
         athlete_ref = (entry.get("athlete") or {}).get("$ref", "")
         if not rank or not athlete_ref:
             continue
-
-        # extract athlete id from ref
         m = re.search(r"/athletes/(\d+)", athlete_ref)
         if not m:
             continue
-
         name = _athlete_name(athlete_ref, sess)
         if not name:
             continue
-
         rankings[name] = {"rank": rank, "points": points}
-        if len(rankings) % 50 == 0:
-            logger.info("  %d players resolved...", len(rankings))
         time.sleep(0.05)
 
     return rankings
@@ -122,22 +168,40 @@ def main() -> None:
         return
 
     sess = _session()
-    rankings = fetch_rankings(sess)
-    logger.info("Built rankings for %d players", len(rankings))
 
+    # ATP rankings (atptour.com top 300, ESPN top 150 as fallback)
+    rankings = fetch_rankings(sess)
     if len(rankings) < 100:
-        raise ValueError(f"Too few players ({len(rankings)}) — something went wrong")
+        raise ValueError(f"Too few ATP players ({len(rankings)}) — something went wrong")
+
+    # WTA rankings — different endpoint structure
+    try:
+        wta_resp = _get("https://site.api.espn.com/apis/site/v2/sports/tennis/wta/rankings", sess)
+        wta: dict[str, dict] = {}
+        for entry in (wta_resp or {}).get("rankings", [{}])[0].get("ranks", []):
+            rank = entry.get("current")
+            points = int(entry.get("points", 0))
+            name = (entry.get("athlete") or {}).get("displayName", "")
+            if rank and name:
+                wta[name] = {"rank": rank, "points": points}
+        logger.info("Built WTA rankings for %d players", len(wta))
+        for name, d in wta.items():
+            if name not in rankings:
+                rankings[name] = d
+        logger.info("Combined: %d players (ATP + WTA)", len(rankings))
+    except Exception as exc:
+        logger.warning("WTA rankings failed (non-fatal): %s", exc)
 
     # sanity check
-    top5 = sorted(rankings.items(), key=lambda x: x[1]["rank"])[:5]
-    print("\nTop 5 ATP:")
+    top5 = sorted([(n, d) for n, d in rankings.items()], key=lambda x: x[1]["rank"])[:5]
+    print("\nTop 5 (ATP):")
     for name, data in top5:
         print(f"  {data['rank']:>3}. {name:<25} {data['points']:>6} pts")
 
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "source": "ESPN Core API",
+        "source": "ESPN Core API (ATP + WTA)",
         "player_count": len(rankings),
         "rankings": rankings,
     }
