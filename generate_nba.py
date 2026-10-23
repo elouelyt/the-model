@@ -43,12 +43,13 @@ def build(doc: dict) -> str:
         f'<td class="num ev">{p["ev"]:+.1%}</td>'
         f'<td><b>{escape(p["player"])}</b><small>{escape(p["team"])}</small></td>'
         f'<td>{"Más de" if p["side"] == "Over" else "Menos de"} {p["line"]:g} <small>{escape(STAT_ES.get(p["stat"], p["stat"]))}</small></td>'
-        f'<td class="num"><b>{p["stake_odds"]:.2f}</b></td>'
+        f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>equilibrio {1 / p["stake_odds"]:.0%}</small></td>'
+        f'<td class="num">{p["fair_prob"]:.1%}</td>'
         f'<td class="num muted">{p["fair_odds"]:.2f}</td>'
         f'<td class="num muted">{escape(p["fanduel"])}</td>'
         f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td></tr>'
         for p in picks
-    ) or '<tr><td colspan="7" class="empty">Ninguna apuesta supera el mínimo ahora mismo.</td></tr>'
+    ) or '<tr><td colspan="8" class="empty">Ninguna apuesta supera el mínimo ahora mismo.</td></tr>'
     best = picks[0] if picks else None
     best_html = (f'<b class="ev">{best["ev"]:+.1%}</b><small>{escape(best["player"])} · '
                  f'{escape(STAT_ES.get(best["stat"], best["stat"]))}</small>') if best else '<b>—</b>'
@@ -97,7 +98,7 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 </div>
 <div class="chips">{chips}</div>
 <div class="card"><table>
-<tr><th class="num">Valor</th><th>Jugador</th><th>Apuesta</th><th class="num">Stake</th><th class="num">Justa</th><th class="num">FanDuel</th><th>Partido</th></tr>
+<tr><th class="num">Valor</th><th>Jugador</th><th>Apuesta</th><th class="num">Stake</th><th class="num">Prob. justa</th><th class="num">Cuota justa</th><th class="num">FanDuel</th><th>Partido</th></tr>
 {rows}</table></div>
 <p class="note">Valor esperado = probabilidad justa de FanDuel × cuota de Stake − 1, con la misma línea en las dos casas.
 Apuesta cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas. Una cuota de Stake por debajo de la "justa" no tiene valor.</p>
