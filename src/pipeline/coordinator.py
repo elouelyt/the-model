@@ -117,6 +117,10 @@ def fetch_odds_node(state: PipelineState) -> PipelineState:
                     for m in matches:
                         if not m.get("home_odds") or not m.get("away_odds"):
                             continue
+                        # ATP-only — skip WTA/women tournaments
+                        t = m.get("tournament", "").lower()
+                        if "wta" in t or "women" in t:
+                            continue
                         # Parse start_time; default to now+6h if missing
                         st_str = m.get("start_time", "")
                         try:
