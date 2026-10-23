@@ -19,6 +19,35 @@ _ATP_KEY_PREFIX = "tennis_atp_"
 _REGIONS = "us,uk,eu"
 _MARKETS = "h2h"
 
+_API_KEY_ENV_VARS = ["THE_ODDS_API_KEY", "THE_ODDS_API_KEY_2"]
+
+
+def get_working_api_key(sport_key: str = "tennis_atp_us_open") -> str | None:
+    """Return the first The-Odds-API key that responds with a non-401 status.
+
+    Validates against the odds endpoint (not just /sports/) to catch keys that
+    are active but have no quota remaining for odds calls.
+    Tries THE_ODDS_API_KEY first, then THE_ODDS_API_KEY_2 as fallback.
+    Returns None if both are unset or both return 401.
+    """
+    for env_var in _API_KEY_ENV_VARS:
+        key = os.getenv(env_var)
+        if not key:
+            continue
+        try:
+            r = requests.get(
+                f"{_BASE_URL}/{sport_key}/odds/",
+                params={"apiKey": key, "regions": "eu", "markets": "h2h"},
+                timeout=10,
+            )
+            if r.status_code != 401:
+                logger.info("Using API key from %s", env_var)
+                return key
+            logger.warning("%s returned 401 — trying next key", env_var)
+        except Exception as exc:
+            logger.warning("%s check failed: %s — trying next key", env_var, exc)
+    return None
+
 
 def fetch_active_atp_sport_keys(api_key: str) -> list[str]:
     """Fetch all currently active ATP singles tournament sport keys from The-Odds-API.
@@ -68,9 +97,9 @@ def fetch_odds() -> list[dict]:
         EnvironmentError: If THE_ODDS_API_KEY is not set.
         requests.HTTPError: If any API call returns a non-200 status code.
     """
-    api_key = os.getenv("THE_ODDS_API_KEY")
+    api_key = get_working_api_key()
     if not api_key:
-        raise EnvironmentError("THE_ODDS_API_KEY is not set in the environment.")
+        raise EnvironmentError("No valid THE_ODDS_API_KEY found (tried THE_ODDS_API_KEY and THE_ODDS_API_KEY_2).")
 
     sport_keys = fetch_active_atp_sport_keys(api_key)
 

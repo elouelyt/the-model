@@ -17,9 +17,10 @@ def fetch_mma_odds() -> list[dict]:
     Each fight dict contains:
         fighter1, fighter2, odds1, odds2, commence_time (ISO str), event
     """
-    api_key = os.getenv("THE_ODDS_API_KEY")
+    from src.ingestion.extract_odds import get_working_api_key
+    api_key = get_working_api_key(sport_key=_SPORT_KEY)
     if not api_key:
-        logger.warning("THE_ODDS_API_KEY not set — skipping MMA odds")
+        logger.warning("No valid THE_ODDS_API_KEY found — skipping MMA odds")
         return []
 
     try:
