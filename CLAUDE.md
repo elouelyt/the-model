@@ -113,6 +113,12 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 **Key lesson from Sprint 5:** TypedDict state with `total=False` lets nodes add keys incrementally without needing to initialise all fields upfront. Use it as the graph's single shared context object.
 **Key lesson from Sprint 5:** Keep node functions side-effect-free and returning `{**state, "new_key": value}` — this makes the graph trivially testable by calling nodes directly with mock state dicts.
 
+## Panel privado (track record) — COMPLETE ✓
+
+`generate_dashboard.py` lee `data/track_record.json` y genera un panel (1 unidad fija por parlay, cuota de Stake): beneficio, ROI, aciertos, curva acumulada, resultado por mes y acierto por rango de cuota. El workflow diario lo cifra con `staticrypt` (secret `DASHBOARD_PASSWORD`) y publica `panel.html`, sin enlace desde `index.html`. Si el secret no existe, el paso se salta: nunca se publica sin cifrar.
+
+**Key lesson:** `staticrypt` pide confirmación interactiva si la contraseña tiene menos de 14 caracteres y se cuelga en CI — usar siempre `--short`. Fijar `--salt` para que "recordar contraseña" no caduque cada día.
+
 ## Sprint 6+ (Planned) — Data Enrichment & Model Upgrade
 
 **Goal:** Improve prediction quality with richer data sources. Improvements go live immediately since the app is already deployed.

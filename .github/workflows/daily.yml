@@ -52,12 +52,25 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python generate_html.py
 
+      - name: Build encrypted dashboard
+        env:
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: |
+          if [ -z "$DASHBOARD_PASSWORD" ]; then
+            echo "DASHBOARD_PASSWORD not set — skipping panel.html (never publish it unencrypted)"
+            exit 0
+          fi
+          python generate_dashboard.py build/panel_src.html
+          npx --yes staticrypt@3.5.4 build/panel_src.html -p "$DASHBOARD_PASSWORD"             --salt 8669795df810e4666e526fa8a931d9da --remember 30 --short             --template-title "Acceso" --template-instructions "Panel privado"             -d build/enc
+          cp build/enc/panel_src.html panel.html
+
       - name: Commit and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Save pipeline outputs before resetting to avoid origin/main overwriting them
           cp index.html /tmp/index_generated.html
+          cp -f panel.html /tmp/panel_generated.html 2>/dev/null || true
           cp data/track_record.json /tmp/track_record_generated.json
           cp -r data/predictions /tmp/predictions_generated
           cp -f data/scores_cache.json /tmp/scores_cache_generated.json 2>/dev/null || true
@@ -65,11 +78,13 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           cp /tmp/index_generated.html index.html
+          cp -f /tmp/panel_generated.html panel.html 2>/dev/null || true
           cp /tmp/track_record_generated.json data/track_record.json
           cp -r /tmp/predictions_generated/. data/predictions/
           cp -f /tmp/scores_cache_generated.json data/scores_cache.json 2>/dev/null || true
           cp -f /tmp/rankings_cache_generated.json data/rankings_cache.json 2>/dev/null || true
           git add index.html || true
+          git add panel.html || true
           git add data/predictions/ || true
           git add data/track_record.json || true
           git add data/scores_cache.json || true
