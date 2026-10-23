@@ -39,11 +39,13 @@ def main() -> None:
         raise SystemExit("DASHBOARD_PASSWORD missing in .env — needed to encrypt the NBA picks.")
     py = sys.executable
 
+    run(py, "scripts/nba_settle.py", check=False)  # settle yesterday's legs and combos with real box scores
     if "--skip-fetch" not in sys.argv:
         run(py, "scripts/nba_stake_scraper.py")
         run(py, "scripts/nba_fanduel.py")
     run(py, "scripts/nba_pinnacle.py")  # free public API, always refreshed
     run(py, "scripts/nba_ev.py")
+    run(py, "scripts/nba_combos.py")
     encrypt_file(ROOT / "data" / "nba_picks.json", ENC)
 
     run("git", "add", "data/nba_picks.enc")

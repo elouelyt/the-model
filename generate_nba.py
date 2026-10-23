@@ -45,6 +45,20 @@ h2.sec { font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color
 .pos { color:var(--green); } .neg { color:#f87171; }
 details.bak { margin-top:14px; color:var(--muted); font-size:.85rem; }
 details.bak textarea { width:100%; min-height:90px; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px; font:12px ui-monospace,monospace; margin:8px 0; }
+.combos { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; }
+.combo { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+.combo .chead { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
+.combo .cn { margin-left:auto; color:var(--muted); font-size:.78rem; }
+.fam { background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:1px 7px; font-size:.72rem; color:var(--orange); }
+.combo ul { list-style:none; margin:0; padding:0; }
+.combo li { display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-top:1px solid var(--border); }
+.combo li small { display:block; color:var(--muted); font-size:.76rem; }
+.combo .cfoot { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; border-top:1px solid var(--border); padding-top:10px; margin-top:4px; font-size:.88rem; }
+.combo .cfoot button { margin-left:auto; }
+.ans { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:12px; margin-bottom:12px; }
+.card.an h3 { font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10px 0 0; }
+.card.an table { min-width:0; }
+
 .bets-empty { color:var(--muted); text-align:center; padding:22px; }
 '''
 
@@ -74,6 +88,10 @@ APP_JS = r'''
     unitInfo.textContent = st.bankroll
       ? '1 unidad = ' + fmt(st.bankroll * 0.01) + ' € (1 % del bankroll) · sugerencia: 0,25 u, o 0,5 u si el EV es del 3 % o más'
       : 'Escribe tu bankroll y te sugiero cuánto apostar en cada jugada (1 unidad = 1 %).';
+    document.querySelectorAll('.combo .csug').forEach(function (c) {
+      var s = st.bankroll ? Math.round(st.bankroll * 0.01 * 0.25 * 2) / 2 : null;
+      c.textContent = s ? 'Sugerido ' + fmt(s) + ' € (0,25 u)' : '0,25 u';
+    });
     document.querySelectorAll('tr[data-key]').forEach(function (r) {
       var ev = parseFloat(r.getAttribute('data-ev')), cell = r.querySelector('.sug'), s = suggest(ev);
       cell.textContent = '';
@@ -84,8 +102,8 @@ APP_JS = r'''
 
   function markPlaced() {
     var placed = {}; st.bets.forEach(function (b) { placed[b.key] = true; });
-    document.querySelectorAll('tr[data-key] .btn').forEach(function (btn) {
-      var done = !!placed[btn.closest('tr').getAttribute('data-key')];
+    document.querySelectorAll('tr[data-key] .btn, .combo .btn').forEach(function (btn) {
+      var done = !!placed[btn.closest('[data-key]').getAttribute('data-key')];
       btn.disabled = done; btn.textContent = done ? '✓ Apostada' : 'Apostada';
     });
   }
@@ -131,11 +149,11 @@ APP_JS = r'''
   }
 
   bk.oninput = function () { var v = parseFloat(bk.value); st.bankroll = v > 0 ? v : null; save(); renderSuggestions(); };
-  document.querySelectorAll('tr[data-key] .btn').forEach(function (btn) {
+  document.querySelectorAll('tr[data-key] .btn, .combo .btn').forEach(function (btn) {
     btn.onclick = function () {
-      var r = btn.closest('tr'), ev = parseFloat(r.getAttribute('data-ev'));
+      var r = btn.closest('[data-key]'), ev = parseFloat(r.getAttribute('data-ev'));
       st.bets.push({ key: r.getAttribute('data-key'), date: Date.now(), desc: r.getAttribute('data-desc'), game: r.getAttribute('data-game'),
-        odds: parseFloat(r.getAttribute('data-odds')), ev: ev, stake: suggest(ev) || 0, status: 'pending' });
+        odds: parseFloat(r.getAttribute('data-odds')), ev: ev, stake: (r.classList.contains('combo') ? (st.bankroll ? Math.round(st.bankroll * 0.01 * 0.25 * 2) / 2 : 0) : suggest(ev)) || 0, status: 'pending' });
       save(); markPlaced(); renderBets();
     };
   });
@@ -174,6 +192,87 @@ def _row(p: dict) -> str:
     )
 
 
+FAMILY_ES = {"probabilidad": "Probabilidad", "valor": "Valor", "mixta": "Mixta"}
+
+
+def _combos_html(doc: dict) -> str:
+    combos = doc.get("combos") or []
+    if not combos:
+        return ""
+    cards = []
+    for i, c in enumerate(combos):
+        legs = "".join(
+            f'<li><span><b>{escape(l["player"])}</b> {"Más de" if l["side"] == "Over" else "Menos de"} {l["line"]:g} '
+            f'<span class="tag">{escape(STAT_ES.get(l["stat"], l["stat"]))}</span>'
+            f'<small>{escape(l["game"])} · {local_time(l["start"])}</small></span>'
+            f'<span class="num"><b>{l["stake_odds"]:.2f}</b><small>{l["fair_prob"]:.0%}</small></span></li>'
+            for l in c["legs"]
+        )
+        fams = " ".join(f'<span class="fam">{escape(FAMILY_ES.get(f, f))}</span>' for f in c["families"])
+        desc = " + ".join(f'{l["player"]} {"+" if l["side"] == "Over" else "-"}{l["line"]:g} {STAT_ES.get(l["stat"], l["stat"])}'
+                          for l in c["legs"])
+        key = "combo|" + "|".join(l["key"] for l in c["legs"])
+        cards.append(
+            f'<div class="combo" data-key="{escape(key)}" data-desc="{escape("Combinada: " + desc)}" '
+            f'data-odds="{c["odds"]}" data-ev="{c["ev"]}" data-game="3 partidos">'
+            f'<div class="chead">{fams}<span class="cn">Combinada {i + 1}</span></div>'
+            f'<ul>{legs}</ul>'
+            f'<div class="cfoot"><span>Cuota <b>{c["odds"]:.2f}</b></span><span>Prob. <b>{c["prob"]:.1%}</b></span>'
+            f'<span class="ev">EV {c["ev"]:+.0%}</span><span class="csug"></span>'
+            f'<button class="btn cbtn" type="button">Apostada</button></div></div>'
+        )
+    return (
+        '<h2 class="sec">Combinadas de 3 · recomendadas</h2>'
+        '<p class="note" style="margin-top:0">Tres piernas de partidos distintos y jugadores distintos, solo de partidos que no han empezado. '
+        'Cuota = producto de las cuotas de Stake; probabilidad = producto de las probabilidades justas. '
+        'Tres familias para comparar resultados: Probabilidad (más acierto), Valor (más EV) y Mixta (EV ≥ 20 % con más acierto). '
+        'Importe sugerido: 0,25 u, como en el método.</p>'
+        f'<div class="combos">{"".join(cards)}</div>'
+    )
+
+
+def _tbl(title: str, rows: list[dict]) -> str:
+    if not rows:
+        return ""
+    body = "".join(
+        f'<tr><td>{escape(r["name"])}</td><td class="num">{r["n"]}</td><td class="num">{r["hit"]:.0%}</td>'
+        f'<td class="num muted">{r["expected"]:.0%}</td>'
+        f'<td class="num {"pos" if r["roi"] > 0 else "neg"}">{r["roi"]:+.0%}</td></tr>' for r in rows)
+    return (f'<div class="card an"><h3>{escape(title)}</h3><table><tr><th></th><th class="num">N</th>'
+            f'<th class="num">Acierto</th><th class="num">Esperado</th><th class="num">ROI</th></tr>{body}</table></div>')
+
+
+def _analysis_html(doc: dict) -> str:
+    a = doc.get("analysis")
+    head = '<h2 class="sec">Resultados y análisis · por qué se acierta o se falla</h2>'
+    if not a or not a.get("legs_settled"):
+        return head + ('<p class="note" style="margin-top:0">Aún sin resultados. Las piernas y combinadas se liquidan solas '
+                       'con los marcadores reales cuando terminan los partidos, y aquí aparecerá cómo calibra cada mercado.</p>')
+    ctx = a["context"]
+
+    def pct(x):
+        return "—" if x is None else f"{x:.0%}"
+    fam = "".join(
+        f'<tr><td>{escape(FAMILY_ES.get(f["name"], f["name"]))}</td><td class="num">{f["n"]}</td>'
+        f'<td class="num">{f["hits"]}</td><td class="num muted">{f["expected_hit"]:.0%}</td>'
+        f'<td class="num {"pos" if f["roi"] > 0 else "neg"}">{f["roi"]:+.0%}</td></tr>' for f in a["combo_families"])
+    fam_html = (f'<div class="card an"><h3>Combinadas por familia</h3><table><tr><th></th><th class="num">N</th>'
+                f'<th class="num">Acertadas</th><th class="num">Esperado</th><th class="num">ROI</th></tr>{fam}</table></div>'
+                if fam else "")
+    return (head
+            + f'<p class="note" style="margin-top:0">{a["legs_settled"]} piernas liquidadas ({a["legs_void"]} anuladas por no jugar) '
+              f'y {a["combos_settled"]} combinadas. "Esperado" es la probabilidad justa media; si el acierto real queda por debajo, '
+              f'el mercado o la casa de referencia están sobrevalorando esa clase de apuesta. ROI con 1 unidad por apuesta a cuota de Stake.</p>'
+            + '<div class="ans">'
+            + _tbl("Calibración (por probabilidad)", a["calibration"]) + _tbl("Por mercado", a["by_stat"])
+            + _tbl("Over / Under", a["by_side"]) + _tbl("Por nivel de EV", a["by_ev"]) + _tbl("Por casas de referencia", a["by_books"])
+            + fam_html + '</div>'
+            + f'<div class="card an"><h3>Contexto del partido</h3><p class="note" style="margin:6px 0">Partidos con diferencia final de '
+              f'{ctx["blowout_threshold"]}+ puntos ({ctx["n_blowout"]} piernas) frente a ajustados ({ctx["n_close"]}): '
+              f'<b>Over</b> {pct(ctx["over_blowout"])} vs {pct(ctx["over_close"])} · <b>Under</b> {pct(ctx["under_blowout"])} vs {pct(ctx["under_close"])}. '
+              f'En palizas los titulares descansan: favorece a los Under y perjudica a los Over.</p></div>')
+
+
 def build(doc: dict) -> str:
     picks = doc["picks"]
     stamp = datetime.fromisoformat(doc["timestamp"])
@@ -183,6 +282,8 @@ def build(doc: dict) -> str:
         f'<button class="chip" data-s="{escape(s)}">{escape(STAT_ES.get(s, s))}</button>' for s in stats_present
     )
     rows = "".join(_row(p) for p in picks) or '<tr><td colspan="8" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
+    combos_html = _combos_html(doc)
+    analysis_html = _analysis_html(doc)
     best = picks[0] if picks else None
     best_html = (f'<b class="ev">{best["ev"]:+.1%}</b><small>{escape(best["player"])} · '
                  f'{escape(STAT_ES.get(best["stat"], best["stat"]))}</small>') if best else '<b>—</b>'
@@ -238,10 +339,12 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 <div class="card"><table>
 <tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">Casas serias</th><th class="num">Apostar</th><th></th></tr>
 {rows}</table></div>
+{combos_html}
 <p class="note">Win% = probabilidad justa sin margen, promedio de las casas serias disponibles para esa línea (FD = FanDuel, PIN = Pinnacle). EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
 <h2 class="sec">Mis apuestas · track record</h2>
 <div class="kpis"><div class="kpi"><span>Beneficio</span><div id="k-profit"></div></div><div class="kpi"><span>ROI</span><div id="k-roi"></div></div><div class="kpi"><span>Aciertos</span><div id="k-hit"></div></div><div class="kpi"><span>Pendientes</span><div id="k-pend"></div></div></div>
 <div class="card"><table><tr><th>Fecha</th><th>Apuesta</th><th class="num">Cuota</th><th class="num">Importe €</th><th>Resultado</th><th class="num">Beneficio</th><th></th></tr><tbody id="betsbody"></tbody></table></div>
+{analysis_html}
 <details class="bak"><summary>Copia de seguridad (para pasar tus apuestas a otro dispositivo)</summary>
 <textarea id="backup" aria-label="Copia de seguridad" placeholder="Pulsa Exportar y copia este texto. Para restaurar, pégalo aquí y pulsa Importar."></textarea>
 <button class="btn" id="exp" type="button">Exportar</button> <button class="btn" id="imp" type="button">Importar</button></details>
