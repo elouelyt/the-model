@@ -1075,6 +1075,20 @@
             }
           ],
           "resolved": true
+        },
+        "23": {
+          "parlays": [
+            {
+              "legs": [
+                "Francisco Cerundolo"
+              ],
+              "stake_odds": 1.52,
+              "best_odds": 1.52,
+              "won": null,
+              "opponent": "Clement Chidekh"
+            }
+          ],
+          "resolved": false
         }
       }
     }
