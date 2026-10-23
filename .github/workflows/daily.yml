@@ -60,7 +60,8 @@ jobs:
             echo "DASHBOARD_PASSWORD not set — skipping panel.html (never publish it unencrypted)"
             exit 0
           fi
-          python generate_dashboard.py build/panel_src.html
+          python generate_dashboard.py build/dashboard.html
+          python scripts/build_panel.py build/site.html build/dashboard.html build/panel_src.html
           npx --yes staticrypt@3.5.4 build/panel_src.html -p "$DASHBOARD_PASSWORD"             --salt 8669795df810e4666e526fa8a931d9da --remember 30 --short             --template-title "Acceso" --template-instructions "Panel privado"             -d build/enc
           cp build/enc/panel_src.html panel.html
 

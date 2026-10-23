@@ -2385,9 +2385,22 @@ def main() -> None:
         results, parlays=parlays, safe_parlays=safe_parlays,
         error=error, track_record=track_record, daily_pick=daily_pick,
     )
-    out = Path("index.html")
+    out = Path("build") / "site.html"
+    out.parent.mkdir(exist_ok=True)
     out.write_text(html, encoding="utf-8")
     logger.info("Written %s (%d bytes)", out, len(html))
+    # index.html is public: the full site only ships encrypted inside panel.html
+    Path("index.html").write_text(_PUBLIC_PLACEHOLDER, encoding="utf-8")
+
+
+_PUBLIC_PLACEHOLDER = (
+    '<!doctype html><html lang="es"><head><meta charset="utf-8">'
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    '<meta name="robots" content="noindex,nofollow"><title>the-model</title>'
+    '<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080808;'
+    'color:#8a8a8a;font:15px system-ui,sans-serif}</style></head>'
+    '<body><p>Acceso privado</p></body></html>'
+)
 
 
 def _save_predictions(parlays: list[dict]) -> None:
