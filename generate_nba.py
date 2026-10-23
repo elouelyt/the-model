@@ -39,7 +39,7 @@ def build(doc: dict) -> str:
         f'<button class="chip" data-s="{escape(s)}">{escape(STAT_ES.get(s, s))}</button>' for s in stats_present
     )
     rows = "".join(
-        f'<tr data-s="{escape(p["stat"])}">'
+        f'<tr data-s="{escape(p["stat"])}" data-ev="{p["ev"]}" data-win="{p["fair_prob"]}">'
         f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td>'
         f'<td><span class="tag">{escape(STAT_ES.get(p["stat"], p["stat"]))}</span>'
         f'<b>{escape(p["player"])} {"Más de" if p["side"] == "Over" else "Menos de"} {p["line"]:g}</b></td>'
@@ -73,6 +73,7 @@ h1 {{ font-size:1.5rem; margin:8px 0 0; }}
 .warn {{ background:#2a1d08; border:1px solid #5a3d0a; color:var(--amber); border-radius:8px; padding:10px 14px; }}
 .chips {{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }}
 .chip {{ background:var(--surface); color:var(--muted); border:1px solid var(--border); border-radius:6px; padding:6px 12px; font:inherit; cursor:pointer; }}
+.sep {{ flex:1; }}
 .chip.on {{ color:var(--text); border-color:var(--orange); }}
 .chip:focus-visible {{ outline:2px solid var(--orange); outline-offset:2px; }}
 .card {{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 16px 10px; overflow-x:auto; }}
@@ -98,16 +99,24 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
   <div class="kpi"><span>Apuestas</span><b>{len(picks)}</b><small>con EV positivo, de mayor a menor</small></div>
   <div class="kpi"><span>Mejor EV</span>{best_html}</div>
 </div>
-<div class="chips">{chips}</div>
+<div class="chips">{chips}<span class="sep"></span><button class="chip sort on" data-k="ev">Ordenar por EV%</button><button class="chip sort" data-k="win">Ordenar por Win%</button></div>
 <div class="card"><table>
 <tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">FanDuel</th></tr>
 {rows}</table></div>
 <p class="note">Win% = probabilidad justa según FanDuel sin margen. EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
 </main>
 <script>
-document.querySelectorAll('.chip').forEach(function(b) {{
+document.querySelectorAll('.chip.sort').forEach(function(b) {{
   b.onclick = function() {{
-    document.querySelectorAll('.chip').forEach(function(x) {{ x.classList.toggle('on', x === b); }});
+    document.querySelectorAll('.chip.sort').forEach(function(x) {{ x.classList.toggle('on', x === b); }});
+    var key = 'data-' + b.dataset.k, rows = Array.prototype.slice.call(document.querySelectorAll('tr[data-ev]'));
+    rows.sort(function(a, c) {{ return parseFloat(c.getAttribute(key)) - parseFloat(a.getAttribute(key)); }});
+    rows.forEach(function(r) {{ r.parentNode.appendChild(r); }});
+  }};
+}});
+document.querySelectorAll('.chip[data-s]').forEach(function(b) {{
+  b.onclick = function() {{
+    document.querySelectorAll('.chip[data-s]').forEach(function(x) {{ x.classList.toggle('on', x === b); }});
     document.querySelectorAll('tr[data-s]').forEach(function(r) {{ r.hidden = b.dataset.s !== 'all' && r.dataset.s !== b.dataset.s; }});
   }};
 }});
