@@ -65,21 +65,35 @@ SCRAPE_JS = r"""
     return (await r.json())?.data;
   }
 
+  function normName(raw) {
+    const s = (raw || "").trim();
+    // Filter doubles (contains " / ")
+    if (s.includes(" / ")) return null;
+    // "Lastname, Firstname" → "Firstname Lastname"
+    if (s.includes(",")) {
+      const [last, first] = s.split(",").map(p => p.trim());
+      return first ? `${first} ${last}` : last;
+    }
+    return s;
+  }
+
   function parseFixture(f, tName) {
     const data = f.data || {};
     if (data.isOutright) return null;
     const comps = data.competitors || [];
     if (comps.length < 2) return null;
-    const home = comps[0].name || comps[0].defaultName || "";
-    const away = comps[1].name || comps[1].defaultName || "";
+    const home = normName(comps[0].name || comps[0].defaultName || "");
+    const away = normName(comps[1].name || comps[1].defaultName || "");
     if (!home || !away) return null;
     let hOdds = null, aOdds = null;
     for (const g of (f.groups || [])) for (const t of (g.templates || [])) for (const m of (t.markets || [])) {
       for (const o of (m.outcomes || [])) if (o.active) {
         const n = (o.name || "").toLowerCase();
         const hl = home.toLowerCase(), al = away.toLowerCase();
-        if (n.includes(hl.split(" ")[0]) || n.includes(hl.split(",")[0])) hOdds = parseFloat(o.odds);
-        else if (n.includes(al.split(" ")[0]) || n.includes(al.split(",")[0])) aOdds = parseFloat(o.odds);
+        // Match by last token (surname) — most reliable after normalization
+        const hLast = hl.split(" ").pop(), aLast = al.split(" ").pop();
+        if (n.includes(hLast) || n.includes(hl)) hOdds = parseFloat(o.odds);
+        else if (n.includes(aLast) || n.includes(al)) aOdds = parseFloat(o.odds);
       }
     }
     return {
