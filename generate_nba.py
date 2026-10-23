@@ -29,6 +29,150 @@ def local_time(raw: str) -> str:
     except (TypeError, ValueError):
         return raw
 
+APP_CSS = r'''
+.bk { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; padding:14px 16px; margin-bottom:14px; }
+.bk label { color:var(--muted); font-size:.85rem; }
+.bk input { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font:inherit; width:130px; }
+.bk input:focus-visible, .stk:focus-visible, select:focus-visible { outline:2px solid var(--orange); outline-offset:2px; }
+.bk .hint { color:var(--muted); font-size:.82rem; }
+.sug { white-space:nowrap; }
+.btn { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:5px 10px; font:inherit; font-size:.82rem; cursor:pointer; }
+.btn:hover { border-color:var(--orange); }
+.btn[disabled] { color:var(--green); border-color:var(--border); cursor:default; }
+.stk { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:4px 6px; font:inherit; width:78px; text-align:right; }
+select { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:4px 6px; font:inherit; }
+h2.sec { font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin:28px 0 12px; }
+.pos { color:var(--green); } .neg { color:#f87171; }
+details.bak { margin-top:14px; color:var(--muted); font-size:.85rem; }
+details.bak textarea { width:100%; min-height:90px; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px; font:12px ui-monospace,monospace; margin:8px 0; }
+.bets-empty { color:var(--muted); text-align:center; padding:22px; }
+'''
+
+APP_JS = r'''
+(function () {
+  var KEY = 'nba_tracker_v1', mem = null;
+  function load() {
+    try { var s = localStorage.getItem(KEY); if (s) return JSON.parse(s); } catch (e) {}
+    return mem || { bankroll: null, bets: [] };
+  }
+  function save() { mem = st; try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  var st = load(); if (!st.bets) st.bets = [];
+  function fmt(x) { return x.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function units(ev) { return ev >= 0.03 ? 0.5 : 0.25; }
+  function suggest(ev) { return st.bankroll ? Math.round(st.bankroll * 0.01 * units(ev) * 2) / 2 : null; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function profit(b) {
+    if (b.status === 'won') return b.stake * (b.odds - 1);
+    if (b.status === 'lost') return -b.stake;
+    return 0;
+  }
+
+  var bk = document.getElementById('bk'), unitInfo = document.getElementById('unit');
+  if (st.bankroll) bk.value = st.bankroll;
+
+  function renderSuggestions() {
+    unitInfo.textContent = st.bankroll
+      ? '1 unidad = ' + fmt(st.bankroll * 0.01) + ' € (1 % del bankroll) · sugerencia: 0,25 u, o 0,5 u si el EV es del 3 % o más'
+      : 'Escribe tu bankroll y te sugiero cuánto apostar en cada jugada (1 unidad = 1 %).';
+    document.querySelectorAll('tr[data-key]').forEach(function (r) {
+      var ev = parseFloat(r.getAttribute('data-ev')), cell = r.querySelector('.sug'), s = suggest(ev);
+      cell.textContent = '';
+      cell.appendChild(document.createTextNode(s ? fmt(s) + ' €' : ''));
+      cell.appendChild(el('small', null, units(ev).toString().replace('.', ',') + ' u'));
+    });
+  }
+
+  function markPlaced() {
+    var placed = {}; st.bets.forEach(function (b) { placed[b.key] = true; });
+    document.querySelectorAll('tr[data-key] .btn').forEach(function (btn) {
+      var done = !!placed[btn.closest('tr').getAttribute('data-key')];
+      btn.disabled = done; btn.textContent = done ? '✓ Apostada' : 'Apostada';
+    });
+  }
+
+  function renderBets() {
+    var body = document.getElementById('betsbody'); body.textContent = '';
+    var resolved = st.bets.filter(function (b) { return b.status === 'won' || b.status === 'lost'; });
+    var wins = resolved.filter(function (b) { return b.status === 'won'; }).length;
+    var total = st.bets.reduce(function (a, b) { return a + profit(b); }, 0);
+    var staked = resolved.reduce(function (a, b) { return a + b.stake; }, 0);
+    var pending = st.bets.filter(function (b) { return b.status === 'pending'; });
+    function kpi(id, v, sub, cls) { var k = document.getElementById(id); k.textContent = ''; k.appendChild(el('b', cls, v)); k.appendChild(el('small', null, sub)); }
+    var cls = total > 0 ? 'pos' : total < 0 ? 'neg' : '';
+    kpi('k-profit', (total >= 0 ? '+' : '') + fmt(total) + ' €', resolved.length + ' resueltas', cls);
+    kpi('k-roi', staked ? (total >= 0 ? '+' : '') + (total / staked * 100).toFixed(1).replace('.', ',') + ' %' : '—', 'beneficio por euro apostado', cls);
+    kpi('k-hit', resolved.length ? Math.round(wins / resolved.length * 100) + ' %' : '—', wins + ' ganadas · ' + (resolved.length - wins) + ' perdidas', '');
+    kpi('k-pend', String(pending.length), fmt(pending.reduce(function (a, b) { return a + b.stake; }, 0)) + ' € en juego', '');
+    if (!st.bets.length) {
+      var tr0 = el('tr'); var td0 = el('td', 'bets-empty', 'Aún no has anotado ninguna apuesta. Pulsa "Apostada" en una jugada cuando la hagas en Stake.'); td0.colSpan = 7; tr0.appendChild(td0); body.appendChild(tr0); return;
+    }
+    st.bets.slice().sort(function (a, b) { return b.date - a.date; }).forEach(function (b) {
+      var tr = el('tr'), d = new Date(b.date);
+      tr.appendChild(el('td', 'muted', ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2)));
+      var t = el('td'); t.appendChild(el('b', null, b.desc)); t.appendChild(el('small', null, b.game)); tr.appendChild(t);
+      tr.appendChild(el('td', 'num', b.odds.toFixed(2)));
+      var ts = el('td', 'num'), inp = el('input', 'stk'); inp.type = 'number'; inp.min = '0'; inp.step = '0.5'; inp.value = b.stake;
+      inp.setAttribute('aria-label', 'Importe apostado');
+      inp.onchange = function () { b.stake = parseFloat(inp.value) || 0; save(); renderBets(); };
+      ts.appendChild(inp); tr.appendChild(ts);
+      var ss = el('td'), sel = el('select');
+      [['pending', 'Pendiente'], ['won', 'Ganada'], ['lost', 'Perdida'], ['void', 'Nula']].forEach(function (o) {
+        var op = el('option', null, o[1]); op.value = o[0]; if (b.status === o[0]) op.selected = true; sel.appendChild(op);
+      });
+      sel.setAttribute('aria-label', 'Resultado');
+      sel.onchange = function () { b.status = sel.value; save(); renderBets(); };
+      ss.appendChild(sel); tr.appendChild(ss);
+      var p = profit(b); tr.appendChild(el('td', 'num ' + (p > 0 ? 'pos' : p < 0 ? 'neg' : 'muted'), b.status === 'pending' ? '—' : (p >= 0 ? '+' : '') + fmt(p) + ' €'));
+      var del = el('td'), x = el('button', 'btn', '✕'); x.setAttribute('aria-label', 'Borrar apuesta');
+      x.onclick = function () { st.bets = st.bets.filter(function (o) { return o !== b; }); save(); renderBets(); markPlaced(); };
+      del.appendChild(x); tr.appendChild(del);
+      body.appendChild(tr);
+    });
+  }
+
+  bk.oninput = function () { var v = parseFloat(bk.value); st.bankroll = v > 0 ? v : null; save(); renderSuggestions(); };
+  document.querySelectorAll('tr[data-key] .btn').forEach(function (btn) {
+    btn.onclick = function () {
+      var r = btn.closest('tr'), ev = parseFloat(r.getAttribute('data-ev'));
+      st.bets.push({ key: r.getAttribute('data-key'), date: Date.now(), desc: r.getAttribute('data-desc'), game: r.getAttribute('data-game'),
+        odds: parseFloat(r.getAttribute('data-odds')), ev: ev, stake: suggest(ev) || 0, status: 'pending' });
+      save(); markPlaced(); renderBets();
+    };
+  });
+  var box = document.getElementById('backup');
+  document.getElementById('exp').onclick = function () { box.value = JSON.stringify(st); box.select(); };
+  document.getElementById('imp').onclick = function () {
+    try {
+      var n = JSON.parse(box.value);
+      if (!n || !Array.isArray(n.bets)) throw new Error('formato');
+      st = n; save(); bk.value = st.bankroll || ''; renderSuggestions(); markPlaced(); renderBets(); box.value = '';
+    } catch (e) { box.value = 'Texto no válido: pega aquí el que exportaste.'; }
+  };
+  renderSuggestions(); markPlaced(); renderBets();
+})();
+'''
+
+
+def _row(p: dict) -> str:
+    side = "Más de" if p["side"] == "Over" else "Menos de"
+    stat = STAT_ES.get(p["stat"], p["stat"])
+    desc = f'{p["player"]} {side} {p["line"]:g} {stat}'
+    key = f'{p["start"][:16]}|{p["player"]}|{p["stat"]}|{p["side"]}|{p["line"]}'
+    books = p.get("books", 1)
+    return (
+        f'<tr data-s="{escape(p["stat"])}" data-ev="{p["ev"]}" data-win="{p["fair_prob"]}" '
+        f'data-odds="{p["stake_odds"]}" data-key="{escape(key)}" data-desc="{escape(desc)}" '
+        f'data-game="{escape(p["game"])}">'
+        f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td>'
+        f'<td><span class="tag">{escape(stat)}</span><b>{escape(p["player"])} {side} {p["line"]:g}</b></td>'
+        f'<td class="num"><span class="pill">{p["fair_prob"]:.1%}</span></td>'
+        f'<td class="num ev">{p["ev"]:+.2%}<i class="meter"><u style="width:{min(p["ev"] / 0.12, 1) * 100:.0f}%"></u></i></td>'
+        f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
+        f'<td class="num muted">{escape(p["fanduel"])}<small>{books} {"casa" if books == 1 else "casas"}</small></td>'
+        f'<td class="num sug"></td>'
+        f'<td><button class="btn" type="button">Apostada</button></td></tr>'
+    )
+
 
 def build(doc: dict) -> str:
     picks = doc["picks"]
@@ -38,17 +182,7 @@ def build(doc: dict) -> str:
     chips = '<button class="chip on" data-s="all">Todos</button>' + "".join(
         f'<button class="chip" data-s="{escape(s)}">{escape(STAT_ES.get(s, s))}</button>' for s in stats_present
     )
-    rows = "".join(
-        f'<tr data-s="{escape(p["stat"])}" data-ev="{p["ev"]}" data-win="{p["fair_prob"]}">'
-        f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td>'
-        f'<td><span class="tag">{escape(STAT_ES.get(p["stat"], p["stat"]))}</span>'
-        f'<b>{escape(p["player"])} {"Más de" if p["side"] == "Over" else "Menos de"} {p["line"]:g}</b></td>'
-        f'<td class="num"><span class="pill">{p["fair_prob"]:.1%}</span></td>'
-        f'<td class="num ev">{p["ev"]:+.2%}<i class="meter"><u style="width:{min(p["ev"] / 0.12, 1) * 100:.0f}%"></u></i></td>'
-        f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
-        f'<td class="num muted">{escape(p["fanduel"])}<small>{p.get("books", 1)} {"casa" if p.get("books", 1) == 1 else "casas"}</small></td></tr>'
-        for p in picks
-    ) or '<tr><td colspan="6" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
+    rows = "".join(_row(p) for p in picks) or '<tr><td colspan="8" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
     best = picks[0] if picks else None
     best_html = (f'<b class="ev">{best["ev"]:+.1%}</b><small>{escape(best["player"])} · '
                  f'{escape(STAT_ES.get(best["stat"], best["stat"]))}</small>') if best else '<b>—</b>'
@@ -90,7 +224,7 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 .meter u {{ display:block; height:100%; background:var(--green); }}
 .empty {{ color:var(--muted); text-align:center; padding:28px; }}
 .note {{ color:var(--muted); font-size:.8rem; margin-top:18px; }}
-</style>
+{APP_CSS}</style>
 <main>
 <h1>NBA · apuestas a jugadores con valor</h1>
 <p class="sub">Cuota justa de las casas serias (FanDuel y Pinnacle, sin margen) frente a la cuota de Stake · mismo método de Beat the Sportsbooks · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
@@ -99,11 +233,19 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
   <div class="kpi"><span>Apuestas</span><b>{len(picks)}</b><small>con EV positivo, de mayor a menor</small></div>
   <div class="kpi"><span>Mejor EV</span>{best_html}</div>
 </div>
+<div class="card bk"><label for="bk">Bankroll actual (€)</label><input id="bk" type="number" min="0" step="1" inputmode="decimal" placeholder="p. ej. 1500"><span class="hint" id="unit"></span></div>
 <div class="chips">{chips}<span class="sep"></span><button class="chip sort on" data-k="ev">Ordenar por EV%</button><button class="chip sort" data-k="win">Ordenar por Win%</button></div>
 <div class="card"><table>
-<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">Casas serias</th></tr>
+<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">Casas serias</th><th class="num">Apostar</th><th></th></tr>
 {rows}</table></div>
 <p class="note">Win% = probabilidad justa sin margen, promedio de las casas serias disponibles para esa línea (FD = FanDuel, PIN = Pinnacle). EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
+<h2 class="sec">Mis apuestas · track record</h2>
+<div class="kpis"><div class="kpi"><span>Beneficio</span><div id="k-profit"></div></div><div class="kpi"><span>ROI</span><div id="k-roi"></div></div><div class="kpi"><span>Aciertos</span><div id="k-hit"></div></div><div class="kpi"><span>Pendientes</span><div id="k-pend"></div></div></div>
+<div class="card"><table><tr><th>Fecha</th><th>Apuesta</th><th class="num">Cuota</th><th class="num">Importe €</th><th>Resultado</th><th class="num">Beneficio</th><th></th></tr><tbody id="betsbody"></tbody></table></div>
+<details class="bak"><summary>Copia de seguridad (para pasar tus apuestas a otro dispositivo)</summary>
+<textarea id="backup" aria-label="Copia de seguridad" placeholder="Pulsa Exportar y copia este texto. Para restaurar, pégalo aquí y pulsa Importar."></textarea>
+<button class="btn" id="exp" type="button">Exportar</button> <button class="btn" id="imp" type="button">Importar</button></details>
+<p class="note">Tus apuestas se guardan solo en este navegador y este dispositivo; si borras los datos del navegador se pierden, así que exporta de vez en cuando.</p>
 </main>
 <script>
 document.querySelectorAll('.chip.sort').forEach(function(b) {{
@@ -121,6 +263,7 @@ document.querySelectorAll('.chip[data-s]').forEach(function(b) {{
   }};
 }});
 </script>
+<script>{APP_JS}</script>
 """
 
 
