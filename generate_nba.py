@@ -46,7 +46,7 @@ def build(doc: dict) -> str:
         f'<td class="num"><span class="pill">{p["fair_prob"]:.1%}</span></td>'
         f'<td class="num ev">{p["ev"]:+.2%}<i class="meter"><u style="width:{min(p["ev"] / 0.12, 1) * 100:.0f}%"></u></i></td>'
         f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
-        f'<td class="num muted">{escape(p["fanduel"])}</td></tr>'
+        f'<td class="num muted">{escape(p["fanduel"])}<small>{p.get("books", 1)} {"casa" if p.get("books", 1) == 1 else "casas"}</small></td></tr>'
         for p in picks
     ) or '<tr><td colspan="6" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
     best = picks[0] if picks else None
@@ -93,7 +93,7 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 </style>
 <main>
 <h1>NBA · apuestas a jugadores con valor</h1>
-<p class="sub">Cuota justa de FanDuel (sin margen) frente a la cuota de Stake · mismo método de Beat the Sportsbooks · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
+<p class="sub">Cuota justa de las casas serias (FanDuel y Pinnacle, sin margen) frente a la cuota de Stake · mismo método de Beat the Sportsbooks · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
 {warn}
 <div class="kpis">
   <div class="kpi"><span>Apuestas</span><b>{len(picks)}</b><small>con EV positivo, de mayor a menor</small></div>
@@ -101,9 +101,9 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 </div>
 <div class="chips">{chips}<span class="sep"></span><button class="chip sort on" data-k="ev">Ordenar por EV%</button><button class="chip sort" data-k="win">Ordenar por Win%</button></div>
 <div class="card"><table>
-<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">FanDuel</th></tr>
+<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">Casas serias</th></tr>
 {rows}</table></div>
-<p class="note">Win% = probabilidad justa según FanDuel sin margen. EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
+<p class="note">Win% = probabilidad justa sin margen, promedio de las casas serias disponibles para esa línea (FD = FanDuel, PIN = Pinnacle). EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
 </main>
 <script>
 document.querySelectorAll('.chip.sort').forEach(function(b) {{

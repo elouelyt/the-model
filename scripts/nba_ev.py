@@ -34,27 +34,46 @@ def fair_probs(over_am: int, under_am: int) -> tuple[float, float]:
     return po / (po + pu), pu / (po + pu)
 
 
+BOOK_FILES = {"FanDuel": "nba_fanduel_cache.json", "Pinnacle": "nba_pinnacle_cache.json"}
+SHORT = {"FanDuel": "FD", "Pinnacle": "PIN"}
+
+
+def load_books() -> dict[tuple, dict[str, tuple[int, int]]]:
+    """(fixture, player, stat, line) -> {book: (over_american, under_american)}."""
+    index: dict[tuple, dict[str, tuple[int, int]]] = {}
+    for book, fname in BOOK_FILES.items():
+        path = ROOT / "data" / fname
+        if not path.exists():
+            continue
+        for r in json.loads(path.read_text(encoding="utf-8"))["rows"]:
+            key = (r["fixture"], norm_name(r["player"]), r["stat"], r["line"])
+            index.setdefault(key, {})[book] = (r["over_american"], r["under_american"])
+    return index
+
+
 def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV) -> list[dict]:
     stake = json.loads((ROOT / "data" / "nba_stake_cache.json").read_text(encoding="utf-8"))
-    fd = json.loads((ROOT / "data" / "nba_fanduel_cache.json").read_text(encoding="utf-8"))
     starts = {g["fixture"]: (g["start"], g["teams"]) for g in stake["games"]}
+    index = load_books()
 
-    fd_index = {(r["fixture"], norm_name(r["player"]), r["stat"], r["line"]): r for r in fd["rows"]}
     picks = []
     for r in stake["rows"]:
-        f = fd_index.get((r["fixture"], norm_name(r["player"]), r["stat"], r["line"]))
-        if not f:
+        books = index.get((r["fixture"], norm_name(r["player"]), r["stat"], r["line"]))
+        if not books:
             continue
-        p_over, p_under = fair_probs(f["over_american"], f["under_american"])
-        for side, prob, odds in (("Over", p_over, r["over"]), ("Under", p_under, r["under"])):
+        probs = [fair_probs(o, u) for o, u in books.values()]
+        p_over = sum(p[0] for p in probs) / len(probs)  # average of each book's no-vig probability
+        for side, prob, odds in (("Over", p_over, r["over"]), ("Under", 1 - p_over, r["under"])):
             ev = prob * odds - 1
             if prob >= min_prob and ev > min_ev:
                 start, teams = starts[r["fixture"]]
+                detail = " · ".join(
+                    f"{SHORT[b]} {o:+d}/{u:+d}" for b, (o, u) in books.items())
                 picks.append({
                     "player": r["player"], "team": r["team"], "stat": r["stat"], "line": r["line"],
                     "side": side, "stake_odds": round(odds, 3), "fair_prob": round(prob, 4),
                     "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
-                    "fanduel": f"O {f['over_american']:+d} / U {f['under_american']:+d}",
+                    "fanduel": detail, "books": len(books),
                     "game": " vs ".join(teams), "start": start,
                 })
     picks.sort(key=lambda p: p["ev"], reverse=True)
@@ -70,7 +89,7 @@ def main() -> None:
     print(f"{len(picks)} picks with EV >= {MIN_EV:.1%}")
     for p in picks[:25]:
         print(f"{p['fair_prob']:6.1%} EV {p['ev']:+6.1%}  {p['player']:<22} {p['stat']:<24} {p['side']:<5} {p['line']:<5} "
-              f"stake {p['stake_odds']:<6} fair {p['fair_odds']:<6} FD {p['fanduel']}")
+              f"stake {p['stake_odds']:<6} fair {p['fair_odds']:<6} [{p['books']}] {p['fanduel']}")
 
 
 if __name__ == "__main__":
