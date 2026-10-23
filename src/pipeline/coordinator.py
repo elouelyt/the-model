@@ -336,8 +336,12 @@ def compute_predictions_node(state: PipelineState) -> PipelineState:
             )
             bookmakers_list = bk.to_dict("records")
 
-            # Inject Stake odds if available — prepend so it sorts first if best price
+            # Stake price: from fetch_stake_odds_node OR already embedded in rows (stake_cache source)
             stake_price = stake_odds.get(player)
+            if not stake_price:
+                stake_rows = player_rows[player_rows["bookmaker_key"] == "stake"] if "bookmaker_key" in player_rows.columns else player_rows[player_rows["bookmaker_title"].str.lower() == "stake"] if "bookmaker_title" in player_rows.columns else player_rows.iloc[0:0]
+                if not stake_rows.empty:
+                    stake_price = float(stake_rows["price"].iloc[0])
             if stake_price:
                 stake_entry = {
                     "bookmaker_title": "Stake",
