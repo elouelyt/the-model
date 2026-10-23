@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-10-23T10:12:46.169145+00:00",
+  "timestamp": "2026-10-23T10:13:42.826256+00:00",
   "source": "ESPN Core API (ATP + WTA)",
-  "player_count": 150,
+  "player_count": 300,
   "rankings": {
     "Jannik Sinner": {
       "rank": 1,
@@ -602,6 +602,606 @@
     "Mark Lajal": {
       "rank": 150,
       "points": 372
+    },
+    "Elena Rybakina": {
+      "rank": 1,
+      "points": 9196
+    },
+    "Aryna Sabalenka": {
+      "rank": 2,
+      "points": 7550
+    },
+    "Mirra Andreeva": {
+      "rank": 3,
+      "points": 6306
+    },
+    "Jessica Pegula": {
+      "rank": 4,
+      "points": 6235
+    },
+    "Coco Gauff": {
+      "rank": 5,
+      "points": 5974
+    },
+    "Elina Svitolina": {
+      "rank": 6,
+      "points": 5229
+    },
+    "Karolina Muchova": {
+      "rank": 7,
+      "points": 4833
+    },
+    "Linda Noskova": {
+      "rank": 8,
+      "points": 4678
+    },
+    "Iga Swiatek": {
+      "rank": 9,
+      "points": 4389
+    },
+    "Marta Kostyuk": {
+      "rank": 10,
+      "points": 3920
+    },
+    "Maja Chwalinska": {
+      "rank": 11,
+      "points": 3031
+    },
+    "Iva Jovic": {
+      "rank": 12,
+      "points": 2931
+    },
+    "Diana Shnaider": {
+      "rank": 13,
+      "points": 2663
+    },
+    "Belinda Bencic": {
+      "rank": 14,
+      "points": 2662
+    },
+    "Elise Mertens": {
+      "rank": 15,
+      "points": 2540
+    },
+    "Victoria Mboko": {
+      "rank": 16,
+      "points": 2501
+    },
+    "Sorana Cirstea": {
+      "rank": 17,
+      "points": 2380
+    },
+    "Amanda Anisimova": {
+      "rank": 18,
+      "points": 2363
+    },
+    "Naomi Osaka": {
+      "rank": 19,
+      "points": 2297
+    },
+    "Alexandra Eala": {
+      "rank": 20,
+      "points": 2241
+    },
+    "Madison Keys": {
+      "rank": 21,
+      "points": 2029
+    },
+    "Zheng Qinwen": {
+      "rank": 22,
+      "points": 2018
+    },
+    "Anna Kalinskaya": {
+      "rank": 23,
+      "points": 1989
+    },
+    "Jelena Ostapenko": {
+      "rank": 24,
+      "points": 1916
+    },
+    "Ann Li": {
+      "rank": 25,
+      "points": 1833
+    },
+    "Marie Bouzkova": {
+      "rank": 26,
+      "points": 1818
+    },
+    "Anastasia Potapova": {
+      "rank": 27,
+      "points": 1814
+    },
+    "Emma Navarro": {
+      "rank": 28,
+      "points": 1794
+    },
+    "Nikola Bartunkova": {
+      "rank": 29,
+      "points": 1711
+    },
+    "Leylah Fernandez": {
+      "rank": 30,
+      "points": 1709
+    },
+    "Maria Sakkari": {
+      "rank": 31,
+      "points": 1706
+    },
+    "Sara Bejlek": {
+      "rank": 32,
+      "points": 1650
+    },
+    "Ekaterina Alexandrova": {
+      "rank": 33,
+      "points": 1591
+    },
+    "Diane Parry": {
+      "rank": 34,
+      "points": 1549
+    },
+    "Jasmine Paolini": {
+      "rank": 35,
+      "points": 1453
+    },
+    "Donna Vekic": {
+      "rank": 36,
+      "points": 1333
+    },
+    "Peyton Stearns": {
+      "rank": 37,
+      "points": 1316
+    },
+    "Cristina Bucsa": {
+      "rank": 38,
+      "points": 1294
+    },
+    "Wang Xinyu": {
+      "rank": 39,
+      "points": 1288
+    },
+    "Daria Snigur": {
+      "rank": 40,
+      "points": 1280
+    },
+    "Kimberly Birrell": {
+      "rank": 41,
+      "points": 1280
+    },
+    "Talia Gibson": {
+      "rank": 42,
+      "points": 1273
+    },
+    "Liudmila Samsonova": {
+      "rank": 43,
+      "points": 1234
+    },
+    "Hailey Baptiste": {
+      "rank": 44,
+      "points": 1154
+    },
+    "Barbora Krejcikova": {
+      "rank": 45,
+      "points": 1133
+    },
+    "Janice Tjen": {
+      "rank": 46,
+      "points": 1120
+    },
+    "Magdalena Frech": {
+      "rank": 47,
+      "points": 1110
+    },
+    "Karolina Pliskova": {
+      "rank": 48,
+      "points": 1105
+    },
+    "Sonay Kartal": {
+      "rank": 49,
+      "points": 1097
+    },
+    "Yuliia Starodubtseva": {
+      "rank": 50,
+      "points": 1090
+    },
+    "Anhelina Kalinina": {
+      "rank": 51,
+      "points": 1087
+    },
+    "Mayar Sherif": {
+      "rank": 52,
+      "points": 1085
+    },
+    "Lanlana Tararudee": {
+      "rank": 53,
+      "points": 1080
+    },
+    "Clara Tauson": {
+      "rank": 54,
+      "points": 1074
+    },
+    "Ashlyn Krueger": {
+      "rank": 55,
+      "points": 1072
+    },
+    "Tamara Korpatsch": {
+      "rank": 56,
+      "points": 1070
+    },
+    "Lilli Tagger": {
+      "rank": 57,
+      "points": 1052
+    },
+    "Katie Boulter": {
+      "rank": 58,
+      "points": 1042
+    },
+    "Catherine McNally": {
+      "rank": 59,
+      "points": 1035
+    },
+    "Elena-Gabriela Ruse": {
+      "rank": 60,
+      "points": 1033
+    },
+    "Paula Badosa": {
+      "rank": 61,
+      "points": 1023
+    },
+    "Oleksandra Oliynykova": {
+      "rank": 62,
+      "points": 1022
+    },
+    "Zeynep Sonmez": {
+      "rank": 63,
+      "points": 987
+    },
+    "Alycia Parks": {
+      "rank": 64,
+      "points": 985
+    },
+    "Elisabetta Cocciaretto": {
+      "rank": 65,
+      "points": 975
+    },
+    "Yulia Putintseva": {
+      "rank": 66,
+      "points": 969
+    },
+    "Kamilla Rakhimova": {
+      "rank": 67,
+      "points": 966
+    },
+    "Camila Osorio": {
+      "rank": 68,
+      "points": 963
+    },
+    "Tatjana Maria": {
+      "rank": 69,
+      "points": 945
+    },
+    "Maria Timofeeva": {
+      "rank": 70,
+      "points": 931
+    },
+    "Jaqueline Cristian": {
+      "rank": 71,
+      "points": 928
+    },
+    "Anna Blinkova": {
+      "rank": 72,
+      "points": 921
+    },
+    "Katie Volynets": {
+      "rank": 73,
+      "points": 919
+    },
+    "Daria Kasatkina": {
+      "rank": 74,
+      "points": 913
+    },
+    "Anna Bondar": {
+      "rank": 75,
+      "points": 913
+    },
+    "Sinja Kraus": {
+      "rank": 76,
+      "points": 910
+    },
+    "Magda Linette": {
+      "rank": 77,
+      "points": 908
+    },
+    "Petra Marcinko": {
+      "rank": 78,
+      "points": 905
+    },
+    "Kaitlin Quevedo": {
+      "rank": 79,
+      "points": 902
+    },
+    "Alina Korneeva": {
+      "rank": 80,
+      "points": 900
+    },
+    "Wang Xiyu": {
+      "rank": 81,
+      "points": 899
+    },
+    "Viktorija Golubic": {
+      "rank": 82,
+      "points": 899
+    },
+    "Panna Udvardy": {
+      "rank": 83,
+      "points": 899
+    },
+    "Mananchaya Sawangkaew": {
+      "rank": 84,
+      "points": 886
+    },
+    "Zhang Shuai": {
+      "rank": 85,
+      "points": 880
+    },
+    "Katerina Siniakova": {
+      "rank": 86,
+      "points": 865
+    },
+    "Taylah Preston": {
+      "rank": 87,
+      "points": 858
+    },
+    "Tereza Valentova": {
+      "rank": 88,
+      "points": 833
+    },
+    "Taylor Townsend": {
+      "rank": 89,
+      "points": 831
+    },
+    "Maya Joint": {
+      "rank": 90,
+      "points": 824
+    },
+    "Antonia Ruzic": {
+      "rank": 91,
+      "points": 823
+    },
+    "Leolia Jeanjean": {
+      "rank": 92,
+      "points": 816
+    },
+    "Darja Vidmanova": {
+      "rank": 93,
+      "points": 812
+    },
+    "Renata Zarazua": {
+      "rank": 94,
+      "points": 801
+    },
+    "Claire Liu": {
+      "rank": 95,
+      "points": 789
+    },
+    "Jessica Bouzas Maneiro": {
+      "rank": 96,
+      "points": 769
+    },
+    "Alina Charaeva": {
+      "rank": 97,
+      "points": 759
+    },
+    "Hanne Vandewinkel": {
+      "rank": 98,
+      "points": 756
+    },
+    "Francesca Jones": {
+      "rank": 99,
+      "points": 752
+    },
+    "Fiona Ferro": {
+      "rank": 100,
+      "points": 748
+    },
+    "Oksana Selekhmeteva": {
+      "rank": 101,
+      "points": 743
+    },
+    "Julia Grabher": {
+      "rank": 102,
+      "points": 738
+    },
+    "Dayana Yastremska": {
+      "rank": 103,
+      "points": 732
+    },
+    "Solana Sierra": {
+      "rank": 104,
+      "points": 730
+    },
+    "Polina Kudermetova": {
+      "rank": 105,
+      "points": 730
+    },
+    "McCartney Kessler": {
+      "rank": 106,
+      "points": 724
+    },
+    "Lucrezia Stefanini": {
+      "rank": 107,
+      "points": 723
+    },
+    "Lisa Pigato": {
+      "rank": 108,
+      "points": 719
+    },
+    "Emma Raducanu": {
+      "rank": 109,
+      "points": 709
+    },
+    "Kristina Liutova": {
+      "rank": 110,
+      "points": 708
+    },
+    "Anastasia Zakharova": {
+      "rank": 111,
+      "points": 704
+    },
+    "Dominika Salkova": {
+      "rank": 112,
+      "points": 693
+    },
+    "Elvina Kalieva": {
+      "rank": 113,
+      "points": 688
+    },
+    "Mary Stoiana": {
+      "rank": 114,
+      "points": 666
+    },
+    "Himeno Sakatsume": {
+      "rank": 115,
+      "points": 665
+    },
+    "Laura Samson": {
+      "rank": 116,
+      "points": 658
+    },
+    "Harriet Dart": {
+      "rank": 117,
+      "points": 654
+    },
+    "Sloane Stephens": {
+      "rank": 118,
+      "points": 650
+    },
+    "Kayla Day": {
+      "rank": 119,
+      "points": 614
+    },
+    "Tatiana Prozorova": {
+      "rank": 120,
+      "points": 614
+    },
+    "Moyuka Uchijima": {
+      "rank": 121,
+      "points": 604
+    },
+    "Aliaksandra Sasnovich": {
+      "rank": 122,
+      "points": 603
+    },
+    "Jeline Vandromme": {
+      "rank": 123,
+      "points": 601
+    },
+    "Veronika Podrez": {
+      "rank": 124,
+      "points": 596
+    },
+    "Simona Waltert": {
+      "rank": 125,
+      "points": 595
+    },
+    "Sofia Kenin": {
+      "rank": 126,
+      "points": 593
+    },
+    "Noma Noha Akugue": {
+      "rank": 127,
+      "points": 591
+    },
+    "Katarzyna Kawa": {
+      "rank": 128,
+      "points": 586
+    },
+    "Leyre Romero Gormaz": {
+      "rank": 129,
+      "points": 585
+    },
+    "Marina Bassols Ribera": {
+      "rank": 130,
+      "points": 581
+    },
+    "Ajla Tomljanovic": {
+      "rank": 131,
+      "points": 575
+    },
+    "Bianca Andreescu": {
+      "rank": 132,
+      "points": 573
+    },
+    "Maddison Inglis": {
+      "rank": 133,
+      "points": 571
+    },
+    "Emerson Jones": {
+      "rank": 134,
+      "points": 565
+    },
+    "Lucia Bronzetti": {
+      "rank": 135,
+      "points": 560
+    },
+    "Alexandra Shubladze": {
+      "rank": 136,
+      "points": 548
+    },
+    "Eva Lys": {
+      "rank": 137,
+      "points": 542
+    },
+    "Andrea Lazaro Garcia": {
+      "rank": 138,
+      "points": 525
+    },
+    "Susan Bandecchi": {
+      "rank": 139,
+      "points": 524
+    },
+    "Guiomar Maristany Zuleta De Reales": {
+      "rank": 140,
+      "points": 519
+    },
+    "Julia Riera": {
+      "rank": 141,
+      "points": 517
+    },
+    "Elizara Yaneva": {
+      "rank": 142,
+      "points": 517
+    },
+    "Tamara Zidansek": {
+      "rank": 143,
+      "points": 513
+    },
+    "Teodora Kostovic": {
+      "rank": 144,
+      "points": 506
+    },
+    "Mia Pohankova": {
+      "rank": 145,
+      "points": 504
+    },
+    "Rebecca Sramkova": {
+      "rank": 146,
+      "points": 499
+    },
+    "Martyna Kubka": {
+      "rank": 147,
+      "points": 498
+    },
+    "Elina Avanesyan": {
+      "rank": 148,
+      "points": 498
+    },
+    "Veronika Erjavec": {
+      "rank": 149,
+      "points": 495
+    },
+    "Jazmin Ortenzi": {
+      "rank": 150,
+      "points": 494
     }
   }
 }
