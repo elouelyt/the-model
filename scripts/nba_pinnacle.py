@@ -25,7 +25,6 @@ STATS = {  # suffix of Pinnacle's description -> Stake stat name
     "Total Points": "points",
     "Total Rebounds": "rebounds",
     "Total Assists": "assists",
-    "Total Threes Made": "threesmade",
     "Total Pts & Rebs & Asts": "points+assists+rebounds",
 }
 

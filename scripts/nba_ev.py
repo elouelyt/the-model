@@ -34,6 +34,9 @@ def fair_probs(over_am: int, under_am: int) -> tuple[float, float]:
     return po / (po + pu), pu / (po + pu)
 
 
+# Markets used in the source videos (no threes): points, rebounds, assists and their combos
+ALLOWED_STATS = {"points", "rebounds", "assists", "points+rebounds", "points+assists",
+                 "assists+rebounds", "points+assists+rebounds"}
 BOOK_FILES = {"FanDuel": "nba_fanduel_cache.json", "Pinnacle": "nba_pinnacle_cache.json"}
 SHORT = {"FanDuel": "FD", "Pinnacle": "PIN"}
 
@@ -58,6 +61,8 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV) -> list[dict
 
     picks = []
     for r in stake["rows"]:
+        if r["stat"] not in ALLOWED_STATS:
+            continue
         books = index.get((r["fixture"], norm_name(r["player"]), r["stat"], r["line"]))
         if not books:
             continue

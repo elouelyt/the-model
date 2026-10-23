@@ -27,7 +27,6 @@ MARKETS = {  # FanDuel accordion label -> Stake stat name
     "Player Points": "points",
     "Player Rebounds": "rebounds",
     "Player Assists": "assists",
-    "Player Made Threes": "threesmade",
     "Player Pts + Reb": "points+rebounds",
     "Player Pts + Ast": "points+assists",
     "Player Reb + Ast": "assists+rebounds",
