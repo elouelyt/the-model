@@ -99,14 +99,13 @@ def fetch_rankings(sess: requests.Session) -> dict[str, dict]:
         cells = row.find_all("td")
         if len(cells) < 4:
             continue
-        rank_text = cells[0].get_text(strip=True).lstrip("+-").lstrip("0123456789").strip()
         rank_num_text = re.sub(r"[^\d]", "", cells[0].get_text(strip=True))
         if not rank_num_text:
             continue
         rank = int(rank_num_text[:4])
-        name_raw = cells[1].get_text(strip=True)
-        # remove leading digits (age shown inline) and clean
-        name = re.sub(r"^\d+", "", name_raw).strip()
+        # Use link text to avoid rank-change prefix (e.g. "-14Tristan Schoolkate")
+        link = cells[1].find("a")
+        name = link.get_text(strip=True) if link else re.sub(r"^[+\-]?\d*", "", cells[1].get_text(strip=True)).strip()
         pts_text = re.sub(r"[^\d]", "", cells[3].get_text(strip=True))
         points = int(pts_text) if pts_text else 0
         if name:
