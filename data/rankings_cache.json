@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-23T10:17:57.513876+00:00",
+  "timestamp": "2026-10-23T10:22:54.829491+00:00",
   "source": "ESPN Core API (ATP + WTA)",
   "player_count": 450,
   "rankings": {
@@ -27,7 +27,7 @@
       "rank": 6,
       "points": 3640
     },
-    "-2Felix Auger-Aliassime": {
+    "Felix Auger-Aliassime": {
       "rank": 7,
       "points": 3590
     },
@@ -47,7 +47,7 @@
       "rank": 11,
       "points": 3234
     },
-    "-4Novak Djokovic": {
+    "Novak Djokovic": {
       "rank": 12,
       "points": 3090
     },
@@ -55,7 +55,7 @@
       "rank": 13,
       "points": 2880
     },
-    "-2Taylor Fritz": {
+    "Taylor Fritz": {
       "rank": 14,
       "points": 2880
     },
@@ -63,7 +63,7 @@
       "rank": 15,
       "points": 2575
     },
-    "-1Jakub Mensik": {
+    "Jakub Mensik": {
       "rank": 16,
       "points": 2500
     },
@@ -71,7 +71,7 @@
       "rank": 17,
       "points": 2375
     },
-    "-1Learner Tien": {
+    "Learner Tien": {
       "rank": 18,
       "points": 2345
     },
@@ -79,11 +79,11 @@
       "rank": 19,
       "points": 2275
     },
-    "-4Jiri Lehecka": {
+    "Jiri Lehecka": {
       "rank": 20,
       "points": 2235
     },
-    "-1Francisco Cerundolo": {
+    "Francisco Cerundolo": {
       "rank": 21,
       "points": 2220
     },
@@ -91,7 +91,7 @@
       "rank": 22,
       "points": 2175
     },
-    "-2Luciano Darderi": {
+    "Luciano Darderi": {
       "rank": 23,
       "points": 2160
     },
@@ -103,7 +103,7 @@
       "rank": 25,
       "points": 1990
     },
-    "-1Lorenzo Musetti": {
+    "Lorenzo Musetti": {
       "rank": 26,
       "points": 1870
     },
@@ -123,11 +123,11 @@
       "rank": 30,
       "points": 1575
     },
-    "-1Alejandro Tabilo": {
+    "Alejandro Tabilo": {
       "rank": 31,
       "points": 1565
     },
-    "-18Valentin Vacherot": {
+    "Valentin Vacherot": {
       "rank": 32,
       "points": 1480
     },
@@ -139,7 +139,7 @@
       "rank": 34,
       "points": 1421
     },
-    "-3Ugo Humbert": {
+    "Ugo Humbert": {
       "rank": 35,
       "points": 1420
     },
@@ -147,7 +147,7 @@
       "rank": 36,
       "points": 1386
     },
-    "-2Alex Michelsen": {
+    "Alex Michelsen": {
       "rank": 37,
       "points": 1370
     },
@@ -163,7 +163,7 @@
       "rank": 40,
       "points": 1235
     },
-    "-2Zizou Bergs": {
+    "Zizou Bergs": {
       "rank": 41,
       "points": 1220
     },
@@ -187,11 +187,11 @@
       "rank": 46,
       "points": 1127
     },
-    "-5Denis Shapovalov": {
+    "Denis Shapovalov": {
       "rank": 47,
       "points": 1105
     },
-    "-3Luca Van Assche": {
+    "Luca Van Assche": {
       "rank": 48,
       "points": 1065
     },
@@ -203,11 +203,11 @@
       "rank": 50,
       "points": 1032
     },
-    "-2Jaume Munar": {
+    "Jaume Munar": {
       "rank": 51,
       "points": 1010
     },
-    "-1Nuno Borges": {
+    "Nuno Borges": {
       "rank": 52,
       "points": 1000
     },
@@ -215,11 +215,11 @@
       "rank": 53,
       "points": 1000
     },
-    "-2Adolfo Daniel Vallejo": {
+    "Adolfo Daniel Vallejo": {
       "rank": 54,
       "points": 997
     },
-    "-5Raphael Collignon": {
+    "Raphael Collignon": {
       "rank": 55,
       "points": 978
     },
@@ -235,15 +235,15 @@
       "rank": 58,
       "points": 929
     },
-    "-2Yannick Hanfmann": {
+    "Yannick Hanfmann": {
       "rank": 59,
       "points": 923
     },
-    "-2Tallon Griekspoor": {
+    "Tallon Griekspoor": {
       "rank": 60,
       "points": 885
     },
-    "-28Arthur Rinderknech": {
+    "Arthur Rinderknech": {
       "rank": 61,
       "points": 870
     },
@@ -255,7 +255,7 @@
       "rank": 63,
       "points": 864
     },
-    "-1Fabian Marozsan": {
+    "Fabian Marozsan": {
       "rank": 64,
       "points": 860
     },
@@ -283,7 +283,7 @@
       "rank": 70,
       "points": 794
     },
-    "-2Facundo Diaz Acosta": {
+    "Facundo Diaz Acosta": {
       "rank": 71,
       "points": 790
     },
@@ -291,11 +291,11 @@
       "rank": 72,
       "points": 779
     },
-    "-9James Duckworth": {
+    "James Duckworth": {
       "rank": 73,
       "points": 774
     },
-    "-9Pablo Carreno Busta": {
+    "Pablo Carreno Busta": {
       "rank": 74,
       "points": 773
     },
@@ -311,7 +311,7 @@
       "rank": 77,
       "points": 759
     },
-    "-8Kamil Majchrzak": {
+    "Kamil Majchrzak": {
       "rank": 78,
       "points": 750
     },
@@ -323,11 +323,11 @@
       "rank": 80,
       "points": 734
     },
-    "-7Sebastian Korda": {
+    "Sebastian Korda": {
       "rank": 81,
       "points": 730
     },
-    "-1Aleksandar Kovacevic": {
+    "Aleksandar Kovacevic": {
       "rank": 82,
       "points": 715
     },
@@ -335,15 +335,15 @@
       "rank": 83,
       "points": 712
     },
-    "-4Marin Cilic": {
+    "Marin Cilic": {
       "rank": 84,
       "points": 704
     },
-    "-9Kyrian Jacquet": {
+    "Kyrian Jacquet": {
       "rank": 85,
       "points": 703
     },
-    "-1Rinky Hijikata": {
+    "Rinky Hijikata": {
       "rank": 86,
       "points": 689
     },
@@ -355,7 +355,7 @@
       "rank": 88,
       "points": 676
     },
-    "-2Lorenzo Sonego": {
+    "Lorenzo Sonego": {
       "rank": 89,
       "points": 658
     },
@@ -371,11 +371,11 @@
       "rank": 92,
       "points": 642
     },
-    "-4Hugo Gaston": {
+    "Hugo Gaston": {
       "rank": 93,
       "points": 641
     },
-    "-23Corentin Moutet": {
+    "Corentin Moutet": {
       "rank": 94,
       "points": 640
     },
@@ -399,15 +399,15 @@
       "rank": 99,
       "points": 613
     },
-    "-8Benjamin Bonzi": {
+    "Benjamin Bonzi": {
       "rank": 100,
       "points": 605
     },
-    "-7Michael Zheng": {
+    "Michael Zheng": {
       "rank": 101,
       "points": 594
     },
-    "-7Jesper de Jong": {
+    "Jesper de Jong": {
       "rank": 102,
       "points": 591
     },
@@ -427,7 +427,7 @@
       "rank": 106,
       "points": 565
     },
-    "-3Martin Damm": {
+    "Martin Damm": {
       "rank": 107,
       "points": 564
     },
@@ -439,7 +439,7 @@
       "rank": 109,
       "points": 555
     },
-    "-5Valentin Royer": {
+    "Valentin Royer": {
       "rank": 110,
       "points": 553
     },
@@ -451,7 +451,7 @@
       "rank": 112,
       "points": 538
     },
-    "-22Jan Choinski": {
+    "Jan Choinski": {
       "rank": 113,
       "points": 533
     },
@@ -463,7 +463,7 @@
       "rank": 115,
       "points": 513
     },
-    "-1Aleksandar Vukic": {
+    "Aleksandar Vukic": {
       "rank": 116,
       "points": 507
     },
@@ -483,11 +483,11 @@
       "rank": 120,
       "points": 493
     },
-    "-14Otto Virtanen": {
+    "Otto Virtanen": {
       "rank": 121,
       "points": 493
     },
-    "-2Sebastian Ofner": {
+    "Sebastian Ofner": {
       "rank": 122,
       "points": 491
     },
@@ -507,19 +507,19 @@
       "rank": 126,
       "points": 458
     },
-    "-9Patrick Kypson": {
+    "Patrick Kypson": {
       "rank": 127,
       "points": 458
     },
-    "-4Nikoloz Basilashvili": {
+    "Nikoloz Basilashvili": {
       "rank": 128,
       "points": 453
     },
-    "-6Shintaro Mochizuki": {
+    "Shintaro Mochizuki": {
       "rank": 129,
       "points": 451
     },
-    "-5Francisco Comesana": {
+    "Francisco Comesana": {
       "rank": 130,
       "points": 449
     },
@@ -563,11 +563,11 @@
       "rank": 140,
       "points": 401
     },
-    "-7Marton Fucsovics": {
+    "Marton Fucsovics": {
       "rank": 141,
       "points": 400
     },
-    "-1Vilius Gaubas": {
+    "Vilius Gaubas": {
       "rank": 142,
       "points": 396
     },
@@ -579,7 +579,7 @@
       "rank": 144,
       "points": 390
     },
-    "-37Giovanni Mpetshi Perricard": {
+    "Giovanni Mpetshi Perricard": {
       "rank": 145,
       "points": 385
     },
@@ -595,19 +595,19 @@
       "rank": 148,
       "points": 378
     },
-    "-28Gabriel Diallo": {
+    "Gabriel Diallo": {
       "rank": 149,
       "points": 375
     },
-    "-1Mark Lajal": {
+    "Mark Lajal": {
       "rank": 150,
       "points": 372
     },
-    "-20Cristian Garin": {
+    "Cristian Garin": {
       "rank": 151,
       "points": 371
     },
-    "-6Clement Chidekh": {
+    "Clement Chidekh": {
       "rank": 152,
       "points": 371
     },
@@ -619,7 +619,7 @@
       "rank": 154,
       "points": 369
     },
-    "-23Tomas Barrios Vera": {
+    "Tomas Barrios Vera": {
       "rank": 155,
       "points": 364
     },
@@ -647,7 +647,7 @@
       "rank": 161,
       "points": 354
     },
-    "-14Dusan Lajovic": {
+    "Dusan Lajovic": {
       "rank": 162,
       "points": 353
     },
@@ -655,15 +655,15 @@
       "rank": 163,
       "points": 353
     },
-    "-1Marco Cecchinato": {
+    "Marco Cecchinato": {
       "rank": 164,
       "points": 353
     },
-    "-9Reilly Opelka": {
+    "Reilly Opelka": {
       "rank": 165,
       "points": 351
     },
-    "-1Andrea Guerrieri": {
+    "Andrea Guerrieri": {
       "rank": 166,
       "points": 351
     },
@@ -675,11 +675,11 @@
       "rank": 168,
       "points": 342
     },
-    "-14Tristan Schoolkate": {
+    "Tristan Schoolkate": {
       "rank": 169,
       "points": 341
     },
-    "-4Zhizhen Zhang": {
+    "Zhizhen Zhang": {
       "rank": 170,
       "points": 340
     },
@@ -695,27 +695,27 @@
       "rank": 173,
       "points": 334
     },
-    "-4Alex Bolt": {
+    "Alex Bolt": {
       "rank": 174,
       "points": 332
     },
-    "-3Vitaliy Sachko": {
+    "Vitaliy Sachko": {
       "rank": 175,
       "points": 330
     },
-    "-33Eliot Spizzirri": {
+    "Eliot Spizzirri": {
       "rank": 176,
       "points": 327
     },
-    "-15Juan Carlos Prado Angelo": {
+    "Juan Carlos Prado Angelo": {
       "rank": 177,
       "points": 327
     },
-    "-10Gauthier Onclin": {
+    "Gauthier Onclin": {
       "rank": 178,
       "points": 326
     },
-    "-2Taro Daniel": {
+    "Taro Daniel": {
       "rank": 179,
       "points": 325
     },
@@ -739,7 +739,7 @@
       "rank": 184,
       "points": 308
     },
-    "-10Inaki Montes-De La Torre": {
+    "Inaki Montes-De La Torre": {
       "rank": 185,
       "points": 307
     },
@@ -747,7 +747,7 @@
       "rank": 186,
       "points": 307
     },
-    "-35Nicolai Budkov Kjaer": {
+    "Nicolai Budkov Kjaer": {
       "rank": 187,
       "points": 306
     },
@@ -767,7 +767,7 @@
       "rank": 191,
       "points": 302
     },
-    "-1Jan Kumstat": {
+    "Jan Kumstat": {
       "rank": 192,
       "points": 302
     },
@@ -791,11 +791,11 @@
       "rank": 197,
       "points": 298
     },
-    "-1Facundo Mena": {
+    "Facundo Mena": {
       "rank": 198,
       "points": 296
     },
-    "-16Gonzalo Bueno": {
+    "Gonzalo Bueno": {
       "rank": 199,
       "points": 296
     },
@@ -807,15 +807,15 @@
       "rank": 201,
       "points": 290
     },
-    "-16Harold Mayot": {
+    "Harold Mayot": {
       "rank": 202,
       "points": 287
     },
-    "-9Andre Ilagan": {
+    "Andre Ilagan": {
       "rank": 203,
       "points": 287
     },
-    "-4Juan Pablo Varillas": {
+    "Juan Pablo Varillas": {
       "rank": 204,
       "points": 285
     },
@@ -823,7 +823,7 @@
       "rank": 205,
       "points": 282
     },
-    "-10Zdenek Kolar": {
+    "Zdenek Kolar": {
       "rank": 206,
       "points": 282
     },
@@ -835,11 +835,11 @@
       "rank": 208,
       "points": 279
     },
-    "-10Edas Butvilas": {
+    "Edas Butvilas": {
       "rank": 209,
       "points": 273
     },
-    "-6Federico Agustin Gomez": {
+    "Federico Agustin Gomez": {
       "rank": 210,
       "points": 272
     },
@@ -851,7 +851,7 @@
       "rank": 212,
       "points": 266
     },
-    "-31Harry Wendelken": {
+    "Harry Wendelken": {
       "rank": 213,
       "points": 264
     },
@@ -871,7 +871,7 @@
       "rank": 217,
       "points": 258
     },
-    "-6Colton Smith": {
+    "Colton Smith": {
       "rank": 218,
       "points": 258
     },
@@ -895,7 +895,7 @@
       "rank": 223,
       "points": 253
     },
-    "-21Andy Andrade": {
+    "Andy Andrade": {
       "rank": 224,
       "points": 253
     },
@@ -907,15 +907,15 @@
       "rank": 226,
       "points": 252
     },
-    "-5Felix Gill": {
+    "Felix Gill": {
       "rank": 227,
       "points": 252
     },
-    "-36Elias Ymer": {
+    "Elias Ymer": {
       "rank": 228,
       "points": 251
     },
-    "-60Mackenzie McDonald": {
+    "Mackenzie McDonald": {
       "rank": 229,
       "points": 249
     },
@@ -923,7 +923,7 @@
       "rank": 230,
       "points": 249
     },
-    "-15Lorenzo Giustino": {
+    "Lorenzo Giustino": {
       "rank": 231,
       "points": 248
     },
@@ -931,11 +931,11 @@
       "rank": 232,
       "points": 248
     },
-    "-20Liam Broady": {
+    "Liam Broady": {
       "rank": 233,
       "points": 247
     },
-    "-17Maxim Mrva": {
+    "Maxim Mrva": {
       "rank": 234,
       "points": 246
     },
@@ -943,7 +943,7 @@
       "rank": 235,
       "points": 244
     },
-    "-1Thiago Monteiro": {
+    "Thiago Monteiro": {
       "rank": 236,
       "points": 238
     },
@@ -979,7 +979,7 @@
       "rank": 244,
       "points": 227
     },
-    "-78Luka Mikrut": {
+    "Luka Mikrut": {
       "rank": 245,
       "points": 226
     },
@@ -991,11 +991,11 @@
       "rank": 247,
       "points": 222
     },
-    "-34Juncheng Shang": {
+    "Juncheng Shang": {
       "rank": 248,
       "points": 220
     },
-    "-8Billy Harris": {
+    "Billy Harris": {
       "rank": 249,
       "points": 218
     },
@@ -1023,7 +1023,7 @@
       "rank": 255,
       "points": 215
     },
-    "-8Max Basing": {
+    "Max Basing": {
       "rank": 256,
       "points": 214
     },
@@ -1031,11 +1031,11 @@
       "rank": 257,
       "points": 214
     },
-    "-22August Holmgren": {
+    "August Holmgren": {
       "rank": 258,
       "points": 214
     },
-    "-1Roberto Carballes Baena": {
+    "Roberto Carballes Baena": {
       "rank": 259,
       "points": 213
     },
@@ -1059,7 +1059,7 @@
       "rank": 264,
       "points": 209
     },
-    "-13Matias Soto": {
+    "Matias Soto": {
       "rank": 265,
       "points": 208
     },
@@ -1067,7 +1067,7 @@
       "rank": 266,
       "points": 207
     },
-    "-49Yoshihito Nishioka": {
+    "Yoshihito Nishioka": {
       "rank": 267,
       "points": 206
     },
@@ -1075,7 +1075,7 @@
       "rank": 268,
       "points": 203
     },
-    "-12Martin Krumich": {
+    "Martin Krumich": {
       "rank": 269,
       "points": 200
     },
@@ -1087,7 +1087,7 @@
       "rank": 271,
       "points": 199
     },
-    "-12Jay Friend": {
+    "Jay Friend": {
       "rank": 272,
       "points": 198
     },
@@ -1107,7 +1107,7 @@
       "rank": 276,
       "points": 198
     },
-    "-2Marc-Andrea Huesler": {
+    "Marc-Andrea Huesler": {
       "rank": 277,
       "points": 196
     },
@@ -1119,15 +1119,15 @@
       "rank": 279,
       "points": 194
     },
-    "-3Yi Zhou": {
+    "Yi Zhou": {
       "rank": 280,
       "points": 193
     },
-    "-28Sumit Nagal": {
+    "Sumit Nagal": {
       "rank": 281,
       "points": 193
     },
-    "-40Pedro Boscardin Dias": {
+    "Pedro Boscardin Dias": {
       "rank": 282,
       "points": 193
     },
@@ -1151,7 +1151,7 @@
       "rank": 287,
       "points": 187
     },
-    "-6Michele Ribecai": {
+    "Michele Ribecai": {
       "rank": 288,
       "points": 187
     },
@@ -1167,7 +1167,7 @@
       "rank": 291,
       "points": 184
     },
-    "-46Henri Squire": {
+    "Henri Squire": {
       "rank": 292,
       "points": 184
     },
@@ -1187,11 +1187,11 @@
       "rank": 296,
       "points": 181
     },
-    "-16Nick Hardt": {
+    "Nick Hardt": {
       "rank": 297,
       "points": 180
     },
-    "-19Juan Bautista Torres": {
+    "Juan Bautista Torres": {
       "rank": 298,
       "points": 180
     },
@@ -1199,7 +1199,7 @@
       "rank": 299,
       "points": 179
     },
-    "-44Daniel Michalski": {
+    "Daniel Michalski": {
       "rank": 300,
       "points": 179
     },
