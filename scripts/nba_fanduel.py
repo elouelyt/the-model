@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -32,7 +33,6 @@ MARKETS = {  # FanDuel accordion label -> Stake stat name
     "Player Reb + Ast": "assists+rebounds",
     "Player Pts + Reb + Ast": "points+assists+rebounds",
 }
-TEAM_ALIASES = {"los-angeles-clippers": "la-clippers"}
 
 CLICK_JS = (
     "(() => { const labels = %s; let n = 0;"
@@ -44,8 +44,7 @@ ROW_RE = re.compile(r"\n([A-Z][^\n]{2,40})\n+O (\d+\.\d)([+-]\d+)\n+U \d+\.\d([+
 
 
 def team_slug(name: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
-    return TEAM_ALIASES.get(slug, slug)
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 def parse_markets(markdown: str) -> list[dict]:
@@ -72,8 +71,15 @@ def main() -> None:
     events = [u for u in (nav.links or []) if "/basketball/nba/" in u and "@" in u]
     logger.info("FanDuel lists %d NBA events", len(events))
 
-    out_rows, credits = [], 0
+    only = sys.argv[1].lower() if len(sys.argv) > 1 else None  # refresh a single game, keep the rest
+    out_rows: list[dict] = []
+    if only and OUT.exists():
+        out_rows = json.loads(OUT.read_text(encoding="utf-8"))["rows"]
     for game in stake["games"]:
+        if only and only not in game["fixture"]:
+            continue
+        if only:
+            out_rows = [r for r in out_rows if r["fixture"] != game["fixture"]]
         slugs = [team_slug(t) for t in game["teams"]]
         url = next((u for u in events if all(s in u for s in slugs)), None)
         if not url:
