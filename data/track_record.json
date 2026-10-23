@@ -1070,11 +1070,11 @@
               ],
               "stake_odds": 1.32,
               "best_odds": 1.32,
-              "won": null,
+              "won": true,
               "opponent": "Stan Wawrinka"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
