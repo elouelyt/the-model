@@ -5,3 +5,4 @@ cloudscraper>=1.2.71
 pandas>=2.0.0
 langgraph>=1.0.0
 google-genai>=1.0.0
+firecrawl
