@@ -16,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HIGH_PROB = 0.56   # pool for the "pure probability" paper family (EV ignored)
+MAX_CACHE_AGE_H = 6   # a reference line older than this is not a fair price any more (stale lines fake EV)
 MIN_PROB = 0.0     # his feed shows win% from ~53%; no probability cut-off
 MIN_EV = 0.003     # his feed lists +EV down to ~0.3%
 OUT = ROOT / "data" / "nba_picks.json"
@@ -56,7 +57,12 @@ def load_books() -> tuple[dict, dict]:
         path = ROOT / "data" / fname
         if not path.exists():
             continue
-        for r in json.loads(path.read_text(encoding="utf-8"))["rows"]:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        age = datetime.now(timezone.utc) - datetime.fromisoformat(doc["timestamp"])
+        if age.total_seconds() > MAX_CACHE_AGE_H * 3600:
+            print(f"[nba_ev] ignoring {fname}: {age.total_seconds() / 3600:.1f} h old")
+            continue
+        for r in doc["rows"]:
             if abs(r["over_american"]) > 400 or abs(r["under_american"]) > 400:  # placeholder quotes
                 continue
             key = (r["fixture"], norm_name(r["player"]), r["stat"], r["line"])

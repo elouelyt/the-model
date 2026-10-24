@@ -217,7 +217,7 @@ def analyse() -> dict:
         return out
 
     prob_labels = ["<52%", "52-54%", "54-56%", "56-60%", "60%+"]
-    ev_labels = ["<3%", "3-6%", "6-10%", "10%+"]
+    ev_labels = ["<0% (sin EV)", "0-3%", "3-6%", "6-10%", "10%+"]
     blow = [l for l in played if l["margin"] >= BLOWOUT]
     close = [l for l in played if l["margin"] < BLOWOUT]
 
@@ -234,7 +234,7 @@ def analyse() -> dict:
         "calibration": table(played, lambda r: bucket(r["fair_prob"], [0.52, 0.54, 0.56, 0.60], prob_labels)),
         "by_stat": table(played, lambda r: r["stat"]),
         "by_side": table(played, lambda r: r["side"]),
-        "by_ev": table(played, lambda r: bucket(r["ev"], [0.03, 0.06, 0.10], ev_labels)),
+        "by_ev": table(played, lambda r: bucket(r["ev"], [0.0, 0.03, 0.06, 0.10], ev_labels)),
         "by_books": table(played, lambda r: f'{r.get("books", 1)} casa(s)'),
         "context": {
             "blowout_threshold": BLOWOUT,

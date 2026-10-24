@@ -28,6 +28,10 @@ GAME_CAP = 2          # max legs per game across the whole bettable set
 TRACKING_GAME_CAP = 3
 PER_FAMILY = 3
 TRACKING_PER_FAMILY = 5
+LEGACY = {  # yesterday's rules, paper only, to see whether its results repeat
+    "valor_ev": (lambda c: True, lambda c: c["ev"]),
+    "prob_ev": (lambda c: True, lambda c: c["prob"]),
+}
 UNITS = 0.25  # video: 0.25-0.5 units on 3-man slips
 FAMILIES = {
     "probabilidad": (lambda c: True, lambda c: c["prob"]),
@@ -135,13 +139,20 @@ def main() -> None:
                         families={"pura": (lambda c: True, lambda c: c["prob"])}, future_only=True,
                         min_leg_prob=0.0, game_cap=TRACKING_GAME_CAP)
     tracking += pure
+    # legacy rules (no win% filter, one book is enough) on upcoming games, paper only
+    legacy = [] if not doc["picks"] else build_combos(
+        doc["picks"], tracking=True, per_family=TRACKING_PER_FAMILY, families=LEGACY, future_only=True,
+        min_leg_prob=0.0, min_books=1, game_cap=TRACKING_GAME_CAP)
+    tracking += legacy
     doc["combos_tracking"] = tracking
     PICKS.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # keep every leg/combo ever recommended that day (first sighting wins), settled later
     known_legs = {leg_key(p) for r in snap["runs"] for p in r["picks"]}
     known_combos = {tuple(sorted(l["key"] for l in c["legs"])) for r in snap["runs"] for c in r["combos"]}
-    new_picks = [p for p in doc["picks"] if leg_key(p) not in known_legs]
+    extras = [{**p, "extra": True} for p in doc.get("high_prob", [])
+              if leg_key(p) not in {leg_key(q) for q in doc["picks"]}]
+    new_picks = [p for p in doc["picks"] + extras if leg_key(p) not in known_legs]
     new_combos = [c for c in combos + tracking if tuple(sorted(l["key"] for l in c["legs"])) not in known_combos]
     quotes = {leg_key(p): [p["stake_odds"], p.get("stake_opp"), p["fair_prob"]] for p in doc["picks"]}
     snap["runs"].append({"at": doc["timestamp"], "picks": new_picks, "combos": new_combos, "quotes": quotes})
