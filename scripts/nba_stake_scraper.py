@@ -29,7 +29,7 @@ SCRAPE_JS = r"""
     fixtureList(type: popular, limit: 30, offset: 0) { id name slug status data { ... on SportFixtureDataMatch { startTime competitors { name } } } } } }`;
   const QP = `query($fixture: String!) { slugFixture(fixture: $fixture) {
     swishGameCompetitorTeams { name players { name markets(inPlay: false, statTypes: [player]) {
-      stat { name } lines { line over under suspended balanced } } } } } }`;
+      stat { name } lines { id line over under suspended balanced } } } } } }`;
   const fx = (await gql({}, QF))?.slugTournament?.fixtureList || [];
   const rows = [], games = [];
   for (const f of fx) {
@@ -42,7 +42,8 @@ SCRAPE_JS = r"""
         for (const l of (m.lines || [])) {
           if (l.suspended || !l.over || !l.under) continue;
           rows.push({fixture: f.slug, team: t.name, player: p.name, stat: m.stat?.name,
-                     line: l.line, over: l.over, under: l.under, balanced: !!l.balanced});
+                     line: l.line, over: l.over, under: l.under, balanced: !!l.balanced,
+                     outcome_id: l.id, event_id: f.id});
         }
     await new Promise(r => setTimeout(r, 200));
   }

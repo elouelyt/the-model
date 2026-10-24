@@ -101,6 +101,7 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
             leg = {
                 "player": r["player"], "team": r["team"], "stat": r["stat"], "line": r["line"],
                 "side": side, "stake_odds": round(odds, 3), "stake_opp": round(opp, 3), "fair_prob": round(prob, 4),
+                "outcome_id": r.get("outcome_id"), "event_id": r.get("event_id"),
                 "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
                 "cons_prob": None if cons_over is None else round(cons_over if side == "Over" else 1 - cons_over, 4),
                 "fanduel": detail, "books": len(books),

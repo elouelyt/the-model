@@ -14,6 +14,7 @@ snapshot of picks + combos is saved in data/nba_history/<date>.json for settleme
 
 import itertools
 import json
+import sys
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -106,7 +107,8 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
         c["legs"] = [{"key": k, "player": by_key[k]["player"], "stat": by_key[k]["stat"],
                       "side": by_key[k]["side"], "line": by_key[k]["line"],
                       "stake_odds": by_key[k]["stake_odds"], "fair_prob": by_key[k]["fair_prob"],
-                      "ev": by_key[k]["ev"], "game": by_key[k]["game"], "start": by_key[k]["start"]}
+                      "ev": by_key[k]["ev"], "game": by_key[k]["game"], "start": by_key[k]["start"],
+                      "outcome_id": by_key[k].get("outcome_id"), "event_id": by_key[k].get("event_id")}
                      for k in c["legs"]]
         c["prob"], c["odds"], c["ev"] = round(c["prob"], 4), round(c["odds"], 2), round(c["ev"], 4)
         c["tracking"] = tracking
@@ -122,6 +124,9 @@ def main() -> None:
     if analysis_path.exists():
         doc["analysis"] = json.loads(analysis_path.read_text(encoding="utf-8"))
 
+    if "--no-snapshot" in sys.argv:  # tests: do not write into the history
+        print(f"{len(combos)} bettable combos (no snapshot)")
+        return
     HISTORY.mkdir(parents=True, exist_ok=True)
     day = (datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")  # slate date: 01:00 runs belong to the evening before
     snap_path = HISTORY / f"{day}.json"

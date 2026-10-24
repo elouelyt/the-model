@@ -4,6 +4,7 @@ Usage: python generate_nba.py [output_path]
 Reads data/nba_picks.json written by scripts/nba_ev.py.
 """
 
+import base64
 import json
 import sys
 from datetime import datetime, timedelta, timezone
@@ -38,6 +39,8 @@ APP_CSS = r'''
 .sug { white-space:nowrap; }
 .btn { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:5px 10px; font:inherit; font-size:.82rem; cursor:pointer; }
 .btn:hover { border-color:var(--orange); }
+a.btn { text-decoration:none; display:inline-block; }
+a.btn.go { border-color:var(--orange); color:var(--orange); }
 .btn[disabled] { color:var(--green); border-color:var(--border); cursor:default; }
 .stk { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:4px 6px; font:inherit; width:78px; text-align:right; }
 select { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:4px 6px; font:inherit; }
@@ -175,6 +178,24 @@ APP_JS = r'''
 '''
 
 
+STAKE_BASKETBALL = "https://stake.com/es/sports/basketball"
+
+
+def stake_url(legs: list[dict]) -> str | None:
+    """Link that fills Stake's betslip (needs the Stake Combo Loader extension): #oj=<base64url json>."""
+    picks = [{"o": l["outcome_id"], "e": l["event_id"], "t": "over" if l["side"] == "Over" else "under",
+              "p": l["stake_odds"]} for l in legs if l.get("outcome_id") and l.get("event_id")]
+    if not picks or len(picks) != len(legs):
+        return None
+    raw = json.dumps(picks, separators=(",", ":")).encode()
+    return f"{STAKE_BASKETBALL}#oj={base64.urlsafe_b64encode(raw).decode().rstrip('=')}"
+
+
+def _go_link(p: dict, label: str = "Stake ↗") -> str:
+    url = stake_url([p])
+    return f'<a class="btn go" href="{escape(url)}" target="_blank" rel="noopener noreferrer">{label}</a> ' if url else ""
+
+
 def _row(p: dict) -> str:
     side = "Más de" if p["side"] == "Over" else "Menos de"
     stat = STAT_ES.get(p["stat"], p["stat"])
@@ -192,7 +213,7 @@ def _row(p: dict) -> str:
         f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
         f'<td class="num muted">{escape(p["fanduel"])}<small>{books} {"casa" if books == 1 else "casas"}</small></td>'
         f'<td class="num sug"></td>'
-        f'<td><button class="btn" type="button">Apostada</button></td></tr>'
+        f'<td>{_go_link(p)}<button class="btn" type="button">Apostada</button></td></tr>'
     )
 
 
@@ -223,7 +244,8 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
             f'<ul>{legs}</ul>'
             f'<div class="cfoot"><span>Cuota <b>{c["odds"]:.2f}</b></span><span>Prob. <b>{c["prob"]:.1%}</b></span>'
             f'<span class="ev">EV {c["ev"]:+.0%}</span>'
-            + ('' if tracking else '<span class="csug"></span><button class="btn cbtn" type="button">Apostada</button>')
+            + ('' if tracking else (f'<a class="btn go" href="{escape(stake_url(c["legs"]))}" target="_blank" rel="noopener noreferrer">Abrir en Stake</a>' if stake_url(c["legs"]) else '')
+               + '<span class="csug"></span><button class="btn cbtn" type="button">Apostada</button>')
             + '</div></div>'
         )
     if tracking:
