@@ -116,9 +116,32 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
     return sorted(out, key=lambda c: c["ev"], reverse=True)
 
 
+def freeze_combos(fresh: list[dict], snap: dict, now: datetime | None = None) -> list[dict]:
+    """Keep the bettable combos already shown today while all their games are still to start, so a combo the
+    user may have bet never vanishes because odds moved. Fresh combos are added only if they reuse no frozen leg or player."""
+    limit = (now or datetime.now(timezone.utc)) + timedelta(minutes=10)
+    kept, seen = [], set()
+    for r in snap["runs"]:
+        for c in r["combos"]:
+            ident = tuple(sorted(l["key"] for l in c["legs"]))
+            if c.get("tracking") or ident in seen or any(parsedate_to_datetime(l["start"]) <= limit for l in c["legs"]):
+                continue
+            seen.add(ident)
+            kept.append(c)
+    used_legs = {l["key"] for c in kept for l in c["legs"]}
+    used_players = {l["player"] for c in kept for l in c["legs"]}
+    added = [c for c in fresh if tuple(sorted(l["key"] for l in c["legs"])) not in seen
+             and not used_legs & {l["key"] for l in c["legs"]} and not used_players & {l["player"] for l in c["legs"]}]
+    return kept + added
+
+
 def main() -> None:
     doc = json.loads(PICKS.read_text(encoding="utf-8"))
     combos = build_combos(doc["picks"])
+    day = (datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")  # slate date: 01:00 runs belong to the evening before
+    snap_path = HISTORY / f"{day}.json"
+    snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
+    combos = freeze_combos(combos, snap)
     doc["combos"] = combos
     analysis_path = ROOT / "data" / "nba_analysis.json"
     if analysis_path.exists():
@@ -128,9 +151,6 @@ def main() -> None:
         print(f"{len(combos)} bettable combos (no snapshot)")
         return
     HISTORY.mkdir(parents=True, exist_ok=True)
-    day = (datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")  # slate date: 01:00 runs belong to the evening before
-    snap_path = HISTORY / f"{day}.json"
-    snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
 
     # paper combos: today's pool (every leg recommended today, first sighting) incl. games already started
     pool = {leg_key(p): p for r in snap["runs"] for p in r["picks"]}
