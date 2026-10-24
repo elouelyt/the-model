@@ -154,6 +154,7 @@ def analyse() -> dict:
                         odds *= l["stake_odds"]
                     hit = bool(live) and all(o["status"] == "won" for _, o in live)
                     combos.append({"date": snap["date"], "families": c["families"], "prob": c["prob"],
+                                   "tracking": bool(c.get("tracking")),
                                    "legs": c["legs"], "outcomes": outcomes, "odds": odds if live else 1.0,
                                    "hit": hit, "void_legs": 3 - len(live)})
     played = [l for l in legs if l["status"] != "void"]
@@ -201,7 +202,12 @@ def analyse() -> dict:
             {"name": f, "n": len(cs), "hits": sum(c["hit"] for c in cs),
              "roi": round(sum((c["odds"] - 1) if c["hit"] else -1 for c in cs) / len(cs), 3),
              "expected_hit": round(sum(c["prob"] for c in cs) / len(cs), 3)} for f, cs in sorted(fam.items())],
-        "combos": combos[-30:],
+        "combos": combos[-120:],
+        "legs": [{"player": l["player"], "stat": l["stat"], "side": l["side"], "line": l["line"],
+                  "win": l["fair_prob"], "ev": l["ev"], "odds": l["stake_odds"], "actual": l["actual"],
+                  "min": l["min"], "margin": l["margin"], "ok": l["status"] == "won",
+                  "game": l["game"], "books": l.get("books", 1), "date": l["date"]}
+                 for l in sorted(played, key=lambda l: -l["ev"])],
     }
 
 

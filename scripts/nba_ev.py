@@ -11,6 +11,7 @@ import re
 import sys
 import unicodedata
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,10 +60,12 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
     stake = json.loads((ROOT / "data" / "nba_stake_cache.json").read_text(encoding="utf-8"))
     starts = {g["fixture"]: (g["start"], g["teams"]) for g in stake["games"]}
     index = load_books()
+    now = datetime.now(timezone.utc)
+    upcoming = {fx for fx, (start, _) in starts.items() if parsedate_to_datetime(start) > now}
 
     picks, high = [], []
     for r in stake["rows"]:
-        if r["stat"] not in ALLOWED_STATS:
+        if r["stat"] not in ALLOWED_STATS or r["fixture"] not in upcoming:
             continue
         books = index.get((r["fixture"], norm_name(r["player"]), r["stat"], r["line"]))
         if not books:

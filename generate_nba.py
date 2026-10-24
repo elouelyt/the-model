@@ -59,6 +59,10 @@ details.bak textarea { width:100%; min-height:90px; background:var(--surface-2);
 .card.an h3 { font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10px 0 0; }
 .card.an table { min-width:0; }
 
+tr.ok td:first-child { color:var(--green); font-weight:700; } tr.xx td:first-child { color:#f87171; font-weight:700; }
+.combo.hit { border-color:var(--green); } .combo li.ok { color:var(--text); } .combo li.xx { color:var(--muted); }
+.combo.miss .cn { color:#f87171; } .combo.hit .cn { color:var(--green); }
+
 .bets-empty { color:var(--muted); text-align:center; padding:22px; }
 '''
 
@@ -250,6 +254,55 @@ def _tbl(title: str, rows: list[dict]) -> str:
             f'<th class="num">Acierto</th><th class="num">Esperado</th><th class="num">ROI</th></tr>{body}</table></div>')
 
 
+
+def _detail_html(a: dict) -> str:
+    """Every settled leg (sortable) and every settled combo with the outcome of each leg."""
+    legs = a.get("legs") or []
+    out = ""
+    if legs:
+        rows = "".join(
+            f'<tr class="{"ok" if l["ok"] else "xx"}" data-ev="{l["ev"]}" data-win="{l["win"]}">'
+            f'<td>{"✓" if l["ok"] else "✗"}</td>'
+            f'<td><b>{escape(l["player"])}</b><small>{escape(l["game"])}</small></td>'
+            f'<td>{"Más de" if l["side"] == "Over" else "Menos de"} {l["line"]:g} <span class="tag">{escape(STAT_ES.get(l["stat"], l["stat"]))}</span></td>'
+            f'<td class="num">{l["win"]:.1%}</td><td class="num">{l["ev"]:+.1%}</td><td class="num">{l["odds"]:.2f}</td>'
+            f'<td class="num"><b>{l["actual"]}</b><small>{l["min"]} min</small></td>'
+            f'<td class="num muted">{l["margin"]}</td><td class="num muted">{l["books"]}</td></tr>' for l in legs)
+        out += (
+            '<details class="bak" open><summary>Todas las apuestas simples liquidadas (' + str(len(legs)) + ')</summary>'
+            '<div class="chips" style="margin-top:10px"><button class="chip lsort on" data-k="ev" type="button">Ordenar por EV%</button>'
+            '<button class="chip lsort" data-k="win" type="button">Ordenar por Win%</button></div>'
+            '<div class="card"><table id="legtbl"><tr><th></th><th>Jugador</th><th>Apuesta</th><th class="num">Win%</th>'
+            '<th class="num">EV%</th><th class="num">Cuota</th><th class="num">Real</th><th class="num">Margen</th><th class="num">Casas</th></tr>'
+            + rows + '</table></div></details>'
+            '<script>(function(){var t=document.getElementById("legtbl");if(!t)return;'
+            'document.querySelectorAll(".chip.lsort").forEach(function(b){b.onclick=function(){'
+            'document.querySelectorAll(".chip.lsort").forEach(function(x){x.classList.toggle("on",x===b)});'
+            'var k="data-"+b.dataset.k,r=Array.prototype.slice.call(t.querySelectorAll("tr[data-ev]"));'
+            'r.sort(function(p,q){return parseFloat(q.getAttribute(k))-parseFloat(p.getAttribute(k))});'
+            'r.forEach(function(x){x.parentNode.appendChild(x)})}})})();</script>'
+        )
+    combos = a.get("combos") or []
+    if combos:
+        cards = []
+        for c in reversed(combos):
+            lines = "".join(
+                f'<li class="{"ok" if o["status"] == "won" else "xx" if o["status"] == "lost" else ""}">'
+                f'<span>{"✓" if o["status"] == "won" else "✗" if o["status"] == "lost" else "—"} <b>{escape(l["player"])}</b> '
+                f'{"Más de" if l["side"] == "Over" else "Menos de"} {l["line"]:g} {escape(STAT_ES.get(l["stat"], l["stat"]))}</span>'
+                f'<span class="num">real <b>{o["actual"]}</b> · {o["min"]} min</span></li>'
+                for l, o in zip(c["legs"], c["outcomes"]))
+            fams = " ".join(f'<span class="fam">{escape(FAMILY_ES.get(f, f))}</span>' for f in c["families"])
+            seg = '<span class="tag">seguimiento</span>' if c.get("tracking") else ""
+            cards.append(
+                f'<div class="combo {"hit" if c["hit"] else "miss"}"><div class="chead">{fams}{seg}'
+                f'<span class="cn">{"ACERTADA" if c["hit"] else "fallada"} · cuota {c["odds"]:.2f}</span></div>'
+                f'<ul>{lines}</ul></div>')
+        out += ('<details class="bak"><summary>Todas las combinadas liquidadas (' + str(len(combos)) + ')</summary>'
+                '<div class="combos" style="margin-top:12px">' + "".join(cards) + '</div></details>')
+    return out
+
+
 def _analysis_html(doc: dict) -> str:
     a = doc.get("analysis")
     head = '<h2 class="sec">Resultados y análisis · por qué se acierta o se falla</h2>'
@@ -275,6 +328,7 @@ def _analysis_html(doc: dict) -> str:
             + _tbl("Calibración (por probabilidad)", a["calibration"]) + _tbl("Por mercado", a["by_stat"])
             + _tbl("Over / Under", a["by_side"]) + _tbl("Por nivel de EV", a["by_ev"]) + _tbl("Por casas de referencia", a["by_books"])
             + fam_html + '</div>'
+            + _detail_html(a)
             + f'<div class="card an"><h3>Contexto del partido</h3><p class="note" style="margin:6px 0">Partidos con diferencia final de '
               f'{ctx["blowout_threshold"]}+ puntos ({ctx["n_blowout"]} piernas) frente a ajustados ({ctx["n_close"]}): '
               f'<b>Over</b> {pct(ctx["over_blowout"])} vs {pct(ctx["over_close"])} · <b>Under</b> {pct(ctx["under_blowout"])} vs {pct(ctx["under_close"])}. '
