@@ -192,7 +192,7 @@ def _row(p: dict) -> str:
     )
 
 
-FAMILY_ES = {"probabilidad": "Probabilidad", "valor": "Valor", "mixta": "Mixta"}
+FAMILY_ES = {"probabilidad": "Probabilidad", "valor": "Valor", "mixta": "Mixta", "pura": "Prob. pura"}
 
 
 def _combos_html(doc: dict, tracking: bool = False) -> str:

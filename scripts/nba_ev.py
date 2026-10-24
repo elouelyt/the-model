@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+HIGH_PROB = 0.56   # pool for the "pure probability" paper family (EV ignored)
 MIN_PROB = 0.0     # his feed shows win% from ~53%; no probability cut-off
 MIN_EV = 0.003     # his feed lists +EV down to ~0.3%
 OUT = ROOT / "data" / "nba_picks.json"
@@ -54,12 +55,12 @@ def load_books() -> dict[tuple, dict[str, tuple[int, int]]]:
     return index
 
 
-def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV) -> list[dict]:
+def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: bool = False):
     stake = json.loads((ROOT / "data" / "nba_stake_cache.json").read_text(encoding="utf-8"))
     starts = {g["fixture"]: (g["start"], g["teams"]) for g in stake["games"]}
     index = load_books()
 
-    picks = []
+    picks, high = [], []
     for r in stake["rows"]:
         if r["stat"] not in ALLOWED_STATS:
             continue
@@ -70,26 +71,31 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV) -> list[dict
         p_over = sum(p[0] for p in probs) / len(probs)  # average of each book's no-vig probability
         for side, prob, odds in (("Over", p_over, r["over"]), ("Under", 1 - p_over, r["under"])):
             ev = prob * odds - 1
+            if not (prob >= HIGH_PROB or (prob >= min_prob and ev > min_ev)):
+                continue
+            start, teams = starts[r["fixture"]]
+            detail = " · ".join(f"{SHORT[b]} {o:+d}/{u:+d}" for b, (o, u) in books.items())
+            leg = {
+                "player": r["player"], "team": r["team"], "stat": r["stat"], "line": r["line"],
+                "side": side, "stake_odds": round(odds, 3), "fair_prob": round(prob, 4),
+                "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
+                "fanduel": detail, "books": len(books),
+                "game": " vs ".join(teams), "start": start,
+            }
             if prob >= min_prob and ev > min_ev:
-                start, teams = starts[r["fixture"]]
-                detail = " · ".join(
-                    f"{SHORT[b]} {o:+d}/{u:+d}" for b, (o, u) in books.items())
-                picks.append({
-                    "player": r["player"], "team": r["team"], "stat": r["stat"], "line": r["line"],
-                    "side": side, "stake_odds": round(odds, 3), "fair_prob": round(prob, 4),
-                    "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
-                    "fanduel": detail, "books": len(books),
-                    "game": " vs ".join(teams), "start": start,
-                })
+                picks.append(leg)
+            if prob >= HIGH_PROB:
+                high.append(leg)
     picks.sort(key=lambda p: p["ev"], reverse=True)
-    return picks
+    high.sort(key=lambda p: p["fair_prob"], reverse=True)
+    return (picks, high) if with_high else picks
 
 
 def main() -> None:
     min_prob = float(sys.argv[1]) if len(sys.argv) > 1 else MIN_PROB
-    picks = build_picks(min_prob)
+    picks, high = build_picks(min_prob, with_high=True)
     OUT.write_text(json.dumps({"timestamp": datetime.now(timezone.utc).isoformat(),
-                               "min_prob": min_prob, "min_ev": MIN_EV, "picks": picks}, ensure_ascii=False, indent=1),
+                               "min_prob": min_prob, "min_ev": MIN_EV, "high_prob": high[:80], "picks": picks}, ensure_ascii=False, indent=1),
                    encoding="utf-8")
     print(f"{len(picks)} picks with EV >= {MIN_EV:.1%}")
     for p in picks[:25]:

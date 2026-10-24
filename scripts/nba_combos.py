@@ -36,7 +36,8 @@ def leg_key(p: dict) -> str:
 
 
 def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool = False,
-                 per_family: int = PER_FAMILY) -> list[dict]:
+                 per_family: int = PER_FAMILY, families: dict | None = None, min_leg_ev: float = MIN_LEG_EV,
+                 future_only: bool | None = None) -> list[dict]:
     """tracking=False: bettable combos (all games still to start).
     tracking=True: paper combos with at least one leg from a game that already started."""
     now = now or datetime.now(timezone.utc)
@@ -45,12 +46,13 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
     def started(p: dict) -> bool:
         return parsedate_to_datetime(p["start"]) <= limit
 
-    legs = [p for p in picks if p["ev"] >= MIN_LEG_EV and (tracking or not started(p))]
+    only_future = (not tracking) if future_only is None else future_only
+    legs = [p for p in picks if p["ev"] >= min_leg_ev and (not only_future or not started(p))]
     combos = []
     for trio in itertools.combinations(legs, 3):
         if len({p["game"] for p in trio}) < 3 or len({p["player"] for p in trio}) < 3:
             continue
-        if tracking and not any(started(p) for p in trio):
+        if tracking and future_only is None and not any(started(p) for p in trio):
             continue
         odds, prob = 1.0, 1.0
         for p in trio:
@@ -59,7 +61,7 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
         combos.append({"legs": [leg_key(p) for p in trio], "prob": prob, "odds": odds, "ev": prob * odds - 1})
 
     chosen: dict[tuple, dict] = {}
-    for name, (keep, score) in FAMILIES.items():
+    for name, (keep, score) in (families or FAMILIES).items():
         used: set[str] = set()
         picked = 0
         for c in sorted((c for c in combos if keep(c)), key=score, reverse=True):
@@ -104,6 +106,10 @@ def main() -> None:
     pool = {leg_key(p): p for r in snap["runs"] for p in r["picks"]}
     pool.update({leg_key(p): p for p in doc["picks"]})
     tracking = build_combos(list(pool.values()), tracking=True, per_family=TRACKING_PER_FAMILY)
+    # paper family "pura": highest fair probability regardless of EV (Stake odds usually below fair)
+    pure = build_combos(doc.get("high_prob", []), tracking=True, per_family=TRACKING_PER_FAMILY, min_leg_ev=-1.0,
+                        families={"pura": (lambda c: True, lambda c: c["prob"])}, future_only=True)
+    tracking += pure
     doc["combos_tracking"] = tracking
     PICKS.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
