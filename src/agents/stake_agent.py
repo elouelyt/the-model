@@ -148,6 +148,40 @@ def _normalize_stake_name(name: str) -> list[str]:
     return result
 
 
+def _stake_first_name(stake_name: str) -> str | None:
+    """First name of a Stake competitor ("Harris, Billy" / "Billy Harris"), or None if only an initial is given."""
+    name = stake_name.strip()
+    if "," in name:
+        toks = name.split(",", 1)[1].replace(".", " ").split()
+        first = toks[0] if toks else ""
+    else:
+        toks = name.split()
+        if len(toks) < 2 or len(toks[-1].replace(".", "")) <= 1 or len(toks[0].replace(".", "")) <= 1:
+            return None  # "Lastname C." / "C. Lastname" / a lone surname
+        first = toks[0]
+    return first.lower() if len(first) > 2 else None
+
+
+def _first_name_conflict(stake_first: str | None, pipeline_name: str) -> bool:
+    """True when both sides carry a clear first name and the two clearly differ.
+
+    Stops "Harris, Billy" from matching "Lloyd Harris" or "Matsuda, Ryuki" from matching
+    "Hayato Matsuoka" just because the surnames are similar.
+    """
+    if not stake_first:
+        return False
+    if "," in pipeline_name:
+        toks = pipeline_name.split(",", 1)[1].replace(".", " ").split()
+    else:
+        toks = pipeline_name.replace(".", " ").split()[:1]
+    if not toks or len(toks[0]) <= 2:
+        return False
+    pf = toks[0].lower()
+    if stake_first[:3] == pf[:3] or stake_first.startswith(pf) or pf.startswith(stake_first):  # Nico/Nicolas, Matt/Matthew
+        return False
+    return _similarity(stake_first, pf) < 0.7
+
+
 def _best_match(
     stake_name: str,
     pipeline_names: list[str],
@@ -169,14 +203,23 @@ def _best_match(
 
     best_name:  str | None = None
     best_score: float      = 0.0
+    stake_first = _stake_first_name(stake_name)
 
     for pipeline_name in pipeline_names:
-        pipeline_last  = pipeline_name.split()[-1].lower()
-        pipeline_lower = pipeline_name.lower()
+        # Pipeline names that come from Stake itself are "Lastname, Firstname": compare them as
+        # "Firstname Lastname" like every other form (the returned name stays as it was).
+        compare_name = pipeline_name
+        if "," in pipeline_name:
+            last, _, first = pipeline_name.partition(",")
+            compare_name = f"{first.strip()} {last.strip()}".strip()
+        pipeline_last  = compare_name.split()[-1].lower()
+        pipeline_lower = compare_name.lower()
 
         for candidate in stake_candidates:
             cand_lower = candidate.lower()
             cand_last  = candidate.split()[-1].lower()
+            if _first_name_conflict(stake_first, pipeline_name):
+                continue
 
             # Full-string similarity. A shared first name alone must not create a match
             # ("Sorger, Sebastian" scored 0.73 against "Sebastian Baez"): if the surnames differ,
