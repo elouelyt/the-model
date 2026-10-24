@@ -22,6 +22,7 @@ PICKS = ROOT / "data" / "nba_picks.json"
 HISTORY = ROOT / "data" / "nba_history"
 MIN_LEG_EV = 0.005
 PER_FAMILY = 3
+TRACKING_PER_FAMILY = 5
 UNITS = 0.25  # video: 0.25-0.5 units on 3-man slips
 FAMILIES = {
     "probabilidad": (lambda c: True, lambda c: c["prob"]),
@@ -34,13 +35,22 @@ def leg_key(p: dict) -> str:
     return f'{p["start"][:16]}|{p["player"]}|{p["stat"]}|{p["side"]}|{p["line"]}'
 
 
-def build_combos(picks: list[dict], now: datetime | None = None) -> list[dict]:
+def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool = False,
+                 per_family: int = PER_FAMILY) -> list[dict]:
+    """tracking=False: bettable combos (all games still to start).
+    tracking=True: paper combos with at least one leg from a game that already started."""
     now = now or datetime.now(timezone.utc)
-    legs = [p for p in picks
-            if p["ev"] >= MIN_LEG_EV and parsedate_to_datetime(p["start"]) > now + timedelta(minutes=10)]
+    limit = now + timedelta(minutes=10)
+
+    def started(p: dict) -> bool:
+        return parsedate_to_datetime(p["start"]) <= limit
+
+    legs = [p for p in picks if p["ev"] >= MIN_LEG_EV and (tracking or not started(p))]
     combos = []
     for trio in itertools.combinations(legs, 3):
         if len({p["game"] for p in trio}) < 3 or len({p["player"] for p in trio}) < 3:
+            continue
+        if tracking and not any(started(p) for p in trio):
             continue
         odds, prob = 1.0, 1.0
         for p in trio:
@@ -59,7 +69,7 @@ def build_combos(picks: list[dict], now: datetime | None = None) -> list[dict]:
             entry = chosen.setdefault(tuple(sorted(c["legs"])), {**c, "families": []})
             entry["families"].append(name)
             picked += 1
-            if picked == PER_FAMILY:
+            if picked == per_family:
                 break
 
     by_key = {leg_key(p): p for p in picks}
@@ -72,6 +82,7 @@ def build_combos(picks: list[dict], now: datetime | None = None) -> list[dict]:
                       "ev": by_key[k]["ev"], "game": by_key[k]["game"], "start": by_key[k]["start"]}
                      for k in c["legs"]]
         c["prob"], c["odds"], c["ev"] = round(c["prob"], 4), round(c["odds"], 2), round(c["ev"], 4)
+        c["tracking"] = tracking
         out.append(c)
     return sorted(out, key=lambda c: c["ev"], reverse=True)
 
@@ -83,23 +94,30 @@ def main() -> None:
     analysis_path = ROOT / "data" / "nba_analysis.json"
     if analysis_path.exists():
         doc["analysis"] = json.loads(analysis_path.read_text(encoding="utf-8"))
-    PICKS.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
     HISTORY.mkdir(parents=True, exist_ok=True)
     day = datetime.now().strftime("%Y-%m-%d")
     snap_path = HISTORY / f"{day}.json"
     snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
+
+    # paper combos: today's pool (every leg recommended today, first sighting) incl. games already started
+    pool = {leg_key(p): p for r in snap["runs"] for p in r["picks"]}
+    pool.update({leg_key(p): p for p in doc["picks"]})
+    tracking = build_combos(list(pool.values()), tracking=True, per_family=TRACKING_PER_FAMILY)
+    doc["combos_tracking"] = tracking
+    PICKS.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+
     # keep every leg/combo ever recommended that day (first sighting wins), settled later
     known_legs = {leg_key(p) for r in snap["runs"] for p in r["picks"]}
     known_combos = {tuple(sorted(l["key"] for l in c["legs"])) for r in snap["runs"] for c in r["combos"]}
     new_picks = [p for p in doc["picks"] if leg_key(p) not in known_legs]
-    new_combos = [c for c in combos if tuple(sorted(l["key"] for l in c["legs"])) not in known_combos]
+    new_combos = [c for c in combos + tracking if tuple(sorted(l["key"] for l in c["legs"])) not in known_combos]
     snap["runs"].append({"at": doc["timestamp"], "picks": new_picks, "combos": new_combos})
     snap_path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
 
-    print(f"{len(combos)} combos (new today: {len(new_combos)}), snapshot {snap_path.name}")
-    for c in combos:
-        print(f"[{'+'.join(c['families'])}] odds {c['odds']:.2f} prob {c['prob']:.1%} EV {c['ev']:+.0%}")
+    print(f"{len(combos)} bettable combos + {len(tracking)} tracking combos (new today: {len(new_combos)}), snapshot {snap_path.name}")
+    for c in combos + tracking:
+        print(f"{'(seg.) ' if c['tracking'] else ''}[{'+'.join(c['families'])}] odds {c['odds']:.2f} prob {c['prob']:.1%} EV {c['ev']:+.0%}")
         for l in c["legs"]:
             print(f"    {l['player']} {l['side']} {l['line']} {l['stat']} @{l['stake_odds']} ({l['fair_prob']:.0%}) - {l['game']}")
 

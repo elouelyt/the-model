@@ -195,8 +195,8 @@ def _row(p: dict) -> str:
 FAMILY_ES = {"probabilidad": "Probabilidad", "valor": "Valor", "mixta": "Mixta"}
 
 
-def _combos_html(doc: dict) -> str:
-    combos = doc.get("combos") or []
+def _combos_html(doc: dict, tracking: bool = False) -> str:
+    combos = doc.get("combos_tracking" if tracking else "combos") or []
     if not combos:
         return ""
     cards = []
@@ -218,8 +218,16 @@ def _combos_html(doc: dict) -> str:
             f'<div class="chead">{fams}<span class="cn">Combinada {i + 1}</span></div>'
             f'<ul>{legs}</ul>'
             f'<div class="cfoot"><span>Cuota <b>{c["odds"]:.2f}</b></span><span>Prob. <b>{c["prob"]:.1%}</b></span>'
-            f'<span class="ev">EV {c["ev"]:+.0%}</span><span class="csug"></span>'
-            f'<button class="btn cbtn" type="button">Apostada</button></div></div>'
+            f'<span class="ev">EV {c["ev"]:+.0%}</span>'
+            + ('' if tracking else '<span class="csug"></span><button class="btn cbtn" type="button">Apostada</button>')
+            + '</div></div>'
+        )
+    if tracking:
+        return (
+            '<details class="bak" style="margin-top:18px"><summary>Seguimiento · combinadas con partidos que ya han empezado (solo para comprobar resultados)</summary>'
+            '<p class="note" style="margin-top:8px">No se pueden apostar ya: usan las cuotas de antes del inicio guardadas hoy. '
+            'Se liquidan solas con el marcador real para medir qué criterio funciona mejor.</p>'
+            f'<div class="combos" style="margin-top:12px">{"".join(cards)}</div></details>'
         )
     return (
         '<h2 class="sec">Combinadas de 3 · recomendadas</h2>'
@@ -282,7 +290,7 @@ def build(doc: dict) -> str:
         f'<button class="chip" data-s="{escape(s)}">{escape(STAT_ES.get(s, s))}</button>' for s in stats_present
     )
     rows = "".join(_row(p) for p in picks) or '<tr><td colspan="8" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
-    combos_html = _combos_html(doc)
+    combos_html = _combos_html(doc) + _combos_html(doc, tracking=True)
     analysis_html = _analysis_html(doc)
     best = picks[0] if picks else None
     best_html = (f'<b class="ev">{best["ev"]:+.1%}</b><small>{escape(best["player"])} · '
