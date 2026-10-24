@@ -15,8 +15,8 @@
           "signal": "value_bet",
           "surface": "indoor_hard",
           "sport_title": "",
-          "best_price": 5.0,
-          "stake_price": 5.0,
+          "best_price": 2.24,
+          "stake_price": 2.24,
           "best_bookmaker": "Stake",
           "sentiment": {
             "available": true,
@@ -30,8 +30,8 @@
           "is_struggling": false
         }
       ],
-      "stake_total_odds": 5.0,
-      "total_odds": 5.0
+      "stake_total_odds": 2.24,
+      "total_odds": 2.24
     }
   ]
 }

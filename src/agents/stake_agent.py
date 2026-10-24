@@ -178,8 +178,12 @@ def _best_match(
             cand_lower = candidate.lower()
             cand_last  = candidate.split()[-1].lower()
 
-            # Full-string similarity
+            # Full-string similarity. A shared first name alone must not create a match
+            # ("Sorger, Sebastian" scored 0.73 against "Sebastian Baez"): if the surnames differ,
+            # cap the full-string score below the acceptance cut-off.
             full_score = _similarity(cand_lower, pipeline_lower)
+            if _similarity(cand_last, pipeline_last) < 0.8:
+                full_score = min(full_score, _FUZZY_CUTOFF - 0.05)
 
             # Surname-only similarity (both directions, slight penalty)
             last_score = max(
@@ -470,6 +474,7 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
     # Sequential calls with the shared session reproduce the working test.py flow.
     logger.info("[stake_agent] Pipeline players: %s", pipeline_player_names)
     stake_odds: dict[str, float] = {}
+    stake_scores: dict[str, float] = {}
 
     for fix in all_fixtures:
         slug = fix.get("slug", "")
@@ -492,6 +497,13 @@ def fetch_stake_odds(pipeline_player_names: list[str]) -> dict[str, float]:
         for stake_name, price in winner_odds.items():
             pipeline_name, score = _best_match(stake_name, pipeline_player_names)
             if pipeline_name and score >= _FUZZY_CUTOFF:
+                if score <= stake_scores.get(pipeline_name, 0.0):
+                    logger.warning(
+                        "[stake_agent] Ignoring weaker match %r → %r (score=%.3f <= %.3f already kept)",
+                        stake_name, pipeline_name, score, stake_scores[pipeline_name],
+                    )
+                    continue
+                stake_scores[pipeline_name] = score
                 stake_odds[pipeline_name] = price
                 logger.info(
                     "[stake_agent] MATCHED %r → %r (score=%.3f) @ %.3f",
