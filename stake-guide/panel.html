@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Combinadas</title>
+<style>
+  :root { --bg:#0f1923; --card:#1a2c38; --line:#2f4553; --text:#e8eef2; --muted:#8aa0ad; --green:#00c853; --amber:#ffd400; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:12px; background:var(--bg); color:var(--text); font:14px/1.35 system-ui, sans-serif; }
+  h1 { font-size:15px; margin:0 0 8px; display:flex; justify-content:space-between; align-items:center; }
+  button { font:inherit; color:var(--text); background:var(--card); border:1px solid var(--line); border-radius:6px; padding:6px 10px; cursor:pointer; }
+  button:hover { border-color:var(--amber); }
+  input { font:inherit; width:100%; padding:7px 9px; background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:6px; margin:6px 0; }
+  .combo { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px; margin:10px 0; }
+  .head { display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-bottom:6px; }
+  .leg { display:flex; justify-content:space-between; width:100%; text-align:left; margin:4px 0; gap:8px; }
+  .leg small { display:block; color:var(--muted); }
+  .leg.done { opacity:.55; }
+  .leg.on { border-color:var(--green); }
+  .odds { font-weight:600; white-space:nowrap; }
+  .note, #msg { color:var(--muted); font-size:12px; }
+  #msg.err { color:#ff6b6b; }
+</style>
+</head>
+<body>
+<h1>Combinadas <span><button id="refresh" title="Volver a descargar">↻</button> <button id="logout" title="Olvidar contraseña">Salir</button></span></h1>
+<div id="login" hidden>
+  <p class="note">Escribe la contraseña del panel. Se guarda solo en este navegador.</p>
+  <input id="pw" type="password" placeholder="Contraseña" autocomplete="off">
+  <button id="go">Entrar</button>
+</div>
+<p id="msg"></p>
+<div id="list"></div>
+<script src="panel.js"></script>
+</body>
+</html>
