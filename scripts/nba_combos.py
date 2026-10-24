@@ -52,8 +52,13 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
         return parsedate_to_datetime(p["start"]) <= limit
 
     only_future = (not tracking) if future_only is None else future_only
+    in_play_limit = now - timedelta(hours=2)  # older games are usually over: their results would be known
+
+    def unfinished(p: dict) -> bool:
+        return parsedate_to_datetime(p["start"]) > in_play_limit
+
     legs = [p for p in picks if p["ev"] >= min_leg_ev and p["fair_prob"] >= min_leg_prob
-            and (not only_future or not started(p))]
+            and (not only_future or not started(p)) and (not tracking or unfinished(p))]
     combos = []
     for trio in itertools.combinations(legs, 3):
         if len({p["game"] for p in trio}) < 3 or len({p["player"] for p in trio}) < 3:
