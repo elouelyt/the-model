@@ -142,6 +142,12 @@ def main() -> None:
     snap_path = HISTORY / f"{day}.json"
     snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
     combos = freeze_combos(combos, snap)
+    stake_cache = ROOT / "data" / "nba_stake_cache.json"
+    fixtures = {" vs ".join(g["teams"]): g["fixture"] for g in json.loads(stake_cache.read_text(encoding="utf-8"))["games"]} if stake_cache.exists() else {}
+    for c in combos + [c for r in snap["runs"] for c in r["combos"]]:  # combos saved before legs carried their game page
+        for l in c["legs"]:
+            if not l.get("fixture"):
+                l["fixture"] = fixtures.get(l["game"])
     doc["combos"] = combos
     analysis_path = ROOT / "data" / "nba_analysis.json"
     if analysis_path.exists():
