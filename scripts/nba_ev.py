@@ -39,8 +39,13 @@ def fair_probs(over_am: int, under_am: int) -> tuple[float, float]:
 # Markets used in the source videos (no threes): points, rebounds, assists and their combos
 ALLOWED_STATS = {"points", "rebounds", "assists", "points+rebounds", "points+assists",
                  "assists+rebounds", "points+assists+rebounds"}
-BOOK_FILES = {"FanDuel": "nba_fanduel_cache.json", "Pinnacle": "nba_pinnacle_cache.json"}
-SHORT = {"FanDuel": "FD", "Pinnacle": "PIN"}
+BOOK_FILES = {  # later files override earlier ones for the same book (fresher, broader sources last)
+    "FanDuel": "nba_fanduel_cache.json",      # Firecrawl, optional
+    "Pinnacle": "nba_pinnacle_cache.json",    # direct public API
+    "BettingPros": "nba_bettingpros_cache.json",  # rows carry their own "book"
+}
+SHORT = {"FanDuel": "FD", "Pinnacle": "PIN", "DraftKings": "DK", "Caesars": "CZR", "BetMGM": "MGM",
+         "Novig": "NOV", "ProphetX": "PX"}
 
 
 def load_books() -> dict[tuple, dict[str, tuple[int, int]]]:
@@ -51,8 +56,10 @@ def load_books() -> dict[tuple, dict[str, tuple[int, int]]]:
         if not path.exists():
             continue
         for r in json.loads(path.read_text(encoding="utf-8"))["rows"]:
+            if abs(r["over_american"]) > 400 or abs(r["under_american"]) > 400:  # placeholder quotes
+                continue
             key = (r["fixture"], norm_name(r["player"]), r["stat"], r["line"])
-            index.setdefault(key, {})[book] = (r["over_american"], r["under_american"])
+            index.setdefault(key, {})[r.get("book", book)] = (r["over_american"], r["under_american"])
     return index
 
 

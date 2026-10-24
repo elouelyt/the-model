@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Refresh NBA value bets and publish them (encrypted) for the private panel.
 
-Chain: Stake props (CDP, needs Chrome on stake.com) -> FanDuel (Firecrawl) + Pinnacle (direct API) -> picks
+Chain: Stake props (CDP, needs Chrome on stake.com) -> BettingPros API (FanDuel, DraftKings, Caesars, BetMGM, Novig, ProphetX) + FanDuel (Firecrawl, complements the missing players) + Pinnacle (direct API) -> picks
 -> data/nba_picks.enc (AES with DASHBOARD_PASSWORD) -> git commit + push.
 The push triggers the "Rebuild private panel" workflow, which rebuilds panel.html.
 Raw picks stay local; the repo only ever sees ciphertext.
@@ -43,6 +43,7 @@ def main() -> None:
     if "--skip-fetch" not in sys.argv:
         run(py, "scripts/nba_stake_scraper.py")
         run(py, "scripts/nba_fanduel.py")
+    run(py, "scripts/nba_bettingpros.py", check=False)  # many books, one API key, no Firecrawl credits
     run(py, "scripts/nba_pinnacle.py")  # free public API, always refreshed
     run(py, "scripts/nba_ev.py")
     run(py, "scripts/nba_combos.py")
