@@ -2,7 +2,7 @@
 """Build 3-leg combos (the video's "3-man power") from data/nba_picks.json and snapshot the day.
 
 Rules: every leg from a different game and a different player, only games that have not started,
-leg win% >= 54% and EV > 0.5%. Across the whole set a leg is used once, a player once and a game at most
+leg win% >= 54%, at least 2 books agreeing, and EV > 0.5%. Across the whole set a leg is used once, a player once and a game at most
 GAME_CAP times (less correlation between tickets). Combo odds = product of Stake odds, combo probability = product of fair probabilities,
 combo EV = probability * odds - 1. Three families are produced so results can be compared later:
   - probabilidad: highest combined probability (the video's "highest chance of hitting")
@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PICKS = ROOT / "data" / "nba_picks.json"
 HISTORY = ROOT / "data" / "nba_history"
 MIN_LEG_EV = 0.005
+MIN_LEG_BOOKS = 2     # at least two reference books must agree on the line
 MIN_LEG_PROB = 0.54   # the video's rule: only legs the sharp books give >= 54%
 GAME_CAP = 2          # max legs per game across the whole bettable set
 TRACKING_GAME_CAP = 3
@@ -42,7 +43,7 @@ def leg_key(p: dict) -> str:
 def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool = False,
                  per_family: int = PER_FAMILY, families: dict | None = None, min_leg_ev: float = MIN_LEG_EV,
                  future_only: bool | None = None, min_leg_prob: float = MIN_LEG_PROB,
-                 game_cap: int = GAME_CAP) -> list[dict]:
+                 game_cap: int = GAME_CAP, min_books: int = MIN_LEG_BOOKS) -> list[dict]:
     """tracking=False: bettable combos (all games still to start).
     tracking=True: paper combos with at least one leg from a game that already started."""
     now = now or datetime.now(timezone.utc)
@@ -58,7 +59,7 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
         return parsedate_to_datetime(p["start"]) > in_play_limit
 
     legs = [p for p in picks if p["ev"] >= min_leg_ev and p["fair_prob"] >= min_leg_prob
-            and (not only_future or not started(p)) and (not tracking or unfinished(p))]
+            and p.get("books", 1) >= min_books and (not only_future or not started(p)) and (not tracking or unfinished(p))]
     combos = []
     for trio in itertools.combinations(legs, 3):
         if len({p["game"] for p in trio}) < 3 or len({p["player"] for p in trio}) < 3:
