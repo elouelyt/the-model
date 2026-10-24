@@ -181,6 +181,11 @@ APP_JS = r'''
 STAKE_BASKETBALL = "https://stake.com/es/sports/basketball"
 
 
+def game_url(leg: dict) -> str:
+    """Plain public page of the game on Stake (no extension needed)."""
+    return f"{STAKE_BASKETBALL}/usa/nba/{leg['fixture']}" if leg.get("fixture") else STAKE_BASKETBALL
+
+
 def stake_url(legs: list[dict]) -> str | None:
     """Link that fills Stake's betslip (needs the Stake Combo Loader extension): #oj=<base64url json>."""
     picks = [{"o": l["outcome_id"], "e": l["event_id"], "t": "over" if l["side"] == "Over" else "under",
@@ -213,7 +218,7 @@ def _row(p: dict) -> str:
         f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
         f'<td class="num muted">{escape(p["fanduel"])}<small>{books} {"casa" if books == 1 else "casas"}</small></td>'
         f'<td class="num sug"></td>'
-        f'<td>{_go_link(p)}<button class="btn" type="button">Apostada</button></td></tr>'
+        f'<td>{_go_link(p)}<a class="btn" href="{escape(game_url(p))}" target="_blank" rel="noopener noreferrer">Partido ↗</a> <button class="btn" type="button">Apostada</button></td></tr>'
     )
 
 
@@ -229,7 +234,7 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
         legs = "".join(
             f'<li><span><b>{escape(l["player"])}</b> {"Más de" if l["side"] == "Over" else "Menos de"} {l["line"]:g} '
             f'<span class="tag">{escape(STAT_ES.get(l["stat"], l["stat"]))}</span>'
-            f'<small>{escape(l["game"])} · {local_time(l["start"])}</small></span>'
+            f'<small><a href="{escape(game_url(l))}" target="_blank" rel="noopener noreferrer">{escape(l["game"])} ↗</a> · {local_time(l["start"])}</small></span>'
             f'<span class="num"><b>{l["stake_odds"]:.2f}</b><small>{l["fair_prob"]:.0%}</small></span></li>'
             for l in c["legs"]
         )
@@ -245,7 +250,7 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
             f'<div class="cfoot"><span>Cuota <b>{c["odds"]:.2f}</b></span><span>Prob. <b>{c["prob"]:.1%}</b></span>'
             f'<span class="ev">EV {c["ev"]:+.0%}</span>'
             + ('' if tracking else (f'<a class="btn go" href="{escape(stake_url(c["legs"]))}" target="_blank" rel="noopener noreferrer" title="Rellena el talón (necesita la extensión)">Rellenar talón</a>' if stake_url(c["legs"]) else '')
-               + f'<a class="btn" href="{STAKE_BASKETBALL}" target="_blank" rel="noopener noreferrer" title="Abre Stake sin extensión: añade las 3 selecciones a mano">Stake (a mano)</a>'
+               + f'<span class="muted">Sin extensión: pulsa el partido de cada pierna</span>'
                + '<button class="btn plain" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.closest(\'.combo\').dataset.desc)">Copiar</button>'
                + '<span class="csug"></span><button class="btn cbtn" type="button">Apostada</button>')
             + '</div></div>'

@@ -108,7 +108,7 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
                       "side": by_key[k]["side"], "line": by_key[k]["line"],
                       "stake_odds": by_key[k]["stake_odds"], "fair_prob": by_key[k]["fair_prob"],
                       "ev": by_key[k]["ev"], "game": by_key[k]["game"], "start": by_key[k]["start"],
-                      "outcome_id": by_key[k].get("outcome_id"), "event_id": by_key[k].get("event_id")}
+                      "outcome_id": by_key[k].get("outcome_id"), "event_id": by_key[k].get("event_id"), "fixture": by_key[k].get("fixture")}
                      for k in c["legs"]]
         c["prob"], c["odds"], c["ev"] = round(c["prob"], 4), round(c["odds"], 2), round(c["ev"], 4)
         c["tracking"] = tracking
