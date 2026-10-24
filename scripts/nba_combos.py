@@ -105,9 +105,11 @@ def main() -> None:
     # paper combos: today's pool (every leg recommended today, first sighting) incl. games already started
     pool = {leg_key(p): p for r in snap["runs"] for p in r["picks"]}
     pool.update({leg_key(p): p for p in doc["picks"]})
-    tracking = build_combos(list(pool.values()), tracking=True, per_family=TRACKING_PER_FAMILY)
+    tracking = []
+    if doc["picks"]:  # never build paper combos after the day's games are over (no post-hoc picks)
+        tracking = build_combos(list(pool.values()), tracking=True, per_family=TRACKING_PER_FAMILY)
     # paper family "pura": highest fair probability regardless of EV (Stake odds usually below fair)
-    pure = build_combos(doc.get("high_prob", []), tracking=True, per_family=TRACKING_PER_FAMILY, min_leg_ev=-1.0,
+    pure = [] if not doc["picks"] else build_combos(doc.get("high_prob", []), tracking=True, per_family=TRACKING_PER_FAMILY, min_leg_ev=-1.0,
                         families={"pura": (lambda c: True, lambda c: c["prob"])}, future_only=True)
     tracking += pure
     doc["combos_tracking"] = tracking
