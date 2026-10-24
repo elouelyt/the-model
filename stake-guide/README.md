@@ -14,14 +14,14 @@ Extensión de Chrome/Brave con dos partes:
 1. En el panel lateral pulsa una pierna (por ejemplo "Max Christie Menos de 3,5 Asistencias").
 2. La pestaña va al partido en Stake. Se marca en amarillo **Apuestas al Jugador**; púlsala.
 3. Se marca el **jugador**; púlsalo para desplegarlo.
-4. La página baja sola hasta el mercado: **mercado en amarillo**. Si la línea que muestra Stake no es la tuya sale en **naranja**; abre la lista de líneas y se marca en **verde** la que toca.
+4. Baja tú hasta el mercado (la extensión no mueve la página): al verlo sale en **amarillo**. Si la línea que muestra Stake no es la tuya sale en **naranja**; abre la lista de líneas y se marca en **verde** la que toca.
 5. Con la línea correcta se marcan en verde la línea y **Sobre/Debajo con su cuota**. Púlsalo.
 6. Vuelve al panel lateral y pasa a la siguiente pierna.
 
 ## Qué hace y qué no
 - Lee el texto visible de la página y pinta con la API de resaltado de CSS (`CSS.highlights`): no añade ni cambia elementos, clases ni atributos (medido: 0 cambios en la página al pintar).
 - No hace clic, no escribe en campos, no apuesta y no hace peticiones de red desde la página de Stake.
-- Lo único que hace de forma automática en la página es un desplazamiento hasta el mercado.
+- No mueve la página: el desplazamiento lo haces tú.
 - El panel lateral descarga `data/nba_picks.enc` de GitHub (cifrado) y lo descifra aquí; la contraseña nunca sale del navegador.
 - Las cuotas del panel son las de la última tanda: mira la cuota real que muestra Stake antes de apostar.
 

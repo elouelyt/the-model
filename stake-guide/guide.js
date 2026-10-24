@@ -5,7 +5,6 @@
   const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   const POSITION = /\s*\((?:PG|SG|SF|PF|C|G|F|G-F|F-C|F-G|C-F)\)\s*$/i;
   let target = null;
-  let scrolledFor = null;
 
   const texts = (root) => {
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -45,10 +44,6 @@
       (!next || (next.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_PRECEDING));
     const stat = all.find((n) => n.textContent.trim() === target.stat && inCard(n));
     if (!stat) { paint("sbg-y", [me]); return; }
-    if (scrolledFor !== target.at) {  // bring the market into view once per leg (a plain scroll)
-      scrolledFor = target.at;
-      stat.parentElement.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
 
     let row = stat.parentElement;
     while (row && !(row.innerText.includes("Sobre") && row.innerText.includes("Debajo"))) row = row.parentElement;
