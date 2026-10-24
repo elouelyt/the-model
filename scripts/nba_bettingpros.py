@@ -47,12 +47,13 @@ TEAMS = {  # BettingPros abbreviation -> nickname (last word of the Stake team n
 
 
 def get(path: str, headers: dict, **params) -> dict:
-    for attempt in range(3):
+    for attempt in range(6):
         r = requests.get(f"{BASE}/{path}", headers=headers, params=params, timeout=45)
         if r.status_code == 429:
-            time.sleep(2 * (attempt + 1))
+            time.sleep(5 * (attempt + 1))  # rate limited: wait longer each time
             continue
         r.raise_for_status()
+        time.sleep(0.4)
         return r.json()
     raise RuntimeError(f"BettingPros rate limited on {path}")
 
