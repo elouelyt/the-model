@@ -244,7 +244,9 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
             f'<ul>{legs}</ul>'
             f'<div class="cfoot"><span>Cuota <b>{c["odds"]:.2f}</b></span><span>Prob. <b>{c["prob"]:.1%}</b></span>'
             f'<span class="ev">EV {c["ev"]:+.0%}</span>'
-            + ('' if tracking else (f'<a class="btn go" href="{escape(stake_url(c["legs"]))}" target="_blank" rel="noopener noreferrer">Abrir en Stake</a>' if stake_url(c["legs"]) else '')
+            + ('' if tracking else (f'<a class="btn go" href="{escape(stake_url(c["legs"]))}" target="_blank" rel="noopener noreferrer" title="Rellena el talón (necesita la extensión)">Rellenar talón</a>' if stake_url(c["legs"]) else '')
+               + f'<a class="btn" href="{STAKE_BASKETBALL}" target="_blank" rel="noopener noreferrer" title="Abre Stake sin extensión: añade las 3 selecciones a mano">Stake (a mano)</a>'
+               + '<button class="btn" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.closest(\'.combo\').dataset.desc)">Copiar</button>'
                + '<span class="csug"></span><button class="btn cbtn" type="button">Apostada</button>')
             + '</div></div>'
         )
