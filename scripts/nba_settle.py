@@ -133,6 +133,36 @@ def bucket(x: float, edges: list[float], labels: list[str]) -> str:
     return labels[-1]
 
 
+
+def clv_stats() -> dict | None:
+    """Closing-line value: Stake odds at first sighting vs the last quote before the game (same day)."""
+    gains = []
+    for path in sorted(HISTORY.glob("*.json")):
+        snap = json.loads(path.read_text(encoding="utf-8"))
+        series: dict[str, list[float]] = defaultdict(list)
+        for run in snap["runs"]:
+            for key, q in (run.get("quotes") or {}).items():
+                series[key].append(q[0])
+        gains += [odds[0] / odds[-1] - 1 for odds in series.values() if len(odds) >= 2]
+    if not gains:
+        return None
+    return {"n": len(gains), "avg": round(sum(gains) / len(gains), 4),
+            "positive": round(sum(g > 0 for g in gains) / len(gains), 3),
+            "negative": round(sum(g < 0 for g in gains) / len(gains), 3)}
+
+
+def stake_vs_books(played: list[dict]) -> dict | None:
+    """Who predicted better: the books' fair probability or Stake's own de-vigged probability?"""
+    rows = [l for l in played if l.get("stake_opp")]
+    if len(rows) < 10:
+        return None
+    ps = [(1 / l["stake_odds"]) / (1 / l["stake_odds"] + 1 / l["stake_opp"]) for l in rows]
+    ys = [1.0 if l["status"] == "won" else 0.0 for l in rows]
+    return {"n": len(rows),
+            "brier_books": round(sum((l["fair_prob"] - y) ** 2 for l, y in zip(rows, ys)) / len(rows), 4),
+            "brier_stake": round(sum((p - y) ** 2 for p, y in zip(ps, ys)) / len(rows), 4)}
+
+
 def analyse() -> dict:
     legs, combos = [], []
     for path in sorted(HISTORY.glob("*.json")):
@@ -158,6 +188,8 @@ def analyse() -> dict:
                                    "legs": c["legs"], "outcomes": outcomes, "odds": odds if live else 1.0,
                                    "hit": hit, "void_legs": 3 - len(live)})
     played = [l for l in legs if l["status"] != "void"]
+    clv = clv_stats()
+    stake_check = stake_vs_books(played)
 
     def table(rows: list[dict], keyfn) -> list[dict]:
         groups: dict[str, list[dict]] = defaultdict(list)
@@ -202,6 +234,8 @@ def analyse() -> dict:
             {"name": f, "n": len(cs), "hits": sum(c["hit"] for c in cs),
              "roi": round(sum((c["odds"] - 1) if c["hit"] else -1 for c in cs) / len(cs), 3),
              "expected_hit": round(sum(c["prob"] for c in cs) / len(cs), 3)} for f, cs in sorted(fam.items())],
+        "clv": clv,
+        "stake_check": stake_check,
         "combos": combos[-120:],
         "legs": [{"player": l["player"], "stat": l["stat"], "side": l["side"], "line": l["line"],
                   "win": l["fair_prob"], "ev": l["ev"], "odds": l["stake_odds"], "actual": l["actual"],

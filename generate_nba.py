@@ -76,7 +76,7 @@ APP_JS = r'''
   function save() { mem = st; try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   var st = load(); if (!st.bets) st.bets = [];
   function fmt(x) { return x.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-  function units(ev) { return ev >= 0.03 ? 0.5 : 0.25; }
+  function units(ev) { return 0.25; }
   function suggest(ev) { return st.bankroll ? Math.round(st.bankroll * 0.01 * units(ev) * 2) / 2 : null; }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function profit(b) {
@@ -90,7 +90,7 @@ APP_JS = r'''
 
   function renderSuggestions() {
     unitInfo.textContent = st.bankroll
-      ? '1 unidad = ' + fmt(st.bankroll * 0.01) + ' € (1 % del bankroll) · sugerencia: 0,25 u, o 0,5 u si el EV es del 3 % o más'
+      ? '1 unidad = ' + fmt(st.bankroll * 0.01) + ' € (1 % del bankroll) · fase de prueba: 0,25 u por apuesta'
       : 'Escribe tu bankroll y te sugiero cuánto apostar en cada jugada (1 unidad = 1 %).';
     document.querySelectorAll('.combo .csug').forEach(function (c) {
       var s = st.bankroll ? Math.round(st.bankroll * 0.01 * 0.25 * 2) / 2 : null;
@@ -238,7 +238,7 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
         '<p class="note" style="margin-top:0">Tres piernas de partidos distintos y jugadores distintos, solo de partidos que no han empezado. '
         'Cuota = producto de las cuotas de Stake; probabilidad = producto de las probabilidades justas. '
         'Tres familias para comparar resultados: Probabilidad (más acierto), Valor (más EV) y Mixta (EV ≥ 20 % con más acierto). '
-        'Importe sugerido: 0,25 u, como en el método.</p>'
+        'Fase de prueba: 0,25 u por combinada hasta acumular 5–7 días de resultados. Reglas: piernas con Win% de 54 % o más, un jugador una sola vez y un máximo de 2 piernas por partido en todo el conjunto.</p>'
         f'<div class="combos">{"".join(cards)}</div>'
     )
 
@@ -320,6 +320,16 @@ def _analysis_html(doc: dict) -> str:
     fam_html = (f'<div class="card an"><h3>Combinadas por familia</h3><table><tr><th></th><th class="num">N</th>'
                 f'<th class="num">Acertadas</th><th class="num">Esperado</th><th class="num">ROI</th></tr>{fam}</table></div>'
                 if fam else "")
+    extra = ""
+    if a.get("clv"):
+        c = a["clv"]
+        extra += (f'<div class="card an"><h3>CLV · ¿mejoraba la cuota de Stake después?</h3><p class="note" style="margin:6px 0">'
+                  f'{c["n"]} apuestas con dos lecturas antes del partido: cuota inicial frente a la última, de media <b>{c["avg"]:+.1%}</b> '
+                  f'({c["positive"]:.0%} mejoraron para nosotros, {c["negative"]:.0%} empeoraron). Positivo sostenido = estábamos pillando precios mejores que los de cierre.</p></div>')
+    if a.get("stake_check"):
+        k = a["stake_check"]
+        extra += (f'<div class="card an"><h3>¿Quién predice mejor?</h3><p class="note" style="margin:6px 0">'
+                  f'{k["n"]} piernas: error (Brier, menor es mejor) de las casas serias <b>{k["brier_books"]}</b> frente a la probabilidad de Stake sin margen <b>{k["brier_stake"]}</b>.</p></div>')
     return (head
             + f'<p class="note" style="margin-top:0">{a["legs_settled"]} piernas liquidadas ({a["legs_void"]} anuladas por no jugar) '
               f'y {a["combos_settled"]} combinadas. "Esperado" es la probabilidad justa media; si el acierto real queda por debajo, '
@@ -327,7 +337,7 @@ def _analysis_html(doc: dict) -> str:
             + '<div class="ans">'
             + _tbl("Calibración (por probabilidad)", a["calibration"]) + _tbl("Por mercado", a["by_stat"])
             + _tbl("Over / Under", a["by_side"]) + _tbl("Por nivel de EV", a["by_ev"]) + _tbl("Por casas de referencia", a["by_books"])
-            + fam_html + '</div>'
+            + fam_html + extra + '</div>'
             + _detail_html(a)
             + f'<div class="card an"><h3>Contexto del partido</h3><p class="note" style="margin:6px 0">Partidos con diferencia final de '
               f'{ctx["blowout_threshold"]}+ puntos ({ctx["n_blowout"]} piernas) frente a ajustados ({ctx["n_close"]}): '

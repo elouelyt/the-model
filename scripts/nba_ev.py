@@ -72,7 +72,7 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
             continue
         probs = [fair_probs(o, u) for o, u in books.values()]
         p_over = sum(p[0] for p in probs) / len(probs)  # average of each book's no-vig probability
-        for side, prob, odds in (("Over", p_over, r["over"]), ("Under", 1 - p_over, r["under"])):
+        for side, prob, odds, opp in (("Over", p_over, r["over"], r["under"]), ("Under", 1 - p_over, r["under"], r["over"])):
             ev = prob * odds - 1
             if not (prob >= HIGH_PROB or (prob >= min_prob and ev > min_ev)):
                 continue
@@ -80,7 +80,7 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
             detail = " · ".join(f"{SHORT[b]} {o:+d}/{u:+d}" for b, (o, u) in books.items())
             leg = {
                 "player": r["player"], "team": r["team"], "stat": r["stat"], "line": r["line"],
-                "side": side, "stake_odds": round(odds, 3), "fair_prob": round(prob, 4),
+                "side": side, "stake_odds": round(odds, 3), "stake_opp": round(opp, 3), "fair_prob": round(prob, 4),
                 "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
                 "fanduel": detail, "books": len(books),
                 "game": " vs ".join(teams), "start": start,
