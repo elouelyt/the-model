@@ -109,7 +109,7 @@ APP_JS = r'''
 
   function markPlaced() {
     var placed = {}; st.bets.forEach(function (b) { placed[b.key] = true; });
-    document.querySelectorAll('tr[data-key] .btn, .combo .btn').forEach(function (btn) {
+    document.querySelectorAll('tr[data-key] button.btn:not(.plain), .combo button.btn:not(.plain)').forEach(function (btn) {
       var done = !!placed[btn.closest('[data-key]').getAttribute('data-key')];
       btn.disabled = done; btn.textContent = done ? '✓ Apostada' : 'Apostada';
     });
@@ -156,7 +156,7 @@ APP_JS = r'''
   }
 
   bk.oninput = function () { var v = parseFloat(bk.value); st.bankroll = v > 0 ? v : null; save(); renderSuggestions(); };
-  document.querySelectorAll('tr[data-key] .btn, .combo .btn').forEach(function (btn) {
+  document.querySelectorAll('tr[data-key] button.btn:not(.plain), .combo button.btn:not(.plain)').forEach(function (btn) {
     btn.onclick = function () {
       var r = btn.closest('[data-key]'), ev = parseFloat(r.getAttribute('data-ev'));
       st.bets.push({ key: r.getAttribute('data-key'), date: Date.now(), desc: r.getAttribute('data-desc'), game: r.getAttribute('data-game'),
@@ -246,7 +246,7 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
             f'<span class="ev">EV {c["ev"]:+.0%}</span>'
             + ('' if tracking else (f'<a class="btn go" href="{escape(stake_url(c["legs"]))}" target="_blank" rel="noopener noreferrer" title="Rellena el talón (necesita la extensión)">Rellenar talón</a>' if stake_url(c["legs"]) else '')
                + f'<a class="btn" href="{STAKE_BASKETBALL}" target="_blank" rel="noopener noreferrer" title="Abre Stake sin extensión: añade las 3 selecciones a mano">Stake (a mano)</a>'
-               + '<button class="btn" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.closest(\'.combo\').dataset.desc)">Copiar</button>'
+               + '<button class="btn plain" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.closest(\'.combo\').dataset.desc)">Copiar</button>'
                + '<span class="csug"></span><button class="btn cbtn" type="button">Apostada</button>')
             + '</div></div>'
         )
