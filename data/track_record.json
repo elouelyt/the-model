@@ -1084,11 +1084,11 @@
               ],
               "stake_odds": 1.52,
               "best_odds": 1.52,
-              "won": null,
+              "won": true,
               "opponent": "Clement Chidekh"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "24": {
           "parlays": [
