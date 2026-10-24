@@ -9,6 +9,7 @@ one market, so a full run is about 30 calls and costs no Firecrawl credits.
 import json
 import logging
 import os
+import sys
 import time
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
@@ -33,7 +34,8 @@ MARKETS = {  # BettingPros market id -> Stake stat name (no threes: not used in 
 }
 # Reference books only: no DFS apps (PrizePicks, Underdog, Sleeper, Betr...), no prediction markets,
 # no soft books that just copy the others. Pinnacle comes from its own API (nba_pinnacle.py).
-BOOKS = {"fanduel": "FanDuel", "draftkings": "DraftKings", "williamhill": "Caesars",
+BOOKS = {"bettingpros": "Consensus",  # BettingPros own average of ALL books (incl. soft and DFS): kept only for comparison
+         "fanduel": "FanDuel", "draftkings": "DraftKings", "williamhill": "Caesars",
          "betMGM": "BetMGM", "novig": "Novig", "prophetx": "ProphetX"}
 TEAMS = {  # BettingPros abbreviation -> nickname (last word of the Stake team name)
     "ATL": "hawks", "BOS": "celtics", "BKN": "nets", "CHA": "hornets", "CHI": "bulls", "CLE": "cavaliers",
@@ -70,6 +72,11 @@ def pages(path: str, key: str, headers: dict, **params):
 
 def main() -> None:
     load_dotenv(ROOT / ".env")
+    if OUT.exists() and "--force" not in sys.argv:
+        age = datetime.now(timezone.utc) - datetime.fromisoformat(json.loads(OUT.read_text(encoding="utf-8"))["timestamp"])
+        if age < timedelta(minutes=20):
+            logger.info("BettingPros cache is %d min old — skipping (use --force to refetch)", age.seconds // 60)
+            return
     key = os.environ.get("BETTINGPROS_API_KEY")
     if not key:
         raise SystemExit("BETTINGPROS_API_KEY missing in .env")
@@ -132,7 +139,8 @@ def main() -> None:
     logger.info("Saved %d lines from %d calls (%s)", len(rows), calls, by_book)
 
 
-BOOKS_BY_ID: dict[int, str] = {}
+BOOKS_BY_ID: dict[int, str] = {0: "bettingpros", 10: "fanduel", 12: "draftkings", 13: "williamhill",
+                                19: "betMGM", 60: "novig", 38: "prophetx"}  # ids from /v3/books (resolved live if missing)
 
 
 def load_book_ids() -> None:
@@ -145,5 +153,9 @@ def load_book_ids() -> None:
 
 if __name__ == "__main__":
     load_dotenv(ROOT / ".env")
-    load_book_ids()
-    main()
+    if len(BOOKS_BY_ID) < len(BOOKS):
+        load_book_ids()
+    try:
+        main()
+    except RuntimeError as exc:  # quota / rate limit: keep the previous cache instead of failing the whole run
+        logger.warning("%s — keeping the previous BettingPros cache", exc)

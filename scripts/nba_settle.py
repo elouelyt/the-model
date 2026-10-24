@@ -163,6 +163,17 @@ def stake_vs_books(played: list[dict]) -> dict | None:
             "brier_stake": round(sum((p - y) ** 2 for p, y in zip(ps, ys)) / len(rows), 4)}
 
 
+def consensus_vs_books(played: list[dict]) -> dict | None:
+    """Our average of reference books vs BettingPros' all-books consensus, on the same legs."""
+    rows = [l for l in played if l.get("cons_prob") is not None]
+    if len(rows) < 10:
+        return None
+    ys = [1.0 if l["status"] == "won" else 0.0 for l in rows]
+    return {"n": len(rows),
+            "brier_ref": round(sum((l["fair_prob"] - y) ** 2 for l, y in zip(rows, ys)) / len(rows), 4),
+            "brier_consensus": round(sum((l["cons_prob"] - y) ** 2 for l, y in zip(rows, ys)) / len(rows), 4)}
+
+
 def analyse() -> dict:
     legs, combos = [], []
     for path in sorted(HISTORY.glob("*.json")):
@@ -190,6 +201,7 @@ def analyse() -> dict:
     played = [l for l in legs if l["status"] != "void"]
     clv = clv_stats()
     stake_check = stake_vs_books(played)
+    cons_check = consensus_vs_books(played)
 
     def table(rows: list[dict], keyfn) -> list[dict]:
         groups: dict[str, list[dict]] = defaultdict(list)
@@ -236,6 +248,7 @@ def analyse() -> dict:
              "expected_hit": round(sum(c["prob"] for c in cs) / len(cs), 3)} for f, cs in sorted(fam.items())],
         "clv": clv,
         "stake_check": stake_check,
+        "consensus_check": cons_check,
         "combos": combos[-120:],
         "legs": [{"player": l["player"], "stat": l["stat"], "side": l["side"], "line": l["line"],
                   "win": l["fair_prob"], "ev": l["ev"], "odds": l["stake_odds"], "actual": l["actual"],

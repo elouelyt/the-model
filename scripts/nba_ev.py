@@ -48,9 +48,10 @@ SHORT = {"FanDuel": "FD", "Pinnacle": "PIN", "DraftKings": "DK", "Caesars": "CZR
          "Novig": "NOV", "ProphetX": "PX"}
 
 
-def load_books() -> dict[tuple, dict[str, tuple[int, int]]]:
-    """(fixture, player, stat, line) -> {book: (over_american, under_american)}."""
+def load_books() -> tuple[dict, dict]:
+    """((fixture, player, stat, line) -> {book: (over, under)} for reference books, same key -> consensus quote)."""
     index: dict[tuple, dict[str, tuple[int, int]]] = {}
+    cons: dict[tuple, tuple[int, int]] = {}
     for book, fname in BOOK_FILES.items():
         path = ROOT / "data" / fname
         if not path.exists():
@@ -59,14 +60,18 @@ def load_books() -> dict[tuple, dict[str, tuple[int, int]]]:
             if abs(r["over_american"]) > 400 or abs(r["under_american"]) > 400:  # placeholder quotes
                 continue
             key = (r["fixture"], norm_name(r["player"]), r["stat"], r["line"])
-            index.setdefault(key, {})[r.get("book", book)] = (r["over_american"], r["under_american"])
-    return index
+            name = r.get("book", book)
+            if name == "Consensus":
+                cons[key] = (r["over_american"], r["under_american"])
+            else:
+                index.setdefault(key, {})[name] = (r["over_american"], r["under_american"])
+    return index, cons
 
 
 def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: bool = False):
     stake = json.loads((ROOT / "data" / "nba_stake_cache.json").read_text(encoding="utf-8"))
     starts = {g["fixture"]: (g["start"], g["teams"]) for g in stake["games"]}
-    index = load_books()
+    index, cons_index = load_books()
     now = datetime.now(timezone.utc)
     upcoming = {fx for fx, (start, _) in starts.items() if parsedate_to_datetime(start) > now}
 
@@ -79,6 +84,8 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
             continue
         probs = [fair_probs(o, u) for o, u in books.values()]
         p_over = sum(p[0] for p in probs) / len(probs)  # average of each book's no-vig probability
+        cq = cons_index.get((r["fixture"], norm_name(r["player"]), r["stat"], r["line"]))
+        cons_over = fair_probs(*cq)[0] if cq else None  # BettingPros consensus, for comparison only
         for side, prob, odds, opp in (("Over", p_over, r["over"], r["under"]), ("Under", 1 - p_over, r["under"], r["over"])):
             ev = prob * odds - 1
             if not (prob >= HIGH_PROB or (prob >= min_prob and ev > min_ev)):
@@ -89,6 +96,7 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
                 "player": r["player"], "team": r["team"], "stat": r["stat"], "line": r["line"],
                 "side": side, "stake_odds": round(odds, 3), "stake_opp": round(opp, 3), "fair_prob": round(prob, 4),
                 "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
+                "cons_prob": None if cons_over is None else round(cons_over if side == "Over" else 1 - cons_over, 4),
                 "fanduel": detail, "books": len(books),
                 "game": " vs ".join(teams), "start": start,
             }

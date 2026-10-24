@@ -330,6 +330,10 @@ def _analysis_html(doc: dict) -> str:
         k = a["stake_check"]
         extra += (f'<div class="card an"><h3>¿Quién predice mejor?</h3><p class="note" style="margin:6px 0">'
                   f'{k["n"]} piernas: error (Brier, menor es mejor) de las casas serias <b>{k["brier_books"]}</b> frente a la probabilidad de Stake sin margen <b>{k["brier_stake"]}</b>.</p></div>')
+    if a.get("consensus_check"):
+        k = a["consensus_check"]
+        extra += (f'<div class="card an"><h3>Nuestra media vs consenso de BettingPros</h3><p class="note" style="margin:6px 0">'
+                  f'{k["n"]} piernas: error Brier de nuestra media de casas de referencia <b>{k["brier_ref"]}</b> frente al consenso de BettingPros (media de todas las casas, incluidas las blandas y las de fantasy) <b>{k["brier_consensus"]}</b>. Menor es mejor; con pocas piernas la diferencia no es concluyente.</p></div>')
     return (head
             + f'<p class="note" style="margin-top:0">{a["legs_settled"]} piernas liquidadas ({a["legs_void"]} anuladas por no jugar) '
               f'y {a["combos_settled"]} combinadas. "Esperado" es la probabilidad justa media; si el acierto real queda por debajo, '
