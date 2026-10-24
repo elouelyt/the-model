@@ -1089,6 +1089,20 @@
             }
           ],
           "resolved": false
+        },
+        "24": {
+          "parlays": [
+            {
+              "legs": [
+                "Sebastian Baez"
+              ],
+              "stake_odds": 5.0,
+              "best_odds": 5.0,
+              "won": null,
+              "opponent": "Giovanni Mpetshi Perricard"
+            }
+          ],
+          "resolved": false
         }
       }
     }

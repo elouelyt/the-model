@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-24",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Sebastian Baez",
+          "rank": 49,
+          "points": 1044,
+          "opponent": "Giovanni Mpetshi Perricard",
+          "opponent_rank": 145,
+          "model_prob": 0.6584,
+          "raw_implied": 0.4464,
+          "edge": 0.212,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 5.0,
+          "stake_price": 5.0,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": null,
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "The model sees significant value in Baez, likely due to his superior ranking (#49 vs #145) and overall tour experience, which the market may be underestimating on indoor hard where he is less prolific. While Baez's primary success is on clay, his higher ranking suggests a more complete game than Mpetshi Perricard's, whose indoor hard form is less established at this level.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 5.0,
+      "total_odds": 5.0
+    }
+  ]
+}
