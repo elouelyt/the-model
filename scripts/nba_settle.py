@@ -224,6 +224,25 @@ def analyse() -> dict:
     def rate(rows: list[dict]) -> float | None:
         return round(sum(r["status"] == "won" for r in rows) / len(rows), 3) if rows else None
 
+    days = []
+    for date in sorted({l["date"] for l in legs}):
+        dl = [l for l in played if l["date"] == date]
+        if not dl:
+            continue
+        dc = [c for c in combos if c["date"] == date]
+        dfam: dict[str, list[dict]] = defaultdict(list)
+        for c in dc:
+            for f in c["families"]:
+                dfam[f].append(c)
+        days.append({
+            "date": date, "n": len(dl), "hit": round(sum(l["status"] == "won" for l in dl) / len(dl), 3),
+            "expected": round(sum(l["fair_prob"] for l in dl) / len(dl), 3),
+            "roi": round(sum((l["stake_odds"] - 1) if l["status"] == "won" else -1 for l in dl) / len(dl), 3),
+            "combos": len(dc), "combos_hit": sum(c["hit"] for c in dc),
+            "families": [{"name": f, "n": len(cs), "hits": sum(c["hit"] for c in cs),
+                          "roi": round(sum((c["odds"] - 1) if c["hit"] else -1 for c in cs) / len(cs), 3)}
+                         for f, cs in sorted(dfam.items())],
+        })
     fam: dict[str, list[dict]] = defaultdict(list)
     for c in combos:
         for f in c["families"]:
@@ -231,6 +250,7 @@ def analyse() -> dict:
     return {
         "updated": datetime.now(timezone.utc).isoformat(),
         "legs_settled": len(played), "legs_void": len(legs) - len(played), "combos_settled": len(combos),
+        "days": days,
         "calibration": table(played, lambda r: bucket(r["fair_prob"], [0.52, 0.54, 0.56, 0.60], prob_labels)),
         "by_stat": table(played, lambda r: r["stat"]),
         "by_side": table(played, lambda r: r["side"]),

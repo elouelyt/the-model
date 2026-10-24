@@ -9,6 +9,7 @@ Raw picks stay local; the repo only ever sees ciphertext.
   python scripts/nba_publish.py [--skip-fetch]   # --skip-fetch reuses the last scraped data
 """
 
+import json
 import logging
 import os
 import subprocess
@@ -51,8 +52,13 @@ def main() -> None:
     run(py, "scripts/nba_ev.py")
     run(py, "scripts/nba_combos.py")
     encrypt_file(ROOT / "data" / "nba_picks.json", ENC)
+    bundle = {p.name: json.loads(p.read_text(encoding="utf-8"))
+              for folder in ("nba_history", "nba_baseline") for p in sorted((ROOT / "data" / folder).glob("*.json"))}
+    (ROOT / "build").mkdir(exist_ok=True)
+    (ROOT / "build" / "nba_history_bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
+    encrypt_file(ROOT / "build" / "nba_history_bundle.json", ROOT / "data" / "nba_history.enc")  # encrypted backup
 
-    run("git", "add", "data/nba_picks.enc")
+    run("git", "add", "data/nba_picks.enc", "data/nba_history.enc")
     if run("git", "diff", "--cached", "--quiet", check=False).returncode == 0:
         logger.info("No changes to publish")
         return

@@ -321,6 +321,17 @@ def _analysis_html(doc: dict) -> str:
                 f'<th class="num">Acertadas</th><th class="num">Esperado</th><th class="num">ROI</th></tr>{fam}</table></div>'
                 if fam else "")
     extra = ""
+    if len(a.get("days") or []) > 0:
+        rows = ""
+        for d in a["days"]:
+            fams = " · ".join(f'{FAMILY_ES.get(f["name"], f["name"])} {f["hits"]}/{f["n"]}' for f in d["families"])
+            rows += (f'<tr><td>{d["date"]}</td><td class="num">{d["n"]}</td><td class="num">{d["hit"]:.0%}</td>'
+                     f'<td class="num muted">{d["expected"]:.0%}</td>'
+                     f'<td class="num {"pos" if d["roi"] > 0 else "neg"}">{d["roi"]:+.0%}</td>'
+                     f'<td class="num">{d["combos_hit"]}/{d["combos"]}</td><td class="muted">{escape(fams)}</td></tr>')
+        extra += ('<div class="card an" style="grid-column:1/-1"><h3>Por día (el 23/10 es la línea base, antes de los cambios)</h3>'
+                  '<table><tr><th>Fecha</th><th class="num">Piernas</th><th class="num">Acierto</th><th class="num">Esperado</th>'
+                  '<th class="num">ROI</th><th class="num">Combinadas</th><th>Por familia (acertadas/total)</th></tr>' + rows + '</table></div>')
     if a.get("clv"):
         c = a["clv"]
         extra += (f'<div class="card an"><h3>CLV · ¿mejoraba la cuota de Stake después?</h3><p class="note" style="margin:6px 0">'

@@ -123,7 +123,7 @@ def main() -> None:
         doc["analysis"] = json.loads(analysis_path.read_text(encoding="utf-8"))
 
     HISTORY.mkdir(parents=True, exist_ok=True)
-    day = datetime.now().strftime("%Y-%m-%d")
+    day = (datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")  # slate date: 01:00 runs belong to the evening before
     snap_path = HISTORY / f"{day}.json"
     snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
 
