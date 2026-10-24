@@ -25,12 +25,14 @@ ROOT = Path(__file__).resolve().parents[1]
 STAKE_CACHE = ROOT / "data" / "nba_stake_cache.json"
 OUT = ROOT / "data" / "nba_bettingpros_cache.json"
 BASE = "https://api.bettingpros.com/v3"
+USAGE = ROOT / "data" / "bettingpros_usage.json"
+DAILY_BUDGET = int(os.environ.get("BETTINGPROS_DAILY_LIMIT", "45"))  # free plan ~50; keep a margin
 MAX_ODDS = 400  # exchanges (Novig, ProphetX) quote placeholders like -99900 when one side has no liquidity
 MAX_AGE = timedelta(hours=4)  # ignore lines a book has not refreshed for this long
 
-MARKETS = {  # BettingPros market id -> Stake stat name (no threes: not used in the source method)
-    156: "points", 157: "rebounds", 151: "assists",
-    335: "points+assists", 336: "points+rebounds", 337: "assists+rebounds", 338: "points+assists+rebounds",
+MARKETS = {  # BettingPros market id -> Stake stat name, most useful first (no threes: not in the source method)
+    151: "assists", 157: "rebounds", 156: "points", 338: "points+assists+rebounds",
+    337: "assists+rebounds", 336: "points+rebounds", 335: "points+assists",
 }
 # Reference books only: no DFS apps (PrizePicks, Underdog, Sleeper, Betr...), no prediction markets,
 # no soft books that just copy the others. Pinnacle comes from its own API (nba_pinnacle.py).
@@ -48,7 +50,19 @@ TEAMS = {  # BettingPros abbreviation -> nickname (last word of the Stake team n
 }
 
 
+def _spend() -> None:
+    today = datetime.now(timezone.utc).date().isoformat()
+    used = json.loads(USAGE.read_text(encoding="utf-8")) if USAGE.exists() else {}
+    if used.get("date") != today:
+        used = {"date": today, "n": 0}
+    if used["n"] >= DAILY_BUDGET:
+        raise RuntimeError(f"BettingPros daily budget of {DAILY_BUDGET} requests used")
+    used["n"] += 1
+    USAGE.write_text(json.dumps(used), encoding="utf-8")
+
+
 def get(path: str, headers: dict, **params) -> dict:
+    _spend()
     for attempt in range(6):
         r = requests.get(f"{BASE}/{path}", headers=headers, params=params, timeout=45)
         if r.status_code == 429:
@@ -99,11 +113,17 @@ def main() -> None:
     event_ids = ":".join(str(e) for e in fixture_by_event)
     now = datetime.now(timezone.utc)
 
-    rows, calls = [], 0
+    rows, calls, stopped = [], 0, False
     for market_id, stat in MARKETS.items():
-        if not event_ids:
+        if not event_ids or stopped:
             break
-        for offer in pages("offers", "offers", headers, sport="NBA", market_id=market_id, event_id=event_ids):
+        try:
+            gen = list(pages("offers", "offers", headers, sport="NBA", market_id=market_id, event_id=event_ids))
+        except RuntimeError as exc:
+            logger.warning("%s — stopping with the markets fetched so far", exc)
+            stopped = True
+            continue
+        for offer in gen:
             calls += 1
             fixture = fixture_by_event.get(offer["event_id"])
             part = (offer.get("participants") or [{}])[0]
