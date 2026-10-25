@@ -195,6 +195,19 @@ BettingPros NFL (cupo 50/día compartido con NBA) y FanDuel (Firecrawl) como 2.�
 universo/calibración de NFL como en `nuevas_ideas/universe.py`; reglas propias (límites por partido, correlación QB-receptor, pesos por mercado) tras 5-7 días de datos.
 Lección NBA aplicada: las jugadas con EV muy alto y probabilidad < 54 % (sobre todo Under) fallaron en NBA; en NFL empezar fiándose de las combinadas con piernas de >= 54 %.
 
+## Pestaña "Combinadas" (NBA + NFL), consenso, extensión de 3 secciones y seguimiento NFL (25/10/2026)
+
+- **Combinadas arriba:** en las pestañas NBA y NFL las combinadas apostables salen justo bajo el título; el seguimiento en papel va tras la tabla (`generate_nba.py`, NFL lo hereda).
+- **Consenso de BettingPros** visible en la tabla ("Consenso BP", con la antigüedad) y en las piernas de las combinadas (`BP xx %`). Es solo informativo (media de TODAS sus casas, no entra en el EV).
+  `nba_ev.py` lo muestra hasta 30 h (`CONS_MAX_AGE_H`) aunque la casa ya no valga como referencia (6 h). BettingPros se consulta UNA vez al día en la primera tanda desde las 17:00 locales
+  (`nba_publish.py`, caché de 7 h en `nba_bettingpros.py`); el cupo (45/50 diarias) cubre asistencias, rebotes y puntos, no los mercados combinados (el 25/10: 69 de 151 jugadas). NFL no tiene consenso (sin cupo).
+- **Pestaña Combinadas** (al lado de MMA): `scripts/mix_combos.py` mezcla piernas NBA (>= 2 casas) y NFL (>= 1) con el motor de `nba_combos.py` (solo combinadas que mezclan ambos deportes, con `freeze_combos`), `scripts/mix_settle.py` liquida cada pierna con su ESPN,
+  `scripts/mix_publish.py` cifra `data/mix_picks.enc` y `data/mix_history.enc` (lo llaman `nba_publish.py` y `nfl_publish.py`), `generate_combos.py` (reutiliza `generate_nba.py`) construye la pestaña con tres bloques: Mezcla NBA+NFL, Mejores de NBA, Mejores de NFL; `build_private.py` la añade (tolerante a errores) y `panel.yml` se dispara con `data/mix_picks.enc`.
+- **NFL = motor NBA:** `nfl/nfl_combos.py` ejecuta `nba_combos.main()` con las rutas de NFL (solo cambia `MIN_BOOKS = 1` hasta tener 2.ª casa); `nba_combos.py` ganó `STAKE_CACHE`/`ANALYSIS` y `min_books=None` (salida de NBA verificada idéntica).
+- **Extensión `stake-guide` 1.2.0:** panel lateral con tres secciones NBA / NFL / Total; enlaces por deporte; `guide.js` acepta posiciones NFL y compara el mercado sin acentos. Nombres de Stake NFL: Yardas por Pases, Pases Completados, Intentos de pases, Pases de Touchdowns, Intercepciones, Yardas por acarreo, Intentos de acarreo, Yardas de recepción, Recepciones.
+- **Seguimiento NFL (como NBA):** liquidación y análisis en `nfl/nfl_settle.py`; las ideas en papel 03, 06, 07, 08 y 09 corren también sobre NFL (`IDEAS_SPORT=nfl`, historiales `ideas/*/history_nfl`); `nuevas_ideas/nfl_universe.py` y el archivo `archive/nfl_batches`; `settle_ideas.py` añade calibración NFL y de las combinadas mezcladas a `RESULTADOS.md`.
+- **Pendiente:** tarea programada para NFL (el clasificador bloqueó `nfl-daily`); mientras tanto `python nfl/nfl_publish.py` a mano (liquida NFL y las mezcladas al final de cada tanda).
+
 ## Nuevas ideas (pruebas en papel) — `nuevas_ideas/`
 
 El usuario pidió (25/10/2026) que **todo cambio nuevo se pruebe en otra carpeta, sin tocar lo que funciona**, con backtesting de 5-7 días,

@@ -6,6 +6,7 @@ data/nba_history, so the existing ESPN settlement code can settle it).
 """
 
 import json
+import os
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -17,8 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-PICKS = ROOT / "data" / "nba_picks.json"
-STAKE_CACHE = ROOT / "data" / "nba_stake_cache.json"
+SPORT = os.environ.get("IDEAS_SPORT", "nba")   # 'nba' (default) or 'nfl': the same paper ideas run on either sport
+PICKS = ROOT / "data" / "nba_picks.json" if SPORT == "nba" else ROOT / "nfl" / "data" / "nfl_picks.json"
+STAKE_CACHE = ROOT / "data" / "nba_stake_cache.json" if SPORT == "nba" else ROOT / "nfl" / "data" / "nfl_stake_cache.json"
+HIST_DIR = "history" if SPORT == "nba" else "history_nfl"
+MIN_BOOKS = 2 if SPORT == "nba" else 1          # NFL has one reference book (Pinnacle) for now
 
 
 def day_key() -> str:
@@ -35,7 +39,7 @@ def combo_id(c: dict) -> tuple:
 
 
 def history_path(idea: str, day: str | None = None) -> Path:
-    d = BASE / "ideas" / idea / "history"
+    d = BASE / "ideas" / idea / HIST_DIR
     d.mkdir(parents=True, exist_ok=True)
     return d / f"{day or day_key()}.json"
 
@@ -127,9 +131,14 @@ class StakePage:
         return self.eval("window.__sgm.r")
 
 
-def eligible_legs(picks: list[dict], min_prob: float = 0.54, min_ev: float = 0.005, min_books: int = 2) -> list[dict]:
+def eligible_legs(picks: list[dict], min_prob: float = 0.54, min_ev: float = 0.005, min_books: int | None = None) -> list[dict]:
     """Legs under the production rules (win >= min_prob, EV > min_ev, >= 2 books) for games that have not started."""
     from email.utils import parsedate_to_datetime
+    min_books = MIN_BOOKS if min_books is None else min_books
     limit = datetime.now(timezone.utc) + timedelta(minutes=10)
     return [p for p in picks if p["fair_prob"] >= min_prob and p["ev"] >= min_ev and p.get("books", 1) >= min_books
             and parsedate_to_datetime(p["start"]) > limit]
+
+
+import nba_combos as _nc  # noqa: E402  (same module object the ideas import: the NFL run relaxes its books rule)
+_nc.MIN_LEG_BOOKS = MIN_BOOKS

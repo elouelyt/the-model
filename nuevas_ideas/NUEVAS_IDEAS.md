@@ -103,6 +103,8 @@ repite las familias de producción como referencia.
 
 15. **NFL añadido (25/10):** misma metodología en `nfl/` (ver `CLAUDE.md`). Primera tanda: 13 partidos, 9.180 líneas de Stake, 510 de Pinnacle (477 con línea idéntica), 122 jugadas con EV >= 0,3 % y 3 combinadas apostables. Hay que calibrarlo igual que NBA antes de fiarse del EV (ver hallazgo 12).
 
+16. **NFL replicado en el seguimiento (25/10):** ideas 03/06/07/08/09 corren también con NFL (`history_nfl`), `nfl_universe.py` y calibración NFL y de las combinadas mezcladas en `RESULTADOS.md`. Hay una familia nueva a vigilar: la pestaña **Combinadas** (mezcla NBA+NFL) con su propia liquidación (`scripts/mix_settle.py`).
+
 ## Los seis vídeos (resumen y utilidad para nosotros)
 Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no están verificadas). Transcripciones automáticas en inglés.
 | Vídeo | Contenido | Se traslada a Stake |
@@ -122,6 +124,7 @@ Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no
 - Medir CLV por familia (el log `quotes` ya lo permite) para ver qué idea compra mejor que el cierre.
 
 ## Registro
+- 2026-10-25 (noche): NFL en la web + pestaña Combinadas (NBA+NFL), consenso BettingPros visible, extensión 1.2.0 (NBA/NFL/Total), seguimiento NFL replicado.
 - 2026-10-25 (tarde, 2): archivo permanente por tanda + universo con box scores (14); objetivo 65-70 % medido de 3 formas (13); ideas 03/04/06/09 arregladas; stake-guide 1.1.0.
 - 2026-10-25 (tarde): liquidado el 24/10 a mano (las tareas de la mañana no se ejecutaron: la app estaba cerrada); análisis de unders/rebotes (hallazgo 12); idea 09 añadida; tabla de calibración de piernas en `RESULTADOS.md`.
 - 2026-10-25: creada la carpeta; ideas 02-08 con código; 01 en producción como familia de papel; 05 descartada con datos;

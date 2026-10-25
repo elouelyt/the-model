@@ -27,13 +27,18 @@ def settle_all() -> int:
     done = 0
     for path in sorted((BASE / "ideas").glob("*/history/*.json")):
         done += nba_settle.settle_file(path, espn)
+    sys.path.insert(0, str(ROOT / "nfl"))
+    import nfl_settle
+    nfl_espn = nfl_settle.Espn()
+    for path in sorted((BASE / "ideas").glob("*/history_nfl/*.json")):
+        done += nfl_settle.settle_file(path, nfl_espn)
     return done
 
 
 def collect() -> list[dict]:
     rows = []
-    for path in sorted((BASE / "ideas").glob("*/history/*.json")):
-        idea = path.parent.parent.name
+    for path in sorted(list((BASE / "ideas").glob("*/history/*.json")) + list((BASE / "ideas").glob("*/history_nfl/*.json"))):
+        idea = path.parent.parent.name + (" (NFL)" if path.parent.name == "history_nfl" else "")
         snap = json.loads(path.read_text(encoding="utf-8"))
         res = snap.get("results", {})
         for run in snap["runs"]:
@@ -76,7 +81,7 @@ def table(rows: list[dict], title: str) -> str:
     return "\n".join(out)
 
 
-def leg_calibration(a: dict) -> list[str]:
+def leg_calibration(a: dict, title: str = "producción NBA") -> list[str]:
     """Daily watch on the production legs (data/nba_analysis.json): are 'value' legs (EV > 1 %) as good as their
     probability says? Sliced by side and by fair-probability bucket. Added 25/10 after day 2: legs with win >= 54 %
     (the combo rule) were calibrated, while Under legs with EV > 1 % and win < 54 % hit ~32 % vs ~52 % expected."""
@@ -93,7 +98,7 @@ def leg_calibration(a: dict) -> list[str]:
         roi = sum((r["odds"] - 1) if r["ok"] else -1 for r in rs) / n
         return f"| {name} | {n} | {hit:.1%} | {exp:.1%} | {100 * (hit - exp):+.1f} ({(hit - exp) / se:+.1f} SE) | {roi:+.1%} |"
 
-    out = ["", "### Calibración de piernas de producción (vigilancia diaria)", "",
+    out = ["", f"### Calibración de piernas de {title} (vigilancia diaria)", "",
            "| Grupo | Piernas | Acierto | Esperado | Dif. pts | ROI |", "|---|---|---|---|---|---|"]
     for side in ("Over", "Under"):
         for lo, hi, tag in ((0.0, 0.54, "prob < 54 %"), (0.54, 1.01, "prob >= 54 %")):
@@ -171,6 +176,21 @@ def main() -> None:
         else:
             parts.append("Sin combinadas `prudente` liquidadas todavía.")
         parts += leg_calibration(a)
+        for label, path in (("NFL", ROOT / "nfl" / "data" / "nfl_analysis.json"), ("combinadas mezcladas NBA+NFL", ROOT / "data" / "mix_analysis.json")):
+            if path.exists():
+                other = json.loads(path.read_text(encoding="utf-8"))
+                if other.get("legs"):
+                    parts += leg_calibration(other, label)
+                    fams = other.get("combo_families", [])
+                    if fams:
+                        parts += ["", f"Familias de combinadas ({label}):", "", "| Familia | Combinadas | Aciertos | ROI |", "|---|---|---|---|"]
+                        parts += [f"| {f.get('name')} | {f.get('n')} | {f.get('hits')} | {f.get('roi', 0):+.1%} |" for f in fams]
+        try:
+            import nfl_universe
+            nfl_universe.download_boxscores()
+            parts += nfl_universe.report(nfl_universe.build())
+        except Exception as exc:
+            parts += ["", f"(universo NFL no disponible: {exc})"]
         try:
             import universe
             nb = universe.download_boxscores()
