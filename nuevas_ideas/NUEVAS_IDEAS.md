@@ -56,6 +56,17 @@ repite las familias de producción como referencia.
 9. Los props de jugador incluyen la prórroga; si el jugador no pisa la pista la selección se anula (en SGM se anula toda la apuesta).
 10. Entorno: el Chrome de depuración está oculto y no repinta; para automatizar hay que `Page.bringToFront` + `Emulation.setFocusEmulationEnabled`,
     y los clics CDP necesitan un `mouseMoved` antes de `mousePressed`.
+11. **Simulación de 30 días con las 10 combinadas actuales** (probabilidad media 19,1 %, cuota media 6,2, EV calculado +17,7 %; 10 combinadas al día a 0,25 u, 4.000 simulaciones):
+
+    | Si nuestra probabilidad por pierna está inflada en... | Beneficio medio 30 d | Rango (p10 a p90) | Prob. de acabar en pérdidas | Caída máx. típica | Racha típica sin acertar |
+    |---|---|---|---|---|---|
+    | 0 puntos (como la calculamos) | +13,1 u | −0,6 a +27,2 | 11 % | 5,9 u | 20 combinadas seguidas |
+    | 1,5 puntos | +6,6 u | −6,4 a +19,8 | 26 % | 7,3 u | 22 |
+    | 3 puntos | 0,0 u | −12,5 a +12,8 | 51 % | 9,5 u | 23 |
+
+    Lectura: el EV de +17,7 % es muy sensible a la calidad de la probabilidad (cada 1,5 puntos de error por pierna recorta el beneficio a la mitad)
+    y, aun siendo correcta, lo normal es pasar ~20 combinadas seguidas sin acertar (≈2 días). Por eso la idea 01 (`prudente`) y la medición de calibración
+    importan más que añadir reglas nuevas. Script: simulación en este informe (reproducible con los `prob`/`odds` de `data/nba_picks.json`).
 
 ## Los seis vídeos (resumen y utilidad para nosotros)
 Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no están verificadas). Transcripciones automáticas en inglés.
