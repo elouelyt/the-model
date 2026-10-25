@@ -1,10 +1,21 @@
 // Stake Bet Guide - page side. READ-ONLY: it reads the visible text of the game page and paints highlights with the
 // CSS Custom Highlight API (no element, class or attribute is added or changed, nothing is clicked, no network).
 // Steps follow what the user does: tab "Apuestas al Jugador" -> player name -> market + line -> Sobre/Debajo.
+// It also tells the side panel (through chrome.storage, never the page) which step it is on and what it cannot find.
 (() => {
   const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  // player names: no accents, no punctuation, no Jr/Sr/II/III/IV ("Aaron Jones Sr." == "Aaron Jones")
+  const nameKey = (s) => norm(s).replace(/[^a-z0-9 ]+/g, " ").split(/\s+/).filter((w) => w && !/^(jr|sr|ii|iii|iv|v)$/.test(w)).join(" ");
   const POSITION = /\s*\([A-Z]{1,3}(?:-[A-Z]{1,3})?\)\s*$/;   // NBA (PG, SF, C...) and NFL (QB, WR, TE...) positions
   let target = null;
+  let lastReport = "";
+
+  const report = (code, detail) => {
+    const sig = code + "|" + detail;
+    if (sig === lastReport) return;
+    lastReport = sig;
+    try { chrome.storage.local.set({ guideState: { code, detail, at: Date.now() } }); } catch (e) { /* extension reloaded */ }
+  };
 
   const texts = (root) => {
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -28,14 +39,34 @@
     "::highlight(sbg-o){background:#ff9100;color:#000}");
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 
+  function findPlayer(names) {
+    const want = nameKey(target.player);
+    const strip = (n) => nameKey(n.textContent.replace(POSITION, ""));
+    const exact = names.find((n) => strip(n) === want);
+    if (exact) return { me: exact, similar: [] };
+    // fallback: same last word and same first initial, only if it is unambiguous
+    const w = want.split(" ");
+    const loose = names.filter((n) => { const k = strip(n).split(" "); return k[k.length - 1] === w[w.length - 1] && k[0][0] === w[0][0]; });
+    if (loose.length === 1) return { me: loose[0], similar: [] };
+    const similar = names.filter((n) => strip(n).split(" ").includes(w[w.length - 1])).map((n) => n.textContent.trim());
+    return { me: null, similar };
+  }
+
   function step() {
     ["sbg-y", "sbg-g", "sbg-o"].forEach((k) => CSS.highlights.delete(k));
-    if (!target || !location.pathname.includes(target.fixture)) return;
+    if (!target) return;
+    if (!location.pathname.includes(target.fixture)) {
+      report("wrong_page", "Esta pestaña no está en el partido de la pierna elegida: pulsa la pierna en el panel.");
+      return;
+    }
     const all = texts(document.body);
     const names = all.filter((n) => POSITION.test(n.textContent) && n.textContent.length < 40);
-    const me = names.find((n) => norm(n.textContent.replace(POSITION, "")) === norm(target.player));
+    const { me, similar } = findPlayer(names);
     if (!me) {
       paint("sbg-y", all.filter((n) => n.textContent.trim() === "Apuestas al Jugador"));
+      if (!names.length) report("tab", `Pulsa la pestaña «Apuestas al Jugador» (aún no veo la lista de jugadores).`);
+      else report("player_missing", `No encuentro a «${target.player}» entre los ${names.length} jugadores de la lista` +
+        (similar.length ? `; parecidos: ${similar.slice(0, 3).join(", ")}` : "; puede que Stake no lo liste (¿ya empezó el partido?)."));
       return;
     }
     // the player's card ends where the next player's name starts
@@ -43,11 +74,18 @@
     const inCard = (n) => (me.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING) &&
       (!next || (next.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_PRECEDING));
     const stat = all.find((n) => norm(n.textContent) === norm(target.stat) && inCard(n));
-    if (!stat) { paint("sbg-y", [me]); return; }
+    if (!stat) {
+      paint("sbg-y", [me]);
+      const opened = all.some((n) => /^Sobre$/.test(n.textContent.trim()) && inCard(n));
+      report(opened ? "market_missing" : "player",
+        opened ? `«${target.player}» no tiene ahora el mercado «${target.stat}» (¿partido ya empezado? en directo Stake cambia los mercados).`
+               : `Pulsa el nombre de ${target.player} para desplegarlo.`);
+      return;
+    }
 
     let row = stat.parentElement;
     while (row && !(row.innerText.includes("Sobre") && row.innerText.includes("Debajo"))) row = row.parentElement;
-    if (!row) { paint("sbg-y", [stat]); return; }
+    if (!row) { paint("sbg-y", [stat]); report("market_missing", `Veo «${target.stat}» pero no sus botones Sobre/Debajo.`); return; }
     const rowTexts = texts(row);
     const line = rowTexts.find((n) => /^\d+(\.\d+)?$/.test(n.textContent.trim()) && /\.5$/.test(n.textContent.trim()));
     paint("sbg-y", [stat]);
@@ -64,16 +102,18 @@
         const r = rowOf(n);
         return !r || r === row || (r.innerText.match(/Sobre/g) || []).length !== 1;
       }));
+      report("line", `Cambia la línea de ${line.textContent.trim()} a ${target.line} (abre el desplegable de la línea).`);
       return;
     }
     const side = rowTexts.find((n) => n.textContent.trim() === target.side);
     paint("sbg-g", [line, side, side && rowTexts[rowTexts.indexOf(side) + 1]]);
+    report("ready", `Todo listo: pulsa «${target.side}» (${target.line}).`);
   }
 
   let timer;
   const later = () => { clearTimeout(timer); timer = setTimeout(step, 150); };
   new MutationObserver(later).observe(document.body, { subtree: true, childList: true });
-  const setTarget = (t) => { target = t || null; step(); };
+  const setTarget = (t) => { target = t || null; lastReport = ""; step(); };
   chrome.storage.local.get("target", (v) => setTarget(v.target));
   chrome.storage.onChanged.addListener((c) => { if (c.target) setTarget(c.target.newValue); });
 })();

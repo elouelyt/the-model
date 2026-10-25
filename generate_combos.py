@@ -57,7 +57,8 @@ def build(doc: dict) -> str:
     dummy = {"picks": [], "combos": [], "combos_tracking": [], "timestamp": doc["timestamp"], "analysis": None}
     base = mod.build(dummy)
     css = re.search(r"<style>(.*?)</style>", base, re.S).group(1)
-    js = re.findall(r"<script>(.*?)</script>", base, re.S)[-1]
+    js = "</script>\n<script>".join(re.findall(r"<script>(.*?)</script>", base, re.S)[-2:])   # tracker + "ya empezó" marker, as separate scripts
+    bankroll = re.search(r'<div class="card bk">.*?</div>', base, re.S).group(0)   # the tracker script needs these fields
     track = base[base.index('<h2 class="sec">Mis apuestas'):base.index("</main>")]
     from datetime import datetime
     stamp = datetime.fromisoformat(doc["timestamp"]).astimezone()
@@ -72,6 +73,7 @@ def build(doc: dict) -> str:
 <main>
 <h1>Combinadas · NBA + NFL</h1>
 <p class="sub">Las mejores combinadas de las dos ligas · mismo método que la pestaña NBA · actualizado {stamp:%d/%m %H:%M}</p>
+{bankroll}
 {mixed}
 {nba}
 {nfl}

@@ -178,6 +178,24 @@ APP_JS = r'''
 '''
 
 
+APP_CSS += r'''
+.combo.started { opacity:.45; }
+.combo.started .cn::after { content:" · ya empezó (no apostable)"; color:var(--amber); font-size:.78rem; }
+'''
+MARK_JS = r'''
+(function () {
+  function mark() {
+    var now = Date.now();
+    document.querySelectorAll('.combo[data-first]').forEach(function (c) {
+      var t = Date.parse(c.getAttribute('data-first'));
+      c.classList.toggle('started', !isNaN(t) && t <= now);
+    });
+  }
+  mark(); setInterval(mark, 60000);
+})();
+'''
+
+
 STAKE_BASKETBALL = "https://stake.com/es/sports/basketball"
 
 
@@ -199,6 +217,14 @@ def stake_url(legs: list[dict]) -> str | None:
 def _go_link(p: dict, label: str = "Stake ↗") -> str:
     url = stake_url([p])
     return f'<a class="btn go" href="{escape(url)}" target="_blank" rel="noopener noreferrer">{label}</a> ' if url else ""
+
+
+def _first_start(combo: dict) -> str:
+    """ISO time of the earliest game of a combo: the page greys the combo out in the browser once that time has passed."""
+    try:
+        return min(parsedate_to_datetime(l["start"]) for l in combo["legs"]).isoformat()
+    except (TypeError, ValueError, KeyError):
+        return ""
 
 
 def _cons(p: dict) -> str:
@@ -253,7 +279,7 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
         key = "combo|" + "|".join(l["key"] for l in c["legs"])
         cards.append(
             f'<div class="combo" data-key="{escape(key)}" data-desc="{escape("Combinada: " + desc)}" '
-            f'data-odds="{c["odds"]}" data-ev="{c["ev"]}" data-game="3 partidos">'
+            f'data-odds="{c["odds"]}" data-ev="{c["ev"]}" data-game="3 partidos" data-first="{"" if tracking else _first_start(c)}">'
             f'<div class="chead">{fams}<span class="cn">Combinada {i + 1}</span></div>'
             f'<ul>{legs}</ul>'
             f'<div class="cfoot"><span>Cuota <b>{c["odds"]:.2f}</b></span><span>Prob. <b>{c["prob"]:.1%}</b></span>'
@@ -494,6 +520,7 @@ document.querySelectorAll('.chip[data-s]').forEach(function(b) {{
 }});
 </script>
 <script>{APP_JS}</script>
+<script>{MARK_JS}</script>
 """
 
 

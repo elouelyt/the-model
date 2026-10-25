@@ -130,4 +130,14 @@ $("go").onclick = async () => { await store.set("pw", $("pw").value); $("pw").va
 $("pw").onkeydown = (e) => { if (e.key === "Enter") $("go").click(); };
 $("refresh").onclick = () => { Object.keys(cache).forEach((k) => delete cache[k]); load(); };
 $("logout").onclick = async () => { await store.del("pw"); Object.keys(cache).forEach((k) => delete cache[k]); load(); };
+// what the highlighter on the Stake tab is doing / cannot find (guide.js writes it; the page never sees it)
+function showState(st) {
+  const el = $("state");
+  if (!st || Date.now() - st.at > 120000) { el.hidden = true; return; }
+  el.hidden = false;
+  el.className = "step" + (st.code === "ready" ? " ok" : "");
+  el.textContent = st.detail;
+}
+chrome.storage.onChanged.addListener((c) => { if (c.guideState) showState(c.guideState.newValue); });
+store.get("guideState").then(showState);
 store.get("section").then((s) => selectSection(SECTIONS[s] ? s : "nba"));
