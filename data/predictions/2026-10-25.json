@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-25",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Arthur Rinderknech",
+          "rank": 61,
+          "points": 870,
+          "opponent": "Kym, Jerome",
+          "opponent_rank": 223,
+          "model_prob": 0.6717,
+          "raw_implied": 0.4975,
+          "edge": 0.1742,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 2.01,
+          "stake_price": 2.01,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Liam Draxl Scores Huge Win Over No. 32 Arthur Rinderknech - UKAthletics",
+            "withdrawn": true,
+            "withdrawal_headline": "Arthur Rinderknech withdraws from Shanghai, one year after career-best final run - TennisTemple"
+          },
+          "recommendation": "Rinderknech, ranked #61 and in positive form, is undervalued by the market at 49.8% implied probability, presenting a strong +17.4% model edge, especially on an indoor hard court where his game typically thrives against a lower-ranked opponent.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 2.01,
+      "total_odds": 2.01
+    }
+  ]
+}

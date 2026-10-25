@@ -1098,9 +1098,23 @@
               ],
               "stake_odds": 2.24,
               "best_odds": 2.24,
-              "won": null,
+              "won": false,
               "opponent": "Giovanni Mpetshi Perricard",
               "note": "Cuota corregida de 5.00 a 2.24: error de emparejamiento de nombres (Sorger) en la ejecución de las 12:24 UTC del 24/10; 2.24 era el precio real de Stake para Baez."
+            }
+          ],
+          "resolved": true
+        },
+        "25": {
+          "parlays": [
+            {
+              "legs": [
+                "Arthur Rinderknech"
+              ],
+              "stake_odds": 2.01,
+              "best_odds": 2.01,
+              "won": null,
+              "opponent": "Kym, Jerome"
             }
           ],
           "resolved": false
