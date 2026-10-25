@@ -39,16 +39,16 @@
     "::highlight(sbg-o){background:#ff9100;color:#000}");
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 
-  function findPlayer(names) {
+  function findPlayer(names, labelText) {
     const want = nameKey(target.player);
-    const strip = (n) => nameKey(n.textContent.replace(POSITION, ""));
+    const strip = (n) => nameKey(labelText(n).replace(POSITION, ""));
     const exact = names.find((n) => strip(n) === want);
     if (exact) return { me: exact, similar: [] };
     // fallback: same last word and same first initial, only if it is unambiguous
     const w = want.split(" ");
     const loose = names.filter((n) => { const k = strip(n).split(" "); return k[k.length - 1] === w[w.length - 1] && k[0][0] === w[0][0]; });
     if (loose.length === 1) return { me: loose[0], similar: [] };
-    const similar = names.filter((n) => strip(n).split(" ").includes(w[w.length - 1])).map((n) => n.textContent.trim());
+    const similar = names.filter((n) => strip(n).split(" ").includes(w[w.length - 1])).map((n) => labelText(n));
     return { me: null, similar };
   }
 
@@ -60,8 +60,19 @@
       return;
     }
     const all = texts(document.body);
-    const names = all.filter((n) => POSITION.test(n.textContent) && n.textContent.length < 40);
-    const { me, similar } = findPlayer(names);
+    // a player label is "Name (POS)": normally one text node, but Stake may split name and position into sibling spans
+    const FULL = /^.{3,40}\s\([A-Z]{1,3}(?:-[A-Z]{1,3})?\)$/;
+    const labelOf = (n) => {
+      const own = n.textContent.trim();
+      if (POSITION.test(own) && own.length < 40) return own;
+      const p = n.parentElement && n.parentElement.parentElement;           // <span>Name</span><span>(POS)</span> inside one element
+      const txt = p && p.innerText ? p.innerText.replace(/\s+/g, " ").trim() : "";
+      return FULL.test(txt) && txt.startsWith(own) && !POSITION.test(own) ? txt : null;
+    };
+    const labelMap = new Map();
+    const names = all.filter((n) => { const l = labelOf(n); if (l) labelMap.set(n, l); return !!l; });
+    const labelText = (n) => labelMap.get(n);
+    const { me, similar } = findPlayer(names, labelText);
     if (!me) {
       paint("sbg-y", all.filter((n) => n.textContent.trim() === "Apuestas al Jugador"));
       if (!names.length) report("tab", `Pulsa la pestaña «Apuestas al Jugador» (aún no veo la lista de jugadores).`);

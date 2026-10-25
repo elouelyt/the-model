@@ -22,6 +22,7 @@ Tres botones arriba: **NBA** (combinadas de la pestaña NBA), **NFL** (las de la
 6. Vuelve al panel lateral y pasa a la siguiente pierna.
 
 ## Cambios
+- 1.2.2: reconoce el nombre del jugador aunque Stake separe «Nombre» y «(POS)» en trozos distintos; el panel muestra su versión (arriba, junto a «Combinadas») y deja siempre visible el último paso del resaltador, con cuánto hace.
 - 1.2.1: el panel lateral muestra en qué paso va el resaltador y qué no encuentra (por ejemplo «No encuentro a X entre los N jugadores de la lista», «no tiene ahora el mercado Y»); nombres de jugador tolerantes (Jr./Sr./II, puntos y acentos).
 - 1.2.0: secciones NBA / NFL / Total, enlaces por deporte y resaltado para NFL (posiciones QB/WR/TE... y mercados de NFL).
 - 1.1.0: reutiliza la misma pestaña de Stake (antes abría una nueva cada vez y el talón se perdía; faltaba el permiso para leer la dirección de la pestaña). Si actualizas desde la 1.0.0, en `chrome://extensions` pulsa **Recargar** en la extensión (el permiso nuevo puede pedir confirmación).

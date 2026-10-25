@@ -133,11 +133,13 @@ $("logout").onclick = async () => { await store.del("pw"); Object.keys(cache).fo
 // what the highlighter on the Stake tab is doing / cannot find (guide.js writes it; the page never sees it)
 function showState(st) {
   const el = $("state");
-  if (!st || Date.now() - st.at > 120000) { el.hidden = true; return; }
+  if (!st) { el.hidden = false; el.className = "step"; el.textContent = "Resaltador: aún sin datos de la pestaña de Stake. Recarga la página de Stake (F5) tras instalar o actualizar la extensión."; return; }
+  const secs = Math.round((Date.now() - st.at) / 1000);
   el.hidden = false;
   el.className = "step" + (st.code === "ready" ? " ok" : "");
-  el.textContent = st.detail;
+  el.textContent = st.detail + (secs > 60 ? ` (hace ${Math.round(secs / 60)} min)` : "");
 }
 chrome.storage.onChanged.addListener((c) => { if (c.guideState) showState(c.guideState.newValue); });
 store.get("guideState").then(showState);
+$("ver").textContent = "v" + chrome.runtime.getManifest().version;
 store.get("section").then((s) => selectSection(SECTIONS[s] ? s : "nba"));
