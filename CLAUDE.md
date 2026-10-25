@@ -140,6 +140,47 @@ Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel si
 ` literales (usar `String.fromCharCode(10)`).
 **Key lesson:** no inventes alias de equipos: FanDuel usa `los-angeles-clippers`, un alias `la-clippers` rompió el emparejamiento.
 
+## NBA — guía para retomar (estado, reglas de trabajo y pendientes)
+
+**Cómo trabaja el usuario (respetar siempre):**
+- Ejecutar los cambios rutinarios sin pedir permiso; parar solo si hay pérdida real de datos o algo irreversible.
+- "Hazlo como Derek": copiar su método, no "mejorarlo". Los cambios de reglas se prueban en PARALELO (familias de seguimiento en papel) sin tocar las combinadas apostables.
+- No borrar los resultados del día: sirven para comparar con el siguiente. La línea base del 23/10 es intocable.
+- Cuando pide ideas: investigar, probar en un Chrome real y DEMOSTRAR (capturas, medidas) antes de proponer. No ofrecer opciones sin probar.
+- Ser honesto sobre lo que se sabe y lo que no (p. ej. qué detecta Stake: nadie fuera de Stake lo sabe). No ayudar a ocultar herramientas a Stake (no renombrar marcas para disimular, no simular clics).
+- Responde en español, sin rodeos.
+
+**Rutina diaria:**
+- Tandas a las 19:00 y 22:00 (hora local) con Chrome de depuración abierto en Stake (`scripts/start_chrome_debug.bat`): `scripts/nba_publish.py` (BettingPros solo en la tardía, cupo 50/día). `--skip-fetch` re-publica sin volver a leer cuotas.
+- Mañana a las 10:00 (`nba-resultados`): `scripts/nba_settle.py` y analizar el día contra la línea base del 23/10 (`days`, familias, calibración, CLV, `consensus_check`, y la familia `prudente`). El usuario dice "analiza" para pedirlo.
+- Los workflows `panel.yml`/`daily.yml` construyen con el código del REPO, no con el local: hay que hacer commit+push del generador ANTES de lanzar `gh workflow run panel.yml` (error ya cometido). `panel.yml` solo se dispara solo cuando cambia un `.enc`.
+
+**Combinadas (estado actual):**
+- Las bettable se mantienen fijas mientras sus partidos no empiecen (`freeze_combos`); se rellena `fixture` en cada pierna (enlace al partido) desde `data/nba_stake_cache.json`.
+- No hay regla de cuota mínima (ni por pierna ni por combinada): la rentabilidad se mide con EV = prob. × cuota − 1. Decisión: no añadirla sin datos (en PrizePicks el pago es fijo y por eso el listón es un % mínimo por pierna ≈ 54-55 %; en Stake cada cuota lleva su margen y se multiplica en la combinada).
+- **Prueba en paralelo `prudente`** (desde 25/10): mismas reglas pero con `fair_prob − 0.015` por pierna (`SHRINK` en `nba_combos.py`), solo papel (seguimiento). Si una combinada ya la eligen otras reglas, solo se añade la etiqueta `prudente`. Medir tras 5–7 días de resultados si habría mejorado el acierto/ROI frente a las actuales antes de cambiar nada.
+- Ideas ya habladas y NO aplicadas: subir Win% mínimo a 56 %, combinadas de 2 o apuestas simples, tope de cuota mínima, mostrar piernas sueltas en el panel lateral cuando la combinada ya empezó.
+
+**Páginas de Stake (estructura medida en un Chrome real, para resaltador/scrapers):**
+- Partido: `https://stake.com/es/sports/basketball/usa/nba/<fixture-slug>` (el `slug` viene de `fixtureList`; verificado). Cambiar de pestaña NO cambia la URL (no hay enlace directo a "Apuestas al Jugador"). Los props de jugador NO existen en el DOM hasta pulsar esa pestaña, así que los enlaces `#:~:text=` no funcionan.
+- Pestaña **Apuestas al Jugador**: campo "Buscar jugador" (filtra al jugador), lista por equipo con `Nombre (SG)` (posición entre paréntesis); al pulsar un jugador se despliegan filas con: nombre del mercado (`Puntos`, `Rebotes`, `Asistencias`, `Puntos + Rebotes`, `Puntos + Asistencias`, `Asistencias + Rebotes`, `Puntos + Asistencias + Rebotes`, además de triples, robos, bloqueos…), la línea (con desplegable de otras líneas, p. ej. 1.5/2.5/3.5) y botones `Sobre`/`Debajo` con la cuota (coma decimal).
+- La API/Web carga sin sesión: el Chrome de depuración no tiene la cuenta iniciada (solo lectura de cuotas; no probado con sesión).
+- Probar interacciones con `Input.dispatchMouseEvent` en coordenadas reales; un clic de prueba puede dejar seleccionado un botón en el talón de esa pestaña (deseleccionar).
+
+**Extensiones (dos, separadas):** `stake-extension/` (rellena el talón desde `#oj=`; la más intrusiva) y `stake-guide/` (panel lateral + `guide.js`: solo lee y pinta con `CSS.highlights`, sin tocar el DOM, sin scroll automático; el usuario hace todos los clics). Zip listo en `build/stake-guide.zip` (`build/` no se sube). Ver los README de cada carpeta. Riesgo de detección: no hay garantías; los términos de Stake (cl. 17.3 sobre software que analiza la información mostrada; 4.19–4.22 cierre y anulación/retención de importes a su criterio; 14.4 VPN solo si es para saltar bloqueos por país) están en https://stake.com/es/policies/terms.
+
+**Pendiente / ideas abiertas:**
+- Panel lateral solo en texto (sin `guide.js`) como versión de menor riesgo, o un interruptor para activar las marcas.
+- Registro de apuestas pegando la ficha de "Mis Apuestas" de Stake (en vez del botón "Apostada").
+- Aviso al móvil al publicar cada tanda y 30 min antes del primer partido; chequeo de cuotas justo antes de apostar.
+- Investigar por qué la tarea de tenis de las 07:07 deja `data/stake_cache.json` de ayer.
+- Contar una sola combinada por conjunto de piernas en las estadísticas por familia (hoy una misma pierna repetida pesa más).
+- Extensión de superposición con Win%/EV% dentro de Stake: descartada por riesgo (modifica la página).
+
+**Lecciones de herramientas:**
+- En este entorno los `heredoc` con comillas complejas fallan en el shell: crear los archivos con la herramienta de escritura o con scripts Python.
+- Probar el generador con `python scripts/nba_combos.py --no-snapshot` (no escribe historial) y el código de una extensión inyectándolo por CDP con `chrome.storage` simulado.
+
 ## Sprint 6+ (Planned) — Data Enrichment & Model Upgrade
 
 **Goal:** Improve prediction quality with richer data sources. Improvements go live immediately since the app is already deployed.
