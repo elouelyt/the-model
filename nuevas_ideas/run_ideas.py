@@ -16,6 +16,12 @@ BASE = Path(__file__).resolve().parent
 
 def main() -> None:
     wanted = sys.argv[1:]
+    sys.path.insert(0, str(BASE))
+    try:
+        import archive
+        print("== archivo:", archive.archive_batch(), flush=True)   # raw lines of this batch, kept forever (local)
+    except Exception as exc:  # never block the ideas
+        print("== archivo failed:", exc)
     for run in sorted((BASE / "ideas").glob("*/run.py")):
         name = run.parent.name
         if wanted and not any(name.startswith(w) for w in wanted):

@@ -107,6 +107,38 @@ def leg_calibration(a: dict) -> list[str]:
     return out
 
 
+def objective_section(a: dict, universe_rows: list[dict]) -> list[str]:
+    """Progress towards the user's goal (65-70 %) measured in the ways it can be read, plus days in profit."""
+    legs = a.get("legs", [])
+    out = ["", "### Objetivo 65-70 %: dónde estamos (se mide de tres formas)", "",
+           "| Medida | Hoy | Para 65 % | Para 70 % |", "|---|---|---|---|"]
+
+    def rate(rs: list[dict], key_ok: str = "ok") -> str:
+        return f"{sum(r[key_ok] for r in rs) / len(rs):.1%} (n={len(rs)})" if rs else "sin datos"
+
+    out.append(f"| Acierto por pierna, todas las recomendadas | {rate(legs)} | 65 % | 70 % |")
+    out.append(f"| Acierto por pierna, prob. casas >= 54 % | {rate([r for r in legs if r['win'] >= 0.54])} | 65 % | 70 % |")
+    out.append(f"| Acierto por pierna, prob. casas >= 62 % | {rate([r for r in legs if r['win'] >= 0.62])} | 65 % | 70 % |")
+    combos = a.get("combos", [])
+    prod = [c for c in combos if not c.get("tracking")]
+    out.append(f"| Acierto de combinadas de 3 (producción) | {sum(c['hit'] for c in prod) / len(prod):.1%} (n={len(prod)}) | " if prod else "| Acierto de combinadas de 3 (producción) | sin datos | ")
+    out[-1] += f"cada pierna al {0.65 ** (1 / 3):.1%} | cada pierna al {0.70 ** (1 / 3):.1%} |"
+    days = a.get("days", [])
+    if days:
+        pos = sum(d["roi"] > 0 for d in days)
+        out.append(f"| Días con beneficio (apuestas simples a 1 u) | {pos} de {len(days)} | todos | todos |")
+    played = [r for r in universe_rows if r["status"] != "void"]
+    hi = [r for r in played if r["p"] >= 0.62]
+    if len(hi) >= 10:
+        hit = sum(r["status"] == "won" for r in hi) / len(hi)
+        roi = sum((r["stake_odds"] - 1) if r["status"] == "won" else -1 for r in hi) / len(hi)
+        out.append(f"| Universo: líneas con prob. >= 62 % (acierto / ROI a cuota Stake) | {hit:.1%} / {roi:+.1%} (n={len(hi)}) | 65 % | 70 % |")
+    out += ["", "Lectura: el acierto y el beneficio se mueven en sentido contrario al elegir piernas más probables (la cuota baja). "
+                "Una combinada de 3 al 65 % exige piernas al 86,6 %, que no existen en este mercado; el objetivo realista es acierto alto "
+                "por pierna con ROI positivo, y esta tabla enseña si algún grupo logra las dos cosas a la vez."]
+    return out
+
+
 def main() -> None:
     n = settle_all()
     rows = collect()
@@ -139,6 +171,14 @@ def main() -> None:
         else:
             parts.append("Sin combinadas `prudente` liquidadas todavía.")
         parts += leg_calibration(a)
+        try:
+            import universe
+            nb = universe.download_boxscores()
+            urows = universe.build()
+            parts += objective_section(a, urows)
+            parts += universe.report(urows)
+        except Exception as exc:  # the universe is an extra: never break the report
+            parts += ["", f"(universo no disponible: {exc})"]
         parts += ["", "### Referencia: familias de producción (todos los días liquidados)", "",
                   "| Familia | Combinadas | Aciertos | ROI |", "|---|---|---|---|"]
         for f in a.get("combo_families", []):

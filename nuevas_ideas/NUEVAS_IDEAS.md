@@ -82,6 +82,24 @@ repite las familias de producción como referencia.
       de calibración (`RESULTADOS.md`, "Calibración de piernas") y no se cambia producción todavía.
     - Consecuencia práctica ya medible: las combinadas de producción NO usan piernas de prob < 54 %, así que no sufren este grupo; la tabla de
       apuestas simples del panel sí lo muestra (se podría ocultar `Under` con prob < 54 % en la tabla: candidato a probar como idea aparte).
+13. **Objetivo del usuario (25/10): "65-70 %" y "salir con beneficios todos los días".** Se mide de tres formas en `RESULTADOS.md` (sección Objetivo):
+    acierto por pierna, acierto de combinadas y días con beneficio. Cuentas de referencia (simulación, suponiendo que nuestras probabilidades fueran correctas):
+
+    | Estrategia | Días en positivo | ROI esperado |
+    |---|---|---|
+    | Combinadas de 3 (como ahora), 10/día, pierna 57 % a 1,80 | 57 % | +6,9 % |
+    | Combinadas de 2, 10/día | 42 % | +5,4 % |
+    | Simples, 10 / 30 / 100 al día | 56 % / 59 % / 62 % | +2,4 % / +2,6 % / +2,5 % |
+    | Simples de alta probabilidad (68 % a 1,42, margen incluido), 30/día | 34 % | −3,4 % |
+
+    Con la probabilidad 3 puntos peor de lo calculado, todas bajan a 32-48 % de días en positivo y ROI negativo. Conclusiones: (a) ni siquiera con todo bien
+    se gana todos los días (lo máximo realista es ~60 % de días en positivo); (b) más apuestas pequeñas suben algo la frecuencia de días en positivo;
+    (c) un acierto del 65-70 % por pierna solo se consigue con piernas de cuota baja (prob. >= 62 %), y ahí el ROI sale negativo; (d) una combinada de 3 al 65 %
+    exigiría piernas al 86,6 % (70 % -> 88,8 %). El camino es mejorar la calibración y medir cada día, no subir el acierto a costa de la cuota.
+14. **Archivo permanente** (`archive.py`, `universe.py`, desde el 25/10): cada tanda guarda en `nuevas_ideas/archive/batches/<hora>/` (gzip, ~300 KB) las líneas completas
+    de Stake y de las casas de referencia, que producción sobrescribe; `universe.py` baja los box scores de TODOS los jugadores y construye `archive/universe.jsonl.gz`
+    (cada línea con su probabilidad de casas, cuota de Stake y resultado). Así cualquier regla nueva se prueba con miles de líneas en lugar de unas pocas jugadas.
+    Una tanda típica tiene 446 líneas con casas de referencia (288 con 1 casa, 158 con 2; con BettingPros más). El informe `RESULTADOS.md` incluye la calibración del universo.
 
 ## Los seis vídeos (resumen y utilidad para nosotros)
 Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no están verificadas). Transcripciones automáticas en inglés.
@@ -102,6 +120,7 @@ Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no
 - Medir CLV por familia (el log `quotes` ya lo permite) para ver qué idea compra mejor que el cierre.
 
 ## Registro
+- 2026-10-25 (tarde, 2): archivo permanente por tanda + universo con box scores (14); objetivo 65-70 % medido de 3 formas (13); ideas 03/04/06/09 arregladas; stake-guide 1.1.0.
 - 2026-10-25 (tarde): liquidado el 24/10 a mano (las tareas de la mañana no se ejecutaron: la app estaba cerrada); análisis de unders/rebotes (hallazgo 12); idea 09 añadida; tabla de calibración de piernas en `RESULTADOS.md`.
 - 2026-10-25: creada la carpeta; ideas 02-08 con código; 01 en producción como familia de papel; 05 descartada con datos;
   tareas programadas nuevas; primer análisis de 6 vídeos.
