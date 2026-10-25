@@ -17,6 +17,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HIGH_PROB = 0.56   # pool for the "pure probability" paper family (EV ignored)
 MAX_CACHE_AGE_H = 6   # a reference line older than this is not a fair price any more (stale lines fake EV)
+CONS_MAX_AGE_H = 30   # the BettingPros consensus is only SHOWN (never used for EV), so an older pass is still informative
+CONS_AGE_H: float | None = None   # age in hours of the consensus quotes loaded by load_books()
 MIN_PROB = 0.0     # his feed shows win% from ~53%; no probability cut-off
 MIN_EV = 0.003     # his feed lists +EV down to ~0.3%
 OUT = ROOT / "data" / "nba_picks.json"
@@ -59,9 +61,13 @@ def load_books() -> tuple[dict, dict]:
             continue
         doc = json.loads(path.read_text(encoding="utf-8"))
         age = datetime.now(timezone.utc) - datetime.fromisoformat(doc["timestamp"])
-        if age.total_seconds() > MAX_CACHE_AGE_H * 3600:
-            print(f"[nba_ev] ignoring {fname}: {age.total_seconds() / 3600:.1f} h old")
-            continue
+        age_h = age.total_seconds() / 3600
+        stale = age_h > MAX_CACHE_AGE_H
+        if stale:
+            print(f"[nba_ev] {fname}: {age_h:.1f} h old -> not used as a reference book" +
+                  (" (consensus still shown)" if book == "BettingPros" and age_h <= CONS_MAX_AGE_H else ""))
+            if not (book == "BettingPros" and age_h <= CONS_MAX_AGE_H):
+                continue
         for r in doc["rows"]:
             if abs(r["over_american"]) > 400 or abs(r["under_american"]) > 400:  # placeholder quotes
                 continue
@@ -69,7 +75,9 @@ def load_books() -> tuple[dict, dict]:
             name = r.get("book", book)
             if name == "Consensus":
                 cons[key] = (r["over_american"], r["under_american"])
-            else:
+                global CONS_AGE_H
+                CONS_AGE_H = age_h
+            elif not stale:
                 index.setdefault(key, {})[name] = (r["over_american"], r["under_american"])
     return index, cons
 
@@ -104,6 +112,7 @@ def build_picks(min_prob: float = MIN_PROB, min_ev: float = MIN_EV, with_high: b
                 "outcome_id": r.get("outcome_id"), "event_id": r.get("event_id"), "fixture": r["fixture"],
                 "fair_odds": round(1 / prob, 3), "ev": round(ev, 4),
                 "cons_prob": None if cons_over is None else round(cons_over if side == "Over" else 1 - cons_over, 4),
+                "cons_age_h": None if cons_over is None or CONS_AGE_H is None else round(CONS_AGE_H, 1),
                 "fanduel": detail, "books": len(books),
                 "game": " vs ".join(teams), "start": start,
             }

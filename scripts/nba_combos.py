@@ -22,6 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PICKS = ROOT / "data" / "nba_picks.json"
 HISTORY = ROOT / "data" / "nba_history"
+STAKE_CACHE = ROOT / "data" / "nba_stake_cache.json"
+ANALYSIS = ROOT / "data" / "nba_analysis.json"
 MIN_LEG_EV = 0.005
 MIN_LEG_BOOKS = 2     # at least two reference books must agree on the line
 MIN_LEG_PROB = 0.54   # the video's rule: only legs the sharp books give >= 54%
@@ -50,10 +52,11 @@ def leg_key(p: dict) -> str:
 def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool = False,
                  per_family: int = PER_FAMILY, families: dict | None = None, min_leg_ev: float = MIN_LEG_EV,
                  future_only: bool | None = None, min_leg_prob: float = MIN_LEG_PROB,
-                 game_cap: int = GAME_CAP, min_books: int = MIN_LEG_BOOKS) -> list[dict]:
+                 game_cap: int = GAME_CAP, min_books: int | None = None) -> list[dict]:
     """tracking=False: bettable combos (all games still to start).
     tracking=True: paper combos with at least one leg from a game that already started."""
     now = now or datetime.now(timezone.utc)
+    min_books = MIN_LEG_BOOKS if min_books is None else min_books   # module value, so another sport can override it
     limit = now + timedelta(minutes=10)
 
     def started(p: dict) -> bool:
@@ -110,7 +113,8 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
                       "side": by_key[k]["side"], "line": by_key[k]["line"],
                       "stake_odds": by_key[k]["stake_odds"], "fair_prob": by_key[k]["fair_prob"],
                       "ev": by_key[k]["ev"], "game": by_key[k]["game"], "start": by_key[k]["start"],
-                      "outcome_id": by_key[k].get("outcome_id"), "event_id": by_key[k].get("event_id"), "fixture": by_key[k].get("fixture")}
+                      "outcome_id": by_key[k].get("outcome_id"), "event_id": by_key[k].get("event_id"), "fixture": by_key[k].get("fixture"),
+                      "cons_prob": by_key[k].get("cons_prob"), "cons_age_h": by_key[k].get("cons_age_h")}
                      for k in c["legs"]]
         c["prob"], c["odds"], c["ev"] = round(c["prob"], 4), round(c["odds"], 2), round(c["ev"], 4)
         c["tracking"] = tracking
@@ -144,14 +148,14 @@ def main() -> None:
     snap_path = HISTORY / f"{day}.json"
     snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
     combos = freeze_combos(combos, snap)
-    stake_cache = ROOT / "data" / "nba_stake_cache.json"
+    stake_cache = STAKE_CACHE
     fixtures = {" vs ".join(g["teams"]): g["fixture"] for g in json.loads(stake_cache.read_text(encoding="utf-8"))["games"]} if stake_cache.exists() else {}
     for c in combos + [c for r in snap["runs"] for c in r["combos"]]:  # combos saved before legs carried their game page
         for l in c["legs"]:
             if not l.get("fixture"):
                 l["fixture"] = fixtures.get(l["game"])
     doc["combos"] = combos
-    analysis_path = ROOT / "data" / "nba_analysis.json"
+    analysis_path = ANALYSIS
     if analysis_path.exists():
         doc["analysis"] = json.loads(analysis_path.read_text(encoding="utf-8"))
 

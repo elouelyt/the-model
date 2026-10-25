@@ -88,8 +88,8 @@ def main() -> None:
     load_dotenv(ROOT / ".env")
     if OUT.exists() and "--force" not in sys.argv:
         age = datetime.now(timezone.utc) - datetime.fromisoformat(json.loads(OUT.read_text(encoding="utf-8"))["timestamp"])
-        if age < timedelta(minutes=20):
-            logger.info("BettingPros cache is %d min old — skipping (use --force to refetch)", age.seconds // 60)
+        if age < timedelta(hours=7):  # one full pass (~37 of the 50 daily requests) serves every later batch of the day
+            logger.info("BettingPros cache is %d min old — skipping (use --force to refetch)", age.total_seconds() // 60)
             return
     key = os.environ.get("BETTINGPROS_API_KEY")
     if not key:

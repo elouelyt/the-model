@@ -44,9 +44,9 @@ def main() -> None:
     if "--skip-fetch" not in sys.argv:
         run(py, "scripts/nba_stake_scraper.py")
         run(py, "scripts/nba_fanduel.py")
-    # The free BettingPros key allows 50 requests/day and a full pass costs ~37: spend it once, in the late run
-    # (closest to tip-off). Earlier runs reuse FanDuel (Firecrawl) + Pinnacle. Force a pass with --bp.
-    if "--bp" in sys.argv or datetime.now().hour >= 21:
+    # The free BettingPros key allows 50 requests/day and a full pass costs ~37: spend it once a day, in the first batch from
+    # 17:00 (nba_bettingpros.py then skips while its cache is < 7 h old). Morning runs use FanDuel (Firecrawl) + Pinnacle. Force with --bp.
+    if "--bp" in sys.argv or datetime.now().hour >= 17:   # first afternoon batch; the 7 h cache then serves the later ones
         run(py, "scripts/nba_bettingpros.py", check=False)
     run(py, "scripts/nba_pinnacle.py")  # free public API, always refreshed
     run(py, "scripts/nba_ev.py")

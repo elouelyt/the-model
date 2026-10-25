@@ -201,6 +201,14 @@ def _go_link(p: dict, label: str = "Stake ↗") -> str:
     return f'<a class="btn go" href="{escape(url)}" target="_blank" rel="noopener noreferrer">{label}</a> ' if url else ""
 
 
+def _cons(p: dict) -> str:
+    """BettingPros consensus (average of ALL its books, informational only) for the same line, with its age."""
+    if p.get("cons_prob") is None:
+        return "—"
+    age = p.get("cons_age_h")
+    return f'{p["cons_prob"]:.0%}' + (f"<small>hace {age:.0f} h</small>" if age and age >= 1 else "")
+
+
 def _row(p: dict) -> str:
     side = "Más de" if p["side"] == "Over" else "Menos de"
     stat = STAT_ES.get(p["stat"], p["stat"])
@@ -214,6 +222,7 @@ def _row(p: dict) -> str:
         f'<td class="muted">{escape(p["game"])}<small>{local_time(p["start"])}</small></td>'
         f'<td><span class="tag">{escape(stat)}</span><b>{escape(p["player"])} {side} {p["line"]:g}</b></td>'
         f'<td class="num"><span class="pill">{p["fair_prob"]:.1%}</span></td>'
+        f'<td class="num muted" title="Consenso de BettingPros (todas sus casas), solo informativo">{_cons(p)}</td>'
         f'<td class="num ev">{p["ev"]:+.2%}<i class="meter"><u style="width:{min(p["ev"] / 0.12, 1) * 100:.0f}%"></u></i></td>'
         f'<td class="num"><b>{p["stake_odds"]:.2f}</b><small>justa {p["fair_odds"]:.2f}</small></td>'
         f'<td class="num muted">{escape(p["fanduel"])}<small>{books} {"casa" if books == 1 else "casas"}</small></td>'
@@ -235,7 +244,7 @@ def _combos_html(doc: dict, tracking: bool = False) -> str:
             f'<li><span><b>{escape(l["player"])}</b> {"Más de" if l["side"] == "Over" else "Menos de"} {l["line"]:g} '
             f'<span class="tag">{escape(STAT_ES.get(l["stat"], l["stat"]))}</span>'
             f'<small><a href="{escape(game_url(l))}" target="_blank" rel="noopener noreferrer">{escape(l["game"])} ↗</a> · {local_time(l["start"])}</small></span>'
-            f'<span class="num"><b>{l["stake_odds"]:.2f}</b><small>{l["fair_prob"]:.0%}</small></span></li>'
+            f'<span class="num"><b>{l["stake_odds"]:.2f}</b><small>{l["fair_prob"]:.0%}' + (f' · BP {l["cons_prob"]:.0%}' if l.get("cons_prob") is not None else '') + '</small></span></li>'
             for l in c["legs"]
         )
         fams = " ".join(f'<span class="fam">{escape(FAMILY_ES.get(f, f))}</span>' for f in c["families"])
@@ -397,8 +406,9 @@ def build(doc: dict) -> str:
     chips = '<button class="chip on" data-s="all">Todos</button>' + "".join(
         f'<button class="chip" data-s="{escape(s)}">{escape(STAT_ES.get(s, s))}</button>' for s in stats_present
     )
-    rows = "".join(_row(p) for p in picks) or '<tr><td colspan="8" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
-    combos_html = _combos_html(doc) + _combos_html(doc, tracking=True)
+    rows = "".join(_row(p) for p in picks) or '<tr><td colspan="9" class="empty">Ninguna apuesta con valor ahora mismo.</td></tr>'
+    combos_html = _combos_html(doc)                       # bettable combos: first thing on the page
+    tracking_html = _combos_html(doc, tracking=True)      # paper follow-up: below the single bets
     analysis_html = _analysis_html(doc)
     best = picks[0] if picks else None
     best_html = (f'<b class="ev">{best["ev"]:+.1%}</b><small>{escape(best["player"])} · '
@@ -446,6 +456,7 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 <h1>NBA · apuestas a jugadores con valor</h1>
 <p class="sub">Cuota justa de las casas serias (FanDuel y Pinnacle, sin margen) frente a la cuota de Stake · mismo método de Beat the Sportsbooks · actualizado {stamp.astimezone():%d/%m %H:%M}</p>
 {warn}
+{combos_html}
 <div class="kpis">
   <div class="kpi"><span>Apuestas</span><b>{len(picks)}</b><small>con EV positivo, de mayor a menor</small></div>
   <div class="kpi"><span>Mejor EV</span>{best_html}</div>
@@ -453,9 +464,9 @@ td small {{ display:block; color:var(--muted); font-size:.78rem; }}
 <div class="card bk"><label for="bk">Bankroll actual (€)</label><input id="bk" type="number" min="0" step="1" inputmode="decimal" placeholder="p. ej. 1500"><span class="hint" id="unit"></span></div>
 <div class="chips">{chips}<span class="sep"></span><button class="chip sort on" data-k="ev">Ordenar por EV%</button><button class="chip sort" data-k="win">Ordenar por Win%</button></div>
 <div class="card"><table>
-<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">Casas serias</th><th class="num">Apostar</th><th></th></tr>
+<tr><th>Partido</th><th>Apuesta</th><th class="num">Win%</th><th class="num" title="Consenso de BettingPros">Consenso BP</th><th class="num">EV%</th><th class="num">Stake</th><th class="num">Casas serias</th><th class="num">Apostar</th><th></th></tr>
 {rows}</table></div>
-{combos_html}
+{tracking_html}
 <p class="note">Win% = probabilidad justa sin margen, promedio de las casas serias disponibles para esa línea (FD = FanDuel, PIN = Pinnacle). EV% = Win% × cuota de Stake − 1, con la misma línea en las dos casas, de mayor a menor. Apuesta en cuanto salga la jugada (las líneas cambian rápido) y cerca del inicio del partido, cuando alineaciones y lesiones ya están confirmadas.</p>
 <h2 class="sec">Mis apuestas · track record</h2>
 <div class="kpis"><div class="kpi"><span>Beneficio</span><div id="k-profit"></div></div><div class="kpi"><span>ROI</span><div id="k-roi"></div></div><div class="kpi"><span>Aciertos</span><div id="k-hit"></div></div><div class="kpi"><span>Pendientes</span><div id="k-pend"></div></div></div>

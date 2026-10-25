@@ -34,9 +34,9 @@ def load() -> types.ModuleType:
         ("<title>NBA</title>", "<title>NFL</title>"),
         ("<h1>NBA · apuestas a jugadores con valor</h1>", "<h1>NFL · apuestas a jugadores con valor</h1>"),
         ("(FanDuel y Pinnacle, sin margen)", "(Pinnacle, sin margen)"),
-        ("{warn}\n<div class=\"kpis\">",
+        ("{warn}\n{combos_html}",
          "{warn}\n<p class=\"warn\">NFL en fase de prueba (desde el 25/10): solo Pinnacle como casa de referencia. Las jugadas con EV muy alto suelen ser ruido "
-         "(en NBA las Under de valor con probabilidad &lt; 54 % fallaron mucho): fíate más de las combinadas con piernas de Win% de 54 % o más.</p>\n<div class=\"kpis\">"),
+         "(en NBA las Under de valor con probabilidad &lt; 54 % fallaron mucho): fíate más de las combinadas con piernas de Win% de 54 % o más.</p>\n{combos_html}"),
     ):
         assert old in src, f"expected text not found in generate_nba.py: {old}"
         src = src.replace(old, new)
