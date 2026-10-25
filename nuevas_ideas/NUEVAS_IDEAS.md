@@ -123,9 +123,16 @@ Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no
 - Si la idea 02 funciona: usar el precio del constructor también para elegir piernas (hoy se elige con cuota web vs casas).
 - Medir CLV por familia (el log `quotes` ya lo permite) para ver qué idea compra mejor que el cierre.
 
+## Idea 10 - Reembolso al descanso NBA (promo de Stake, 19/10/2026 - 30/06/2027)
+Promo: apuesta SIMPLE previa al partido al ganador (incl. prórroga); si tu equipo va +16 al descanso y no gana, te devuelven la apuesta. Solo la primera apuesta por partido, usuario y hogar; no vale para combinadas; apostar a ambos equipos puede descalificar.
+Medición (`ideas/10_reembolso_descanso/halftime_backtest.py`, ESPN, temporada 2025-26, 1.235 partidos): un equipo iba +16 al descanso en el 20,4 % de los partidos y perdió 12 veces (0,97 % de los partidos; 4,8 % de los líderes).
+Apostando a un equipo al azar el reembolso ocurre ~0,5 % de las veces; apostando siempre al favorito sería algo más (~0,8 %, estimado, sin cuotas). Valor extra ~0,5-1 % de la apuesta: pequeño frente al margen del moneyline (~4 %). No convierte una apuesta sin valor en valor; solo suma a una que ya lo tenga.
+Pendiente: comprobar si Stake expone el moneyline NBA en su API y compararlo con Pinnacle (liga 487, ya leída) para detectar valor real; entonces prueba en papel 5-7 días. Estado: medido, sin pruebas en papel todavía.
+
 ## Registro
 - 2026-10-25 (noche): NFL en la web + pestaña Combinadas (NBA+NFL), consenso BettingPros visible, extensión 1.2.0 (NBA/NFL/Total), seguimiento NFL replicado.
 - 2026-10-25 (tarde, 2): archivo permanente por tanda + universo con box scores (14); objetivo 65-70 % medido de 3 formas (13); ideas 03/04/06/09 arregladas; stake-guide 1.1.0.
 - 2026-10-25 (tarde): liquidado el 24/10 a mano (las tareas de la mañana no se ejecutaron: la app estaba cerrada); análisis de unders/rebotes (hallazgo 12); idea 09 añadida; tabla de calibración de piernas en `RESULTADOS.md`.
 - 2026-10-25: creada la carpeta; ideas 02-08 con código; 01 en producción como familia de papel; 05 descartada con datos;
   tareas programadas nuevas; primer análisis de 6 vídeos.
+- 2026-10-25 (noche, 2): copia de seguridad fechada (`scripts/backup_data.py`), combinadas fijas se retiran si Stake quita una pierna, idea 10 (reembolso al descanso) medida.
