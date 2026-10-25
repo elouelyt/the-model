@@ -33,6 +33,8 @@ LEGACY = {  # yesterday's rules, paper only, to see whether its results repeat
     "valor_ev": (lambda c: True, lambda c: c["ev"]),
     "prob_ev": (lambda c: True, lambda c: c["prob"]),
 }
+SHRINK = 0.015  # paper test "prudente": discount every leg's fair probability by 1.5 points before the rules
+PRUDENT = {"prudente": (lambda c: c["ev"] > 0, lambda c: c["prob"])}
 UNITS = 0.25  # video: 0.25-0.5 units on 3-man slips
 FAMILIES = {
     "probabilidad": (lambda c: True, lambda c: c["prob"]),
@@ -175,6 +177,19 @@ def main() -> None:
         doc["picks"], tracking=True, per_family=TRACKING_PER_FAMILY, families=LEGACY, future_only=True,
         min_leg_prob=0.0, min_books=1, game_cap=TRACKING_GAME_CAP)
     tracking += legacy
+    # paper test "prudente" (does not change the bettable combos): same rules, legs with fair_prob - SHRINK
+    shrunk = [{**p, "fair_prob": round(p["fair_prob"] - SHRINK, 4), "ev": round((p["fair_prob"] - SHRINK) * p["stake_odds"] - 1, 4)}
+              for p in doc["picks"]]
+    prudent = [] if not doc["picks"] else build_combos(
+        shrunk, tracking=True, per_family=TRACKING_PER_FAMILY, families=PRUDENT, future_only=True,
+        game_cap=TRACKING_GAME_CAP)
+    by_legs = {tuple(sorted(l["key"] for l in c["legs"])): c for c in combos + tracking}
+    for c in prudent:  # a combo the other rules already picked just gets the extra family label
+        same = by_legs.get(tuple(sorted(l["key"] for l in c["legs"])))
+        if same is not None:
+            same["families"].append("prudente")
+        else:
+            tracking.append(c)
     doc["combos_tracking"] = tracking
     PICKS.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
@@ -184,6 +199,11 @@ def main() -> None:
     extras = [{**p, "extra": True} for p in doc.get("high_prob", [])
               if leg_key(p) not in {leg_key(q) for q in doc["picks"]}]
     new_picks = [p for p in doc["picks"] + extras if leg_key(p) not in known_legs]
+    stored = {tuple(sorted(l["key"] for l in c["legs"])): c for r in snap["runs"] for c in r["combos"]}
+    for c in combos + tracking:  # a combo recorded earlier under other rules can also belong to "prudente" now
+        old = stored.get(tuple(sorted(l["key"] for l in c["legs"])))
+        if old is not None:
+            old["families"] = sorted(set(old["families"]) | set(c["families"]))
     new_combos = [c for c in combos + tracking if tuple(sorted(l["key"] for l in c["legs"])) not in known_combos]
     quotes = {leg_key(p): [p["stake_odds"], p.get("stake_opp"), p["fair_prob"]] for p in doc["picks"]}
     snap["runs"].append({"at": doc["timestamp"], "picks": new_picks, "combos": new_combos, "quotes": quotes})
