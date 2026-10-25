@@ -42,6 +42,9 @@ def main() -> None:
         run(py, "nfl/nfl_stake_scraper.py")
     run(py, "nfl/nfl_pinnacle.py")
     run(py, "nfl/nfl_ev.py")
+    # second opinion + consensus from the BettingPros WEBSITE (player pages, no API cap) for the players with candidate legs, then EV again
+    run(py, "scripts/bp_web.py", "nfl", "--max", "45", check=False)
+    run(py, "nfl/nfl_ev.py")
     run(py, "nfl/nfl_combos.py")
     try:  # permanent raw archive for later back-testing (local only)
         sys.path.insert(0, str(ROOT / "nuevas_ideas"))

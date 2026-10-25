@@ -50,6 +50,9 @@ def main() -> None:
         run(py, "scripts/nba_bettingpros.py", check=False)
     run(py, "scripts/nba_pinnacle.py")  # free public API, always refreshed
     run(py, "scripts/nba_ev.py")
+    # consensus + all books from the BettingPros WEBSITE (player pages, no API cap) for the players with candidate legs, then EV again
+    run(py, "scripts/bp_web.py", "nba", "--max", "45", check=False)
+    run(py, "scripts/nba_ev.py")
     run(py, "scripts/nba_combos.py")
     encrypt_file(ROOT / "data" / "nba_picks.json", ENC)
     bundle = {p.name: json.loads(p.read_text(encoding="utf-8"))

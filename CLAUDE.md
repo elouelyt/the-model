@@ -208,6 +208,16 @@ Lección NBA aplicada: las jugadas con EV muy alto y probabilidad < 54 % (sobre 
 - **Seguimiento NFL (como NBA):** liquidación y análisis en `nfl/nfl_settle.py`; las ideas en papel 03, 06, 07, 08 y 09 corren también sobre NFL (`IDEAS_SPORT=nfl`, historiales `ideas/*/history_nfl`); `nuevas_ideas/nfl_universe.py` y el archivo `archive/nfl_batches`; `settle_ideas.py` añade calibración NFL y de las combinadas mezcladas a `RESULTADOS.md`.
 - **Tareas programadas (resuelto 25/10):** el clasificador de permisos bloqueó crear `nfl-daily` y editar tareas con la herramienta; con permiso explícito del usuario se editaron a mano los `SKILL.md` de `nba-daily-tarde` y `nba-daily` (paso 3: `python nfl/nfl_publish.py` tras la tanda de NBA, en el mismo Chrome) y `nba-resultados` (`nfl_settle.py` + `mix_settle.py`). No hay tarea de NFL propia: NFL y las mezcladas se publican a las 19:04 y 22:09 dentro de las tareas de NBA.
 
+## BettingPros WEB (todas las casas + consenso, sin tope de API) — `scripts/bp_web.py` (25/10/2026)
+
+La clave de API de BettingPros del usuario está limitada (50 peticiones/día, 20 ofertas por página), pero la **página web** muestra TODAS las casas y la columna Consensus. `scripts/bp_web.py <nfl|nba> [--max N]` abre una pestaña nueva del Chrome de depuración,
+visita la página de cada jugador con jugadas candidatas (`https://www.bettingpros.com/<deporte>/odds/player-props/<slug>/`, prob. >= 52 % y EV > 0), baja hasta que salen los mercados que hacen falta (la página carga de 5 en 5 al hacer scroll)
+y lee lo que pinta (columnas OPEN / BEST ODDS / CONSENSUS y luego cada casa en el orden de la cabecera). No usa la API ni extrae ninguna clave. Guarda `nfl/data/nfl_bettingpros_cache.json` / `data/nba_bettingpros_web_cache.json` (mismo formato que las otras cachés; casas:
+DraftKings, FanDuel, BetMGM, Caesars, HardRock, theScore, Fanatics, Novig, ProphetX + Consensus; sin DFS ni mercados de predicción). ~7 s por jugador, ~5 min por deporte; `nba_publish.py` y `nfl_publish.py` lo ejecutan entre dos cálculos de EV
+(por eso las tareas programadas tienen ahora 25 / 20 min de tiempo máximo). `nba_ev.py` y `nfl_ev.py` leen ambas cachés y muestran el consenso (hasta 30 h). NFL pasa a la regla de >= 2 casas (`nfl_combos._min_books()`) cuando esta caché es reciente (< 6 h).
+Lecciones: las páginas de MERCADO (todos los jugadores) se vuelven pesadas con >40 filas y se cuelgan; el scroll que funciona es `window.scrollTo(0, document.body.scrollHeight)` repetido (el gesto de rueda del ratón no carga más); en los partidos ya empezados las casas cierran la línea (celdas vacías).
+Primera lectura NFL: 14 jugadores, 330 líneas, 10 casas + consenso por jugador (19 de 65 jugadas con consenso; las demás son de partidos ya empezados o jugadores sin página). NBA validado con 4 jugadores (9-10 casas cada uno).
+
 ## Nuevas ideas (pruebas en papel) — `nuevas_ideas/`
 
 El usuario pidió (25/10/2026) que **todo cambio nuevo se pruebe en otra carpeta, sin tocar lo que funciona**, con backtesting de 5-7 días,

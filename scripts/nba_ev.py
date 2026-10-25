@@ -45,10 +45,11 @@ ALLOWED_STATS = {"points", "rebounds", "assists", "points+rebounds", "points+ass
 BOOK_FILES = {  # later files override earlier ones for the same book (fresher, broader sources last)
     "FanDuel": "nba_fanduel_cache.json",      # Firecrawl, optional
     "Pinnacle": "nba_pinnacle_cache.json",    # direct public API
-    "BettingPros": "nba_bettingpros_cache.json",  # rows carry their own "book"
+    "BettingPros": "nba_bettingpros_cache.json",  # rows carry their own "book" (API, capped at 50 requests/day)
+    "BettingProsWeb": "nba_bettingpros_web_cache.json",  # same, read from the BettingPros web pages (scripts/bp_web.py, no cap)
 }
 SHORT = {"FanDuel": "FD", "Pinnacle": "PIN", "DraftKings": "DK", "Caesars": "CZR", "BetMGM": "MGM",
-         "Novig": "NOV", "ProphetX": "PX"}
+         "Novig": "NOV", "ProphetX": "PX", "HardRock": "HR", "theScore": "SCR", "Fanatics": "FAN"}
 
 
 def load_books() -> tuple[dict, dict]:
@@ -65,8 +66,8 @@ def load_books() -> tuple[dict, dict]:
         stale = age_h > MAX_CACHE_AGE_H
         if stale:
             print(f"[nba_ev] {fname}: {age_h:.1f} h old -> not used as a reference book" +
-                  (" (consensus still shown)" if book == "BettingPros" and age_h <= CONS_MAX_AGE_H else ""))
-            if not (book == "BettingPros" and age_h <= CONS_MAX_AGE_H):
+                  (" (consensus still shown)" if book.startswith("BettingPros") and age_h <= CONS_MAX_AGE_H else ""))
+            if not (book.startswith("BettingPros") and age_h <= CONS_MAX_AGE_H):
                 continue
         for r in doc["rows"]:
             if abs(r["over_american"]) > 400 or abs(r["under_american"]) > 400:  # placeholder quotes
