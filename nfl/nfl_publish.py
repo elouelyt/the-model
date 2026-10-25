@@ -64,7 +64,14 @@ def main() -> None:
     if "--no-push" in sys.argv:
         logger.info("--no-push: data refreshed and archived locally, nothing committed")
         return
-    run("git", "add", "data/nfl_picks.enc", "data/nfl_history.enc")
+    mix_files: list[str] = []
+    try:  # mixed NBA+NFL combos for the 'Combinadas' tab
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import mix_publish
+        mix_files = mix_publish.update()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("mix combos skipped: %s", exc)
+    run("git", "add", "data/nfl_picks.enc", "data/nfl_history.enc", *mix_files)
     if run("git", "diff", "--cached", "--quiet", check=False).returncode == 0:
         logger.info("No changes to publish")
         return

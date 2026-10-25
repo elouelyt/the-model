@@ -19,12 +19,16 @@
   .leg.done { opacity:.55; }
   .leg.on { border-color:var(--green); }
   .odds { font-weight:600; white-space:nowrap; }
+  .tabs { display:flex; gap:6px; margin:4px 0 8px; }
+  .tab.on { border-color:var(--green); color:var(--green); }
+  .sp { font-style:normal; font-size:10px; color:var(--amber); border:1px solid var(--line); border-radius:4px; padding:0 4px; }
   .note, #msg { color:var(--muted); font-size:12px; }
   #msg.err { color:#ff6b6b; }
 </style>
 </head>
 <body>
 <h1>Combinadas <span><button id="refresh" title="Volver a descargar">↻</button> <button id="logout" title="Olvidar contraseña">Salir</button></span></h1>
+<div class="tabs"><button class="tab on" data-s="nba">NBA</button><button class="tab" data-s="nfl">NFL</button><button class="tab" data-s="total">Total</button></div>
 <div id="login" hidden>
   <p class="note">Escribe la contraseña del panel. Se guarda solo en este navegador.</p>
   <input id="pw" type="password" placeholder="Contraseña" autocomplete="off">

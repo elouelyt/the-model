@@ -3,7 +3,7 @@
 // Steps follow what the user does: tab "Apuestas al Jugador" -> player name -> market + line -> Sobre/Debajo.
 (() => {
   const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-  const POSITION = /\s*\((?:PG|SG|SF|PF|C|G|F|G-F|F-C|F-G|C-F)\)\s*$/i;
+  const POSITION = /\s*\([A-Z]{1,3}(?:-[A-Z]{1,3})?\)\s*$/;   // NBA (PG, SF, C...) and NFL (QB, WR, TE...) positions
   let target = null;
 
   const texts = (root) => {
@@ -42,7 +42,7 @@
     const next = names[names.indexOf(me) + 1];
     const inCard = (n) => (me.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING) &&
       (!next || (next.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_PRECEDING));
-    const stat = all.find((n) => n.textContent.trim() === target.stat && inCard(n));
+    const stat = all.find((n) => norm(n.textContent) === norm(target.stat) && inCard(n));
     if (!stat) { paint("sbg-y", [me]); return; }
 
     let row = stat.parentElement;
