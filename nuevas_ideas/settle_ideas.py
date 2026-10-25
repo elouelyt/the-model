@@ -76,6 +76,37 @@ def table(rows: list[dict], title: str) -> str:
     return "\n".join(out)
 
 
+def leg_calibration(a: dict) -> list[str]:
+    """Daily watch on the production legs (data/nba_analysis.json): are 'value' legs (EV > 1 %) as good as their
+    probability says? Sliced by side and by fair-probability bucket. Added 25/10 after day 2: legs with win >= 54 %
+    (the combo rule) were calibrated, while Under legs with EV > 1 % and win < 54 % hit ~32 % vs ~52 % expected."""
+    import math
+    legs = a.get("legs", [])
+
+    def row(name: str, rs: list[dict]) -> str:
+        if not rs:
+            return ""
+        n = len(rs)
+        hit = sum(r["ok"] for r in rs) / n
+        exp = sum(r["win"] for r in rs) / n
+        se = math.sqrt(max(exp * (1 - exp), 0.01) / n)
+        roi = sum((r["odds"] - 1) if r["ok"] else -1 for r in rs) / n
+        return f"| {name} | {n} | {hit:.1%} | {exp:.1%} | {100 * (hit - exp):+.1f} ({(hit - exp) / se:+.1f} SE) | {roi:+.1%} |"
+
+    out = ["", "### Calibración de piernas de producción (vigilancia diaria)", "",
+           "| Grupo | Piernas | Acierto | Esperado | Dif. pts | ROI |", "|---|---|---|---|---|---|"]
+    for side in ("Over", "Under"):
+        for lo, hi, tag in ((0.0, 0.54, "prob < 54 %"), (0.54, 1.01, "prob >= 54 %")):
+            for val, vt in ((True, "EV > 1 %"), (False, "EV <= 1 %")):
+                rs = [r for r in legs if r["side"] == side and lo <= r["win"] < hi and (r["ev"] > 0.01) == val]
+                if len(rs) >= 5:
+                    out.append(row(f"{side}, {tag}, {vt}", rs))
+    for day in sorted({r["date"] for r in legs}):
+        rs = [r for r in legs if r["date"] == day]
+        out.append(row(f"Día {day} (todas)", rs))
+    return out
+
+
 def main() -> None:
     n = settle_all()
     rows = collect()
@@ -107,6 +138,7 @@ def main() -> None:
                          f"{sum(c['prob'] for c in prud) / len(prud):.1%}, ROI {profit / len(prud):+.1%}.")
         else:
             parts.append("Sin combinadas `prudente` liquidadas todavía.")
+        parts += leg_calibration(a)
         parts += ["", "### Referencia: familias de producción (todos los días liquidados)", "",
                   "| Familia | Combinadas | Aciertos | ROI |", "|---|---|---|---|"]
         for f in a.get("combo_families", []):

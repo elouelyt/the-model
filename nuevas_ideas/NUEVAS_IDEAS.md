@@ -28,6 +28,7 @@ son locales y no se suben al repo.
 | 06 | Win% mínimo **56 %** por pierna (hoy 54 %) | propuesta del asistente (más colchón) | código listo | `06_win56` |
 | 07 | Combinadas de **2 piernas** | propuesta del asistente (menos margen y varianza) | código listo | `07_dos_piernas` |
 | 08 | Apuestas **simples** (top EV y top probabilidad) | propuesta del asistente | código listo | `08_simples` |
+| 09 | Quitar el margen con el método de la **potencia** (en vez del proporcional) | análisis del 25/10 de los unders | código listo | `09_devig_potencia` |
 
 Cada combinada vale 1 unidad plana en el informe (la apuesta real de producción sigue siendo 0,25 u). El informe también
 repite las familias de producción como referencia.
@@ -67,6 +68,20 @@ repite las familias de producción como referencia.
     Lectura: el EV de +17,7 % es muy sensible a la calidad de la probabilidad (cada 1,5 puntos de error por pierna recorta el beneficio a la mitad)
     y, aun siendo correcta, lo normal es pasar ~20 combinadas seguidas sin acertar (≈2 días). Por eso la idea 01 (`prudente`) y la medición de calibración
     importan más que añadir reglas nuevas. Script: simulación en este informe (reproducible con los `prob`/`odds` de `data/nba_picks.json`).
+12. **Por qué fallan unders y rebotes (análisis del 25/10 con 324 piernas liquidadas, 23 y 24/10):**
+    - El fallo no es "unders" ni "rebotes" en general. Las piernas **con probabilidad ≥ 54 %** (la regla de las combinadas) están **calibradas**:
+      Over 52,0 % vs 56,0 % esperado (EV>1 %) y 70,6 % vs 57,6 % (EV≤1 %); Under 57,9 % vs 57,7 % y 54,3 % vs 57,9 %.
+    - El grupo que falla es **Under, prob < 54 %, EV > 1 %: 60 piernas, 23,3 % de acierto vs 49,9 % esperado (−4,1 SE, ROI −52 %)**.
+      Over con prob < 54 % y EV > 1 %: 95 piernas, 48,4 % vs 50,1 %: bien.
+    - Por día: el 23/10 las piernas "de valor" acertaron 31,9 % (n=94) vs 51,6 % esperado (pipeline con los fallos de datos de ese día: cuotas
+      de casas desactualizadas, marcadores -99900, alias de equipo); el 24/10, ya corregido, 51,4 % vs 51,4 % (calibradas, ROI +3,7 %), pero Under de valor
+      35,7 % (n=42) vs Over de valor 61,9 % (n=63): el sesgo de lado persiste.
+    - Mecanismo **no identificado**. No se ve movimiento de línea (cambio medio de cuota Stake −0,25 % y de prob. de referencia +0,08 pts en las Under de valor
+      entre tandas). Hipótesis a probar: el quitar-margen proporcional sesga el lado "underdog"; se prueba en la idea 09.
+    - Reservas: miré muchos cortes (lado, mercado, EV, casas, día), así que parte puede ser azar; por eso el informe diario repite la tabla
+      de calibración (`RESULTADOS.md`, "Calibración de piernas") y no se cambia producción todavía.
+    - Consecuencia práctica ya medible: las combinadas de producción NO usan piernas de prob < 54 %, así que no sufren este grupo; la tabla de
+      apuestas simples del panel sí lo muestra (se podría ocultar `Under` con prob < 54 % en la tabla: candidato a probar como idea aparte).
 
 ## Los seis vídeos (resumen y utilidad para nosotros)
 Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no están verificadas). Transcripciones automáticas en inglés.
@@ -87,5 +102,6 @@ Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no
 - Medir CLV por familia (el log `quotes` ya lo permite) para ver qué idea compra mejor que el cierre.
 
 ## Registro
+- 2026-10-25 (tarde): liquidado el 24/10 a mano (las tareas de la mañana no se ejecutaron: la app estaba cerrada); análisis de unders/rebotes (hallazgo 12); idea 09 añadida; tabla de calibración de piernas en `RESULTADOS.md`.
 - 2026-10-25: creada la carpeta; ideas 02-08 con código; 01 en producción como familia de papel; 05 descartada con datos;
   tareas programadas nuevas; primer análisis de 6 vídeos.
