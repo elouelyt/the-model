@@ -32,8 +32,7 @@ def main() -> None:
     legs = [p for p in doc["picks"] if med.get(norm(p["player"]), 0) >= MIN_MEDIAN]
     fams = {"minutos": (lambda c: True, lambda c: c["prob"])}
     built = nba_combos.build_combos(legs, tracking=False, per_family=nba_combos.PER_FAMILY, families=fams)
-    by_key = {nba_combos.leg_key(p): p for p in legs}
-    combos = [combo_from_legs([by_key[k] for k in c["legs"]], ["minutos"], c["odds"], c["prob"]) for c in built]
+    combos = [combo_from_legs(c["legs"], ["minutos"], c["odds"], c["prob"]) for c in built]   # build_combos already returns the leg dicts
     print(f"[{IDEA}] {len(legs)}/{len(doc['picks'])} legs with median >= {MIN_MEDIAN:g} min -> {len(combos)} combos, "
           f"{save_combos(IDEA, combos)} new")
 

@@ -16,7 +16,7 @@ def main() -> None:
     fams = {"win56": (lambda c: True, lambda c: c["prob"])}
     built = nba_combos.build_combos(doc["picks"], tracking=False, per_family=nba_combos.PER_FAMILY, families=fams, min_leg_prob=0.56)
     by_key = {nba_combos.leg_key(p): p for p in doc["picks"]}
-    combos = [combo_from_legs([by_key[k] for k in c["legs"]], ["win56"], c["odds"], c["prob"]) for c in built]
+    combos = [combo_from_legs(c["legs"], ["win56"], c["odds"], c["prob"]) for c in built]   # build_combos already returns the leg dicts
     print(f"[{IDEA}] {len(combos)} combos, {save_combos(IDEA, combos)} new")
 
 

@@ -54,8 +54,7 @@ def main() -> None:
         legs.append({**p, "fair_prob": round(prob, 4), "ev": round(prob * p["stake_odds"] - 1, 4)})
     fams = {"devig_pot": (lambda c: True, lambda c: c["prob"])}
     built = nba_combos.build_combos(legs, tracking=False, per_family=nba_combos.PER_FAMILY, families=fams)
-    by_key = {nba_combos.leg_key(p): p for p in legs}
-    combos = [combo_from_legs([by_key[k] for k in c["legs"]], ["devig_pot"], c["odds"], c["prob"]) for c in built]
+    combos = [combo_from_legs(c["legs"], ["devig_pot"], c["odds"], c["prob"]) for c in built]   # build_combos already returns the leg dicts
     shift = [l["fair_prob"] - p["fair_prob"] for l, p in zip(legs, [q for q in doc["picks"] if fair_over_power(q.get("fanduel")) is not None])]
     avg = sum(shift) / len(shift) if shift else 0.0
     print(f"[{IDEA}] {len(legs)} legs; mean fair-prob shift vs proportional {avg * 100:+.2f} pts; {len(combos)} combos, {save_combos(IDEA, combos)} new")

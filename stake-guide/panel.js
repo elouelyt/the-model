@@ -30,14 +30,30 @@ async function decrypt(buf, password) {
 const fmtTime = (s) => new Date(s).toLocaleString("es-ES", { weekday: "short", hour: "2-digit", minute: "2-digit" });
 const keyOf = (l) => `${l.fixture}|${l.player}|${l.stat}|${l.side}|${l.line}`;
 
+const STAKE_URL = /^https:\/\/([^/]*\.)?stake\.com\//;
+
+// Stake keeps the betslip in each tab's sessionStorage, so every leg of a combo must open in the SAME tab:
+// a new tab starts with an empty slip. Reuse the tab we used last; else any open Stake tab; else open one.
+async function stakeTab() {
+  const savedId = await store.get("stakeTabId");
+  if (savedId != null) {
+    try {
+      const t = await chrome.tabs.get(savedId);
+      if (t && STAKE_URL.test(t.url || "")) return t;
+    } catch (e) { /* tab was closed */ }
+  }
+  const [any] = await chrome.tabs.query({ url: ["https://stake.com/*", "https://*.stake.com/*"] });
+  return any || null;
+}
+
 async function pick(leg) {
   const target = { player: leg.player, stat: STAT_ES[leg.stat] || leg.stat, line: String(leg.line),
                    side: leg.side === "Over" ? "Sobre" : "Debajo", fixture: leg.fixture, at: Date.now() };
   await store.set("target", target);
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const url = GAME_URL(leg.fixture);
-  if (tab && tab.url && /^https:\/\/([^/]*\.)?stake\.com\//.test(tab.url)) await chrome.tabs.update(tab.id, { url });
-  else await chrome.tabs.create({ url });
+  const tab = await stakeTab();
+  const shown = tab ? await chrome.tabs.update(tab.id, { url, active: true }) : await chrome.tabs.create({ url });
+  await store.set("stakeTabId", shown.id);
 }
 
 async function render(doc) {

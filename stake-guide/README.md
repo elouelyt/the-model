@@ -12,11 +12,14 @@ Extensión de Chrome/Brave con dos partes:
 
 ## Uso
 1. En el panel lateral pulsa una pierna (por ejemplo "Max Christie Menos de 3,5 Asistencias").
-2. La pestaña va al partido en Stake. Se marca en amarillo **Apuestas al Jugador**; púlsala.
+2. La **misma pestaña** de Stake va al partido (se reutiliza siempre; Stake guarda el talón por pestaña, así que las selecciones de la combinada se acumulan ahí. Si no hay ninguna pestaña de Stake abierta, abre una y la reutiliza después). Se marca en amarillo **Apuestas al Jugador**; púlsala.
 3. Se marca el **jugador**; púlsalo para desplegarlo.
 4. Baja tú hasta el mercado (la extensión no mueve la página): al verlo sale en **amarillo**. Si la línea que muestra Stake no es la tuya sale en **naranja**; abre la lista de líneas y se marca en **verde** la que toca.
 5. Con la línea correcta se marcan en verde la línea y **Sobre/Debajo con su cuota**. Púlsalo.
 6. Vuelve al panel lateral y pasa a la siguiente pierna.
+
+## Cambios
+- 1.1.0: reutiliza la misma pestaña de Stake (antes abría una nueva cada vez y el talón se perdía; faltaba el permiso para leer la dirección de la pestaña). Si actualizas desde la 1.0.0, en `chrome://extensions` pulsa **Recargar** en la extensión (el permiso nuevo puede pedir confirmación).
 
 ## Qué hace y qué no
 - Lee el texto visible de la página y pinta con la API de resaltado de CSS (`CSS.highlights`): no añade ni cambia elementos, clases ni atributos (medido: 0 cambios en la página al pintar).
