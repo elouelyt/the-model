@@ -68,6 +68,11 @@ def main() -> None:
         mix_files = mix_publish.update()
     except Exception as exc:  # noqa: BLE001
         logger.warning("mix combos skipped: %s", exc)
+    try:  # dated local zip of all records outside the project folder
+        import backup_data
+        backup_data.main()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("backup skipped: %s", exc)
     run("git", "add", "data/nba_picks.enc", "data/nba_history.enc", *mix_files)
     if run("git", "diff", "--cached", "--quiet", check=False).returncode == 0:
         logger.info("No changes to publish")
