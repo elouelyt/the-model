@@ -48,7 +48,9 @@ def main() -> None:
     HISTORY.mkdir(parents=True, exist_ok=True)
     snap_path = HISTORY / f"{day}.json"
     snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
-    combos = nc.freeze_combos(fresh, snap)
+    nba_cache = ROOT / "data" / "nba_stake_cache.json"
+    nfl_cache = ROOT / "nfl" / "data" / "nfl_stake_cache.json"
+    combos = nc.freeze_combos(fresh, snap, available=nc.available_lines(nba_cache, nfl_cache))
     for c in combos:  # frozen ones keep their stored legs (already tagged)
         for l in c["legs"]:
             l.setdefault("sport", sport_of.get(l["key"], "nba"))

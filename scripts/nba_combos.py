@@ -122,9 +122,26 @@ def build_combos(picks: list[dict], now: datetime | None = None, tracking: bool 
     return sorted(out, key=lambda c: c["ev"], reverse=True)
 
 
-def freeze_combos(fresh: list[dict], snap: dict, now: datetime | None = None) -> list[dict]:
+def available_lines(*caches: Path, max_age_h: float = 3.0) -> set | None:
+    """(fixture, player, stat, line) of every line Stake offers right now, from fresh Stake caches; None when a cache is missing or stale
+    (then nothing is dropped: we cannot tell)."""
+    out: set = set()
+    for path in caches:
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            age = datetime.now(timezone.utc) - datetime.fromisoformat(doc["timestamp"])
+        except (OSError, KeyError, ValueError):
+            return None
+        if age > timedelta(hours=max_age_h) or len(doc["rows"]) < 100:
+            return None
+        out |= {(r["fixture"], r["player"], r["stat"], r["line"]) for r in doc["rows"]}
+    return out
+
+
+def freeze_combos(fresh: list[dict], snap: dict, now: datetime | None = None, available: set | None = None) -> list[dict]:
     """Keep the bettable combos already shown today while all their games are still to start, so a combo the
-    user may have bet never vanishes because odds moved. Fresh combos are added only if they reuse no frozen leg or player."""
+    user may have bet never vanishes because odds moved. A frozen combo IS dropped when Stake no longer offers one of its lines
+    (player ruled out, market withdrawn): `available` = lines Stake offers now. Fresh combos are added only if they reuse no frozen leg or player."""
     limit = (now or datetime.now(timezone.utc)) + timedelta(minutes=10)
     kept, seen = [], set()
     for r in snap["runs"]:
@@ -132,6 +149,9 @@ def freeze_combos(fresh: list[dict], snap: dict, now: datetime | None = None) ->
             ident = tuple(sorted(l["key"] for l in c["legs"]))
             if c.get("tracking") or ident in seen or any(parsedate_to_datetime(l["start"]) <= limit for l in c["legs"]):
                 continue
+            if available is not None and any(l.get("fixture") and (l["fixture"], l["player"], l["stat"], l["line"]) not in available
+                                             for l in c["legs"]):
+                continue   # Stake withdrew one of the legs: the combo cannot be bet any more
             seen.add(ident)
             kept.append(c)
     used_legs = {l["key"] for c in kept for l in c["legs"]}
@@ -147,7 +167,7 @@ def main() -> None:
     day = (datetime.now() - timedelta(hours=6)).strftime("%Y-%m-%d")  # slate date: 01:00 runs belong to the evening before
     snap_path = HISTORY / f"{day}.json"
     snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {"date": day, "runs": []}
-    combos = freeze_combos(combos, snap)
+    combos = freeze_combos(combos, snap, available=available_lines(STAKE_CACHE))
     stake_cache = STAKE_CACHE
     fixtures = {" vs ".join(g["teams"]): g["fixture"] for g in json.loads(stake_cache.read_text(encoding="utf-8"))["games"]} if stake_cache.exists() else {}
     for c in combos + [c for r in snap["runs"] for c in r["combos"]]:  # combos saved before legs carried their game page
