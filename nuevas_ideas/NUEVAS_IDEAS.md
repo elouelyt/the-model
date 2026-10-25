@@ -101,6 +101,8 @@ repite las familias de producción como referencia.
     (cada línea con su probabilidad de casas, cuota de Stake y resultado). Así cualquier regla nueva se prueba con miles de líneas en lugar de unas pocas jugadas.
     Una tanda típica tiene 446 líneas con casas de referencia (288 con 1 casa, 158 con 2; con BettingPros más). El informe `RESULTADOS.md` incluye la calibración del universo.
 
+15. **NFL añadido (25/10):** misma metodología en `nfl/` (ver `CLAUDE.md`). Primera tanda: 13 partidos, 9.180 líneas de Stake, 510 de Pinnacle (477 con línea idéntica), 122 jugadas con EV >= 0,3 % y 3 combinadas apostables. Hay que calibrarlo igual que NBA antes de fiarse del EV (ver hallazgo 12).
+
 ## Los seis vídeos (resumen y utilidad para nosotros)
 Todos son del mismo autor (vende un Discord de picks; sus cifras de beneficio no están verificadas). Transcripciones automáticas en inglés.
 | Vídeo | Contenido | Se traslada a Stake |

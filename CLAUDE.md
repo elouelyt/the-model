@@ -181,6 +181,20 @@ Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel si
 - En este entorno los `heredoc` con comillas complejas fallan en el shell: crear los archivos con la herramienta de escritura o con scripts Python.
 - Probar el generador con `python scripts/nba_combos.py --no-snapshot` (no escribe historial) y el código de una extensión inyectándolo por CDP con `chrome.storage` simulado.
 
+## NFL player props (misma metodología que NBA) — `nfl/` (desde 25/10/2026)
+
+Pipeline paralelo e independiente de NBA (no toca sus scripts): `nfl/nfl_stake_scraper.py` (Stake NFL por CDP, mismos GraphQL con `sport:"american-football", category:"usa", tournament:"nfl"`;
+9 mercados: yardas de pase/carrera/recepción, recepciones, acarreos, pases intentados/completados, TD de pase, intercepciones; ~9.000 líneas por tanda incl. alternativas, `balanced` = principal),
+`nfl/nfl_pinnacle.py` (API pública de invitado, liga 889; ~510 líneas, 477 con la misma línea que Stake; única casa de referencia por ahora), `nfl/nfl_ev.py` (prob. justa sin margen vs cuota Stake),
+`nfl/nfl_combos.py` (reutiliza `nba_combos.build_combos`/`freeze_combos` con `min_books=1`), `nfl/nfl_settle.py` (ESPN `football/nfl`; reutiliza `nba_settle.analyse()` apuntado a `nfl/data/nfl_history`; pierna anulada si el jugador no aparece en ninguna categoría del box score),
+`nfl/nfl_publish.py` (cadena completa, cifra `data/nfl_picks.enc` y `data/nfl_history.enc`, commit+push; `--no-push` solo refresca y archiva), `nfl/generate_nfl.py` (carga el código de `generate_nba.py` sustituyendo textos/constantes: la pestaña NFL hereda las mejoras de NBA).
+`scripts/build_private.py` añade la pestaña **NFL** (tolerante a errores) y `panel.yml` se dispara también con `data/nfl_picks.enc`. Datos locales en `nfl/data/` (gitignored); archivo permanente por tanda en `nuevas_ideas/archive/nfl_batches`.
+Estado 25/10: pestaña publicada en modo prueba (aviso en la pestaña); sin liquidar aún. NFL tiene partidos domingo, lunes y jueves (hora UTC ~17:00, 20:05, 20:25, 00:20 / jueves 00:15).
+**Pendiente NFL:** tarea programada (el clasificador bloqueó crear `nfl-daily` y `nfl-datos`; el usuario debe permitirlo o crearla: `python nfl/nfl_publish.py` en 09:30, 16:30 y 20:30 con Chrome de depuración abierto en Stake);
+BettingPros NFL (cupo 50/día compartido con NBA) y FanDuel (Firecrawl) como 2.ª/3.ª casa; mercados de TD; nombres en español de los mercados de Stake NFL para `stake-guide/guide.js` (hoy solo NBA) y enlace "Rellenar talón" (la extensión antigua escribe talón de baloncesto; en NFL está desactivado);
+universo/calibración de NFL como en `nuevas_ideas/universe.py`; reglas propias (límites por partido, correlación QB-receptor, pesos por mercado) tras 5-7 días de datos.
+Lección NBA aplicada: las jugadas con EV muy alto y probabilidad < 54 % (sobre todo Under) fallaron en NBA; en NFL empezar fiándose de las combinadas con piernas de >= 54 %.
+
 ## Nuevas ideas (pruebas en papel) — `nuevas_ideas/`
 
 El usuario pidió (25/10/2026) que **todo cambio nuevo se pruebe en otra carpeta, sin tocar lo que funciona**, con backtesting de 5-7 días,
