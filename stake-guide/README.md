@@ -10,6 +10,9 @@ Extensión de Chrome/Brave con dos partes:
 2. **Cargar descomprimida** → elige esta carpeta (`stake-guide`).
 3. Pulsa el icono de la extensión: se abre el panel lateral. Escribe la contraseña del panel (se guarda solo en este navegador).
 
+## Secciones del panel lateral
+Tres botones arriba: **NBA** (combinadas de la pestaña NBA), **NFL** (las de la pestaña NFL) y **Total** (combinadas que mezclan piernas de NBA y NFL). El resaltado en Stake funciona igual en las dos ligas (nombres de mercado de NFL en español de Stake: Yardas por Pases, Yardas por acarreo, Yardas de recepción, Recepciones, Intentos de acarreo…).
+
 ## Uso
 1. En el panel lateral pulsa una pierna (por ejemplo "Max Christie Menos de 3,5 Asistencias").
 2. La **misma pestaña** de Stake va al partido (se reutiliza siempre; Stake guarda el talón por pestaña, así que las selecciones de la combinada se acumulan ahí. Si no hay ninguna pestaña de Stake abierta, abre una y la reutiliza después). Se marca en amarillo **Apuestas al Jugador**; púlsala.
@@ -19,6 +22,7 @@ Extensión de Chrome/Brave con dos partes:
 6. Vuelve al panel lateral y pasa a la siguiente pierna.
 
 ## Cambios
+- 1.2.0: secciones NBA / NFL / Total, enlaces por deporte y resaltado para NFL (posiciones QB/WR/TE... y mercados de NFL).
 - 1.1.0: reutiliza la misma pestaña de Stake (antes abría una nueva cada vez y el talón se perdía; faltaba el permiso para leer la dirección de la pestaña). Si actualizas desde la 1.0.0, en `chrome://extensions` pulsa **Recargar** en la extensión (el permiso nuevo puede pedir confirmación).
 
 ## Qué hace y qué no
