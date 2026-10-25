@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the private, encrypted panel.html with four tabs: Recomendaciones, Rendimiento, NBA, MMA.
+"""Build the private, encrypted panel.html with the tabs: Recomendaciones, Rendimiento, NBA, NFL (when data/nfl_picks.enc exists), MMA.
 
 Usage:
   python scripts/build_private.py --from-build   # daily run: use build/site.html and refresh data/site.enc
@@ -28,6 +28,7 @@ from private_crypto import decrypt_file, encrypt_file  # noqa: E402
 BUILD = ROOT / "build"
 SITE_ENC = ROOT / "data" / "site.enc"
 NBA_ENC = ROOT / "data" / "nba_picks.enc"
+NFL_ENC = ROOT / "data" / "nfl_picks.enc"
 SALT = "8669795df810e4666e526fa8a931d9da"
 STATICRYPT = "staticrypt@3.5.4"
 
@@ -63,6 +64,15 @@ def main() -> None:
         picks_path = BUILD / "nba_picks.json"
         decrypt_file(NBA_ENC, picks_path)
         tabs.append(("NBA", generate_nba.build(json.loads(picks_path.read_text(encoding="utf-8")))))
+    if NFL_ENC.exists():
+        try:  # a problem in the NFL tab must never break the rest of the panel
+            sys.path.insert(0, str(ROOT / "nfl"))
+            import generate_nfl  # noqa: E402
+            nfl_path = BUILD / "nfl_picks.json"
+            decrypt_file(NFL_ENC, nfl_path)
+            tabs.append(("NFL", generate_nfl.build(json.loads(nfl_path.read_text(encoding="utf-8")))))
+        except Exception as exc:  # noqa: BLE001
+            print(f"NFL tab skipped: {exc}")
     if mma:
         tabs.append(("MMA", mma))
 

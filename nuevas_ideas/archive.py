@@ -39,5 +39,28 @@ def archive_batch() -> str:
     return f"archived batch {stamp}: {saved} files, {size} KB"
 
 
+NFL_FILES = ["nfl_stake_cache.json", "nfl_pinnacle_cache.json", "nfl_picks.json"]
+
+
+def archive_nfl_batch() -> str:
+    """Same idea for NFL: nfl/data/*.json are overwritten every batch."""
+    nfl = ROOT / "nfl" / "data"
+    stake = nfl / "nfl_stake_cache.json"
+    if not stake.exists():
+        return "no nfl stake cache"
+    stamp = json.loads(stake.read_text(encoding="utf-8"))["timestamp"][:19].replace(":", "").replace("-", "")
+    dest = BASE / "archive" / "nfl_batches" / stamp
+    if dest.exists():
+        return f"nfl batch {stamp} already archived"
+    dest.mkdir(parents=True)
+    for name in NFL_FILES:
+        src = nfl / name
+        if src.exists():
+            with src.open("rb") as f_in, gzip.open(dest / (name + ".gz"), "wb", compresslevel=6) as f_out:
+                shutil.copyfileobj(f_in, f_out)
+    return f"archived nfl batch {stamp}: {sum(p.stat().st_size for p in dest.glob('*.gz')) // 1024} KB"
+
+
 if __name__ == "__main__":
     print(archive_batch())
+    print(archive_nfl_batch())

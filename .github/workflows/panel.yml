@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "data/nba_picks.enc"   # pushed from the local NBA refresh
+      - "data/nfl_picks.enc"   # pushed from the local NFL refresh
   workflow_dispatch:
 
 concurrency:
