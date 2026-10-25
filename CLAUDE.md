@@ -206,7 +206,7 @@ Lección NBA aplicada: las jugadas con EV muy alto y probabilidad < 54 % (sobre 
 - **NFL = motor NBA:** `nfl/nfl_combos.py` ejecuta `nba_combos.main()` con las rutas de NFL (solo cambia `MIN_BOOKS = 1` hasta tener 2.ª casa); `nba_combos.py` ganó `STAKE_CACHE`/`ANALYSIS` y `min_books=None` (salida de NBA verificada idéntica).
 - **Extensión `stake-guide` 1.2.0:** panel lateral con tres secciones NBA / NFL / Total; enlaces por deporte; `guide.js` acepta posiciones NFL y compara el mercado sin acentos. Nombres de Stake NFL: Yardas por Pases, Pases Completados, Intentos de pases, Pases de Touchdowns, Intercepciones, Yardas por acarreo, Intentos de acarreo, Yardas de recepción, Recepciones.
 - **Seguimiento NFL (como NBA):** liquidación y análisis en `nfl/nfl_settle.py`; las ideas en papel 03, 06, 07, 08 y 09 corren también sobre NFL (`IDEAS_SPORT=nfl`, historiales `ideas/*/history_nfl`); `nuevas_ideas/nfl_universe.py` y el archivo `archive/nfl_batches`; `settle_ideas.py` añade calibración NFL y de las combinadas mezcladas a `RESULTADOS.md`.
-- **Pendiente:** tarea programada para NFL (el clasificador bloqueó `nfl-daily`); mientras tanto `python nfl/nfl_publish.py` a mano (liquida NFL y las mezcladas al final de cada tanda).
+- **Tareas programadas (resuelto 25/10):** el clasificador de permisos bloqueó crear `nfl-daily` y editar tareas con la herramienta; con permiso explícito del usuario se editaron a mano los `SKILL.md` de `nba-daily-tarde` y `nba-daily` (paso 3: `python nfl/nfl_publish.py` tras la tanda de NBA, en el mismo Chrome) y `nba-resultados` (`nfl_settle.py` + `mix_settle.py`). No hay tarea de NFL propia: NFL y las mezcladas se publican a las 19:04 y 22:09 dentro de las tareas de NBA.
 
 ## Nuevas ideas (pruebas en papel) — `nuevas_ideas/`
 
