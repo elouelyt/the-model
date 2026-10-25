@@ -3,7 +3,7 @@
 
 Chain: settle -> Stake props (CDP, needs Chrome on stake.com) -> Pinnacle -> picks -> combos -> data/nfl_picks.enc
 (AES with DASHBOARD_PASSWORD) -> git commit + push; the push triggers the 'Rebuild private panel' workflow (NFL tab).
-Raw picks stay local (nfl/data); the repo only sees ciphertext.   python nfl/nfl_publish.py [--skip-fetch]
+Raw picks stay local (nfl/data); the repo only sees ciphertext.   python nfl/nfl_publish.py [--skip-fetch] [--no-push]   (--no-push: refresh, archive and encrypt locally, do not commit or push)
 """
 
 import json
@@ -61,6 +61,9 @@ def main() -> None:
     (ROOT / "build" / "nfl_history_bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
     encrypt_file(ROOT / "build" / "nfl_history_bundle.json", ROOT / "data" / "nfl_history.enc")  # encrypted backup
 
+    if "--no-push" in sys.argv:
+        logger.info("--no-push: data refreshed and archived locally, nothing committed")
+        return
     run("git", "add", "data/nfl_picks.enc", "data/nfl_history.enc")
     if run("git", "diff", "--cached", "--quiet", check=False).returncode == 0:
         logger.info("No changes to publish")
