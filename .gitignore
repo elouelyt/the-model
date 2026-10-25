@@ -30,3 +30,11 @@ venv/
 !data/ufc_model.json
 !data/predictions/
 !data/predictions/*.json
+
+# nuevas_ideas: local-only paper-test data
+nuevas_ideas/ideas/*/history/
+nuevas_ideas/ideas/*/candidates/
+nuevas_ideas/data/
+nuevas_ideas/RESULTADOS.md
+nuevas_ideas/resultados.json
+nuevas_ideas/**/__pycache__/

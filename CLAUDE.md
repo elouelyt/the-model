@@ -181,6 +181,16 @@ Método del vídeo de Derek (comparación de líneas): cuota justa de FanDuel si
 - En este entorno los `heredoc` con comillas complejas fallan en el shell: crear los archivos con la herramienta de escritura o con scripts Python.
 - Probar el generador con `python scripts/nba_combos.py --no-snapshot` (no escribe historial) y el código de una extensión inyectándolo por CDP con `chrome.storage` simulado.
 
+## Nuevas ideas (pruebas en papel) — `nuevas_ideas/`
+
+El usuario pidió (25/10/2026) que **todo cambio nuevo se pruebe en otra carpeta, sin tocar lo que funciona**, con backtesting de 5-7 días,
+y que se anote en el índice `nuevas_ideas/NUEVAS_IDEAS.md` (añadir, nunca borrar). Cada idea es `nuevas_ideas/ideas/NN_nombre/run.py` y genera
+combinadas de papel con los datos de producción (solo lectura); `nuevas_ideas/settle_ideas.py` las liquida con ESPN (reusa `scripts/nba_settle.py`)
+y escribe `nuevas_ideas/RESULTADOS.md`. Tareas programadas nuevas: `nuevas-ideas-tanda` (19:35 y 22:35) y `nuevas-ideas-resultados` (~10:40).
+Ideas: 01 `prudente` (en producción como familia de papel), 02 SGM mismo partido con el precio de Stake (consulta `calculateSwishCustomBet`),
+03 unders, 04 minutos, 05 sinergias (descartada con datos), 06 win56, 07 dos piernas, 08 simples. Leer `NUEVAS_IDEAS.md` antes de tocar nada de esto.
+Los historiales (`ideas/*/history`, `candidates`, `data`) son locales (`.gitignore`).
+
 ## Sprint 6+ (Planned) — Data Enrichment & Model Upgrade
 
 **Goal:** Improve prediction quality with richer data sources. Improvements go live immediately since the app is already deployed.
