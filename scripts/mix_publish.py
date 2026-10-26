@@ -35,7 +35,13 @@ def update() -> list[str]:
     (ROOT / "build").mkdir(exist_ok=True)
     (ROOT / "build" / "mix_history_bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
     encrypt_file(ROOT / "build" / "mix_history_bundle.json", HIST_ENC)
-    return ["data/mix_picks.enc", "data/mix_history.enc"]
+    files = ["data/mix_picks.enc", "data/mix_history.enc"]
+    try:  # 'Resultados' tab data; its failure must not stop the mixed combos
+        import results_publish
+        files += results_publish.update()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("results tab data skipped: %s", exc)
+    return files
 
 
 if __name__ == "__main__":

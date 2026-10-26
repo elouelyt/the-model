@@ -30,6 +30,7 @@ SITE_ENC = ROOT / "data" / "site.enc"
 NBA_ENC = ROOT / "data" / "nba_picks.enc"
 NFL_ENC = ROOT / "data" / "nfl_picks.enc"
 MIX_ENC = ROOT / "data" / "mix_picks.enc"
+RESULTS_ENC = ROOT / "data" / "results.enc"
 SALT = "8669795df810e4666e526fa8a931d9da"
 STATICRYPT = "staticrypt@3.5.4"
 
@@ -82,6 +83,14 @@ def main() -> None:
             tabs.append(("Combinadas", generate_combos.build(json.loads(mix_path.read_text(encoding="utf-8")))))
         except Exception as exc:  # noqa: BLE001
             print(f"Combinadas tab skipped: {exc}")
+    if RESULTS_ENC.exists():
+        try:  # the 'Resultados' tab (how the picks are doing); its failure must not break the panel
+            import generate_results
+            res_path = BUILD / "results.json"
+            decrypt_file(RESULTS_ENC, res_path)
+            tabs.append(("Resultados", generate_results.build(json.loads(res_path.read_text(encoding="utf-8")))))
+        except Exception as exc:  # noqa: BLE001
+            print(f"Resultados tab skipped: {exc}")
     if mma:
         tabs.append(("MMA", mma))
 

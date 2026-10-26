@@ -6,6 +6,7 @@ on:
       - "data/nba_picks.enc"   # pushed from the local NBA refresh
       - "data/nfl_picks.enc"   # pushed from the local NFL refresh
       - "data/mix_picks.enc"   # mixed NBA+NFL combos
+      - "data/results.enc"     # results tab
   workflow_dispatch:
 
 concurrency:

@@ -41,3 +41,4 @@ nuevas_ideas/**/__pycache__/
 nuevas_ideas/archive/
 # nfl: local-only raw data
 nfl/data/
+data/results.json
