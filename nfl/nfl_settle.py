@@ -77,17 +77,20 @@ class Espn:
                         p.update({"rushing yards": num("YDS"), "rushing attempts": num("CAR")})
                     elif block["name"] == "receiving":
                         p.update({"receiving yards": num("YDS"), "receptions": num("REC")})
+        scores = [float(c["score"]) for c in comp["competitors"]]
+        players["__game"] = {"margin": abs(scores[0] - scores[1]), "total": sum(scores)}
         self._boxes[event_id] = players
         return players
 
 
 def settle_leg(leg: dict, players: dict) -> dict:
+    game = players.get("__game", {})
     p = players.get(norm_name(leg["player"]))
     if p is None:
-        return {"status": "void", "actual": None, "min": None, "margin": None, "total": None}
+        return {"status": "void", "actual": None, "min": None, "margin": game.get("margin"), "total": game.get("total")}
     actual = p.get(leg["stat"], 0.0)
     won = actual > leg["line"] if leg["side"] == "Over" else actual < leg["line"]
-    return {"status": "won" if won else "lost", "actual": actual, "min": None, "margin": None, "total": None}
+    return {"status": "won" if won else "lost", "actual": actual, "min": None, "margin": game.get("margin"), "total": game.get("total")}
 
 
 def settle_file(path: Path, espn: Espn) -> int:
@@ -102,7 +105,7 @@ def settle_file(path: Path, espn: Espn) -> int:
                 legs.setdefault(l["key"], l)
     by_game: dict[tuple, list] = defaultdict(list)
     for key, leg in legs.items():
-        if key not in results:
+        if key not in results or results[key].get("margin") is None:   # also re-settle legs stored before the margin was kept
             by_game[(leg["game"], leg["start"])].append((key, leg))
     done = 0
     for (game, start), items in by_game.items():

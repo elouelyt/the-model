@@ -13,7 +13,7 @@ from pathlib import Path
 
 import requests
 
-OUT = Path(__file__).resolve().parent / "history"
+OUT = Path(__file__).resolve().parent / "data"
 URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={d}"
 
 
