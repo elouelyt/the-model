@@ -1118,6 +1118,20 @@
             }
           ],
           "resolved": false
+        },
+        "26": {
+          "parlays": [
+            {
+              "legs": [
+                "Arthur Fery"
+              ],
+              "stake_odds": 2.04,
+              "best_odds": 2.04,
+              "won": null,
+              "opponent": "Jacob Fearnley"
+            }
+          ],
+          "resolved": false
         }
       }
     }
