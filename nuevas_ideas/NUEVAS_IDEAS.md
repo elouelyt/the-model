@@ -250,3 +250,16 @@ Leído por API y su web (`aliu2298.github.io/edge-machine`, abierta en una pesta
   Resultado global 14 días: 132 de 221 acertadas con precios medios ~70c (59,7 % frente a ~70 % esperado) = por debajo del precio. Kalshi es un exchange regulado en EE. UU.; no sabemos si es accesible para el usuario.
 - **No son props de jugador** (NBA solo totales por equipo y moneyline), así que no sustituye lo nuestro.
 - Idea 26 (solo nota, sin tocar la web): añadir a nuestro informe interno "ganadas vs esperadas" con z, y medir el DESLIZAMIENTO de precio (cuota publicada vs cuota real de Stake al apostar) con las apuestas que registra la extensión.
+
+## Repo georgedouzas/sports-betting (2026-10-28): legítimo y bien hecho; aporta datos y rigor, no beneficio
+Leído por API y PyPI (nada instalado ni ejecutado). MIT, 824 estrellas, creado en 2019, 570 commits del autor, última versión 0.15.1 (28/07/2026), paquete en PyPI con dependencias normales
+(numpy, pandas, scikit-learn, aiohttp, pandera, pyarrow; opcionales mcp y playwright). Aviso menor: usa `cloudpickle`, así que nunca cargar dataloaders/modelos guardados que vengan de terceros.
+- **Qué es**: caja de herramientas Python/CLI/servidor MCP para agentes: un *dataloader* une una fuente de estadísticas y una de cuotas (p. ej. football-data.co.uk, gratis; OddsApi, de pago),
+  y un *bettor* envuelve cualquier modelo de scikit-learn, hace backtest y devuelve apuestas de valor (p̂ > 1/cuota). Fútbol y baloncesto.
+- **Rigor**: documenta la regla de oro "el modelo solo puede usar lo que sabría en el instante de apostar" y confiesa que una versión anterior de su README mostraba un backtest del +269 % por fuga
+  de información (le daba el marcador del descanso a una apuesta pre-partido). Pruebas de fuga en `tests/dataloaders/test_leakage.py`.
+- **Peligro**: el módulo `execution` coloca apuestas reales manejando la web de la casa con un navegador (ellos mismos avisan: incumple los términos de la mayoría de casas y arriesga la cuenta y el saldo).
+  NO usar con Stake; no entra en nuestro método (solo lectura, nunca hacer clic por el usuario).
+- **Idea 27 (a probar, antes de gastar nada)**: prueba histórica barata de "ventaja por precio" en fútbol con las cuotas gratuitas de football-data.co.uk (varias casas "soft" + cierre de Pinnacle):
+  si la mejor cuota entre casas, frente a la probabilidad sin margen del cierre de Pinnacle, da EV > 0 sostenido en miles de partidos por liga y mercado. Sería la fase 0 de medir DÓNDE hay ventaja
+  (por deporte/mercado) con años de datos en vez de semanas. Pendiente de decidir; descargaría ficheros CSV públicos (datos, no código).
