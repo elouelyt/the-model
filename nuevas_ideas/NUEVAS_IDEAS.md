@@ -239,3 +239,14 @@ normales con millones de descargas, sin `postinstall` (sin señales de malware, 
   Varias tablas imprimen "+Infinity %" (error de cálculo), así que no son fiables.
 - Útil como contraejemplo de lo que NO hacer: elegir reglas mirando resultados con pocas decenas de apuestas. Nuestro protocolo (>= 200 liquidadas, IC95 % del CLV sharp > 0, penalización por nº de pruebas) lo evita.
 - Idea 25 (solo nota): "dinero sharp concentrado" (carteras/órdenes de Novig, ProphetX, Polymarket) como señal extra frente a Stake; no accesible ni demostrada hoy.
+
+## Repo aliu2298/edge-machine + su web en vivo (2026-10-27): ejemplo de buena disciplina, pero en Kalshi
+Leído por API y su web (`aliu2298.github.io/edge-machine`, abierta en una pestaña aparte del Chrome de depuración y cerrada después; la pestaña de Stake no se tocó). No se ejecutó su código (Python con Actions en la nube).
+- **Qué es**: diario de apuestas EN PAPEL sobre mercados de predicción de **Kalshi** (precios en céntimos), no casas de apuestas: reglas de "favorito 70-80c", "casi seguro", lado barato con venta automática,
+  fútbol/tenis/cripto/commodities/economía/NBA (totales por equipo y 1T, moneyline). 503 archivos, 100 commits de una sola cuenta, cron de GitHub Actions + VPS para precios de cierre.
+- **Lo bueno** (para copiar el método): cada señal se registra ANTES del evento al precio disponible (las tardías se rechazan); comisión del 7 % incluida; tabla "ganadas vs ganadas esperadas por el precio" con z;
+  línea base ciega y control; z agrupado por noche; "se lee a partir de 30 liquidadas"; no declara ventaja por el recuento bruto; carriles perdedores se retiran a la vista (R2 -41 %, "cheap rungs" -37,8 % en 145).
+- **Lo malo**: 43 reglas probadas a la vez y las "Promising" son +20-40 % de ROI con 10-25 apuestas y z de 1-1,8 (ruido típico de probar muchas reglas); los carriles de valor de NBA en producción tienen n=19-29.
+  Resultado global 14 días: 132 de 221 acertadas con precios medios ~70c (59,7 % frente a ~70 % esperado) = por debajo del precio. Kalshi es un exchange regulado en EE. UU.; no sabemos si es accesible para el usuario.
+- **No son props de jugador** (NBA solo totales por equipo y moneyline), así que no sustituye lo nuestro.
+- Idea 26 (solo nota, sin tocar la web): añadir a nuestro informe interno "ganadas vs esperadas" con z, y medir el DESLIZAMIENTO de precio (cuota publicada vs cuota real de Stake al apostar) con las apuestas que registra la extensión.

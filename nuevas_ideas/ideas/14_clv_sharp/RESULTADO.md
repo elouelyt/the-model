@@ -1,5 +1,5 @@
 # Idea 14 - CLV contra casas sharp
-Generado 2026-10-27 21:52. Líneas con 2+ tandas separadas >= 30 min: 854 (de 2936).
+Generado 2026-10-27 22:40. Líneas con 2+ tandas separadas >= 30 min: 854 (de 2936).
 | Grupo | Líneas | Cambio de prob. justa (pts) | EV con prob. de cierre | % con EV > 0 |
 |---|---|---|---|---|
 | todas las líneas | 854 | +0.00 | -9.11 % | 14% |

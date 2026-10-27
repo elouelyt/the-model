@@ -1,6 +1,6 @@
 # Idea 15 - consenso ponderado por margen
 
-Generado 2026-10-27 21:52. Líneas liquidadas con >= 2 casas: 457.
+Generado 2026-10-27 22:40. Líneas liquidadas con >= 2 casas: 457.
 
 | Método | Brier (menor = mejor) | Log-loss |
 |---|---|---|
