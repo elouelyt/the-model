@@ -157,3 +157,17 @@ Prueba hecha sobre el histórico (no es producción): combinadas de 3 piernas, W
 - Piernas < 1,7: NBA 56 combinadas, -6,2 u; NFL 24, +17,6 u; juntas 83 combinadas, 29 % ganadas, +3,8 u (ROI +5 %).
 - Piernas < 1,9: NBA 75 combinadas, -9,6 u; NFL 32, +28,0 u; juntas 109 combinadas, 26 % ganadas, +0,7 u (ROI +1 %).
 Lectura: el corte se eligió mirando los datos (sesgo); en NBA no mejora, el beneficio sale del NFL de un domingo. Pendiente: prueba en papel 5-7 días antes de tocar nada.
+
+## Ideas 14-17 - De 8 vídeos de apuestas (2026-10-27; transcripciones en `nuevas_ideas/videos/`)
+Vídeos: over/under fútbol con tiros y córners (CK7LyOODP6c), IA como herramienta no oráculo (ykICNBiFubg), 5 sitios donde hay valor (MWD59aG-cZo),
+"over 1,5 goles 87 %" (rhu6hanYgJA), 10 estrategias (AgtmcDtnePo), gurús de prop firms (B9VRtVrvpE8, no es de apuestas), por qué las combinadas pierden y casas
+soft/sharp (oKQjHLLoGb4), empezar de cero con +EV/dinero sharp (tkI5MOZ9gvQ). Todos coinciden en: apostar precio, no resultado; validar con CLV; no juzgar por una apuesta.
+Datos nuestros comprobados: la cuota de Stake de una combinada de jugadores de partidos distintos = producto de las cuotas de las piernas (6,33 real vs 6,35 producto;
+4,84 vs 4,83), sin margen extra de combinada. CLV actual contra el cierre de Stake: n=369, media -0,02 %, 21 % a favor / 16 % en contra (no concluyente).
+- Idea 14: CLV contra casas SHARP. Guardar la probabilidad justa de FanDuel/Pinnacle/Novig en la última tanda antes del inicio y compararla con la del momento de la apuesta.
+  Es la validación más rápida (días, no meses). Pendiente de implementar (hay que registrar la tanda previa al inicio por pierna).
+- Idea 15: consenso ponderado por margen. Hoy el EV usa la media de probabilidades sin margen de las casas con la misma línea; ponderar cada casa por 1/margen (ancho entre over y under)
+  y exigir que no discrepen entre sí. Prueba en papel 5-7 días comparando acierto de las piernas que cambian de elegidas a no elegidas.
+- Idea 16: tamaño por confianza (fracción de Kelly, 0,5-2,5 unidades según EV) en vez de importe fijo. Solo en papel.
+- Idea 17: noticias tardías (alineaciones/lesiones) = líneas de Stake desfasadas: tanda extra ~45 min antes del primer partido y excluir dudosos/descartados (ESPN injuries).
+No se añade: filtros por porcentaje de acierto (vídeo 87 %: acierto no es valor), arbitraje/match betting y trading (necesitan exchange y varias casas), prop firms (no aplica).
