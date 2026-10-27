@@ -142,3 +142,11 @@ Herramienta, no cambio de reglas. La extensión 1.3.0 (`nuevas_ideas/stake-guide
 la apuesta, la guarda en el repo privado `elouelyt/the-model-bets`. `scripts/real_bets.py` la descarga cada mañana (tarea `TheModel-Resultados`), la liquida
 con ESPN (piernas anuladas fuera, cuota recalculada) y entra en «Mis apuestas reales» de la pestaña Resultados. Pendiente: crear el repo y el token
 (`LEEME_REGISTRO.md`) y probar con la primera apuesta real. Probado: lectura del cupón en vivo y liquidación con un registro de prueba.
+
+## Idea 12 - Del vídeo "betting explained" (youtube EPwzirlb2rI, 2026-10-27): qué se puede aprovechar
+Vídeo de iniciación (programa deportivo patrocinado por DraftKings): momios, moneyline, spread, totales, parlays, unidades. No habla de valor esperado ni de ventaja.
+Lo único aplicable, anotado como posible prueba (NO implementado):
+- **Tamaño de la apuesta (unidad)**: 1-5 % del banco por apuesta, constante. Para el modelo (cuotas 5-7, acierto ~19 %) 1 % es lo prudente; hoy se apuesta ~0,25 $ sin banco definido.
+- **Mercados de partido** (total de puntos, spread, moneyline) Stake vs Pinnacle sin margen, con el mismo método de valor que las piernas de jugador. Sería una prueba en papel de 5-7 días
+  con combinadas de 2-3 patas de partidos distintos; ya lo cubre en parte la idea 10 (moneyline).
+- Lo demás ya lo hace el modelo: anuladas/empates se quitan de la combinada y la cuota se recalcula; líneas con .5 (sin empate).
