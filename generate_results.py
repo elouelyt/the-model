@@ -109,6 +109,37 @@ def mine_section(mine: dict) -> str:
             "(suele ser algo más baja que la del panel). Las perdidas se cuentan sin detalle.</p>")
 
 
+def all_section(doc: dict) -> str:
+    """Everything the model recommends, NBA + NFL + mixed, day by day (without the 23/10 old-rules day): combos you can bet,
+    paper combos, and every single leg as a flat 1 u bet."""
+    days: dict[str, dict] = {}
+    for key in ("NBA", "NFL", "Mezcla"):
+        for d in (doc.get(key) or {}).get("days", []):
+            if d["baseline"]:
+                continue
+            r = days.setdefault(d["date"], dict(bn=0, bw=0, bp=0.0, tn=0, tw=0, tp=0.0, ln=0, lp=0.0, sn=0, sp=0.0))
+            r["bn"] += d["bettable"]["n"]; r["bw"] += d["bettable"]["won"]; r["bp"] += d["bettable"]["profit"]
+            r["tn"] += d["tracking"]["n"]; r["tw"] += d["tracking"]["won"]; r["tp"] += d["tracking"]["profit"]
+            if d["legs"].get("n"):
+                r["ln"] += d["legs"]["n"]; r["lp"] += d["legs"]["n"] * d["legs"]["roi"]
+            if d["legs54"].get("n"):
+                r["sn"] += d["legs54"]["n"]; r["sp"] += d["legs54"]["n"] * d["legs54"]["roi"]
+    if not days:
+        return ""
+    tot = {k: sum(r[k] for r in days.values()) for k in next(iter(days.values()))}
+
+    def line(label: str, r: dict) -> list[str]:
+        return [label, f'{r["bw"]}/{r["bn"]}', units(r["bp"]), f'{r["tw"]}/{r["tn"]}', units(r["tp"]),
+                f'{r["sn"]}', units(r["sp"]), f'{r["ln"]}', units(r["lp"])]
+
+    rows = [line(date_es(dt), r) for dt, r in sorted(days.items(), reverse=True)]
+    rows.append(line("<b>Total</b>", tot))
+    return ("<h2>Todas las apuestas del modelo (NBA + NFL + mezcla)</h2>" + table(
+        ["Día", "Combinadas apostables", "Resultado", "Combinadas en papel", "Resultado", "Piernas Win ≥ 54 %", "1 u c/u", "Todas las piernas", "1 u c/u"], rows) +
+        '<p class="note">Cada pierna cuenta como una apuesta simple de 1 u con la cuota guardada. Las combinadas de NBA, NFL y mezcla comparten piernas: '
+        "no se pueden sumar como si fueran apuestas independientes.</p>")
+
+
 def build(doc: dict) -> str:
     nba, nfl, mix = doc.get("NBA"), doc.get("NFL"), doc.get("Mezcla")
     tiles = []
@@ -132,7 +163,7 @@ def build(doc: dict) -> str:
              "(incluyen partidos ya empezados o reglas alternativas) y no se apuestan. Resultado en unidades, con 1 u por combinada y la cuota guardada al "
              "publicarla; una pierna anulada se quita de la combinada. El 23/10 se jugó con las reglas antiguas: se muestra aparte y no entra en los totales. "
              "Son pocos días: una racha buena o mala no demuestra nada todavía.</p>")
-    body = (head + f'<div class="tiles">{"".join(tiles)}</div>' + notes + mine_section(mine) + sport_section("NBA", nba) + sport_section("NFL", nfl) +
+    body = (head + f'<div class="tiles">{"".join(tiles)}</div>' + notes + all_section(doc) + mine_section(mine) + sport_section("NBA", nba) + sport_section("NFL", nfl) +
             sport_section(MIX, mix, "Las mezcladas repiten piernas de las combinadas de NBA y NFL: no suman como resultados independientes."))
     return (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f"<style>{CSS}</style></head><body><main>{body}</main></body></html>")
