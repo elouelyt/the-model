@@ -171,3 +171,11 @@ Datos nuestros comprobados: la cuota de Stake de una combinada de jugadores de p
 - Idea 16: tamaño por confianza (fracción de Kelly, 0,5-2,5 unidades según EV) en vez de importe fijo. Solo en papel.
 - Idea 17: noticias tardías (alineaciones/lesiones) = líneas de Stake desfasadas: tanda extra ~45 min antes del primer partido y excluir dudosos/descartados (ESPN injuries).
 No se añade: filtros por porcentaje de acierto (vídeo 87 %: acierto no es valor), arbitraje/match betting y trading (necesitan exchange y varias casas), prop firms (no aplica).
+
+## Vídeo 9 - "IA como becario" (youtube anzaEtg0qKk, Unabated, 2026-10-27; transcripción en `nuevas_ideas/videos/`)
+Cinco usos de la IA que no son "dime a quién apostar": vigilar lesiones/alineaciones, tracker que liquida con ESPN y calcula CLV contra el cierre de casas sharp, limpiar y cruzar datos,
+tiempo/meteorología (API gratuita del National Weather Service), y alertas en vivo (ejemplo: baloncesto universitario con ambos equipos en bonus de faltas en la 1ª parte).
+- Refuerza idea 14 (CLV contra casas sharp) y idea 17 (lesiones/alineaciones: en baloncesto los minutos lo son todo).
+- Idea 18 (nueva, solo papel): meteorología para el NFL (viento/lluvia/frío en partidos al aire libre) como filtro de piernas de pase y yardas; comprobar si las piernas Over de pase/yardas
+  con viento fuerte aciertan menos que lo esperado. El propio vídeo avisa de que el mercado ya lo incorpora en buena parte.
+- No aplica: apuestas en vivo (requieren atención y rapidez; fuera de nuestro método).
