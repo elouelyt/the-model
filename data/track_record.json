@@ -1132,20 +1132,6 @@
             }
           ],
           "resolved": true
-        },
-        "27": {
-          "parlays": [
-            {
-              "legs": [
-                "Frances Tiafoe"
-              ],
-              "stake_odds": 1.82,
-              "best_odds": 1.82,
-              "won": null,
-              "opponent": "Lorenzo Musetti"
-            }
-          ],
-          "resolved": false
         }
       }
     }
