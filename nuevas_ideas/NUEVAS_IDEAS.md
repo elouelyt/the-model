@@ -263,3 +263,11 @@ Leído por API y PyPI (nada instalado ni ejecutado). MIT, 824 estrellas, creado 
 - **Idea 27 (a probar, antes de gastar nada)**: prueba histórica barata de "ventaja por precio" en fútbol con las cuotas gratuitas de football-data.co.uk (varias casas "soft" + cierre de Pinnacle):
   si la mejor cuota entre casas, frente a la probabilidad sin margen del cierre de Pinnacle, da EV > 0 sostenido en miles de partidos por liga y mercado. Sería la fase 0 de medir DÓNDE hay ventaja
   (por deporte/mercado) con años de datos en vez de semanas. Pendiente de decidir; descargaría ficheros CSV públicos (datos, no código).
+
+### Resultado de la idea 27 (2026-10-28): fútbol histórico, 44.470 partidos, 12 ligas, 2014-15 a 2024-25
+Datos: 132 CSV públicos de football-data.co.uk descargados a una carpeta temporal (16 MB). Código en `ideas/27_futbol_historico/run.py`, tabla en su `RESULTADO.md`.
+- Apostar a ciegas en Bet365 cuesta -5,67 % de EV frente a la probabilidad de cierre de Pinnacle (el margen).
+- Regla "Bet365 paga más que Pinnacle en el mismo momento" (EV > 2 %), 1X2: 1.822 apuestas en 11 temporadas (~165 al año entre todas las ligas), EV con la prob. de cierre **+1,8 %**, ROI realizado +9,8 % (z 1,58, no
+  significativo). Hay señal pequeña de que el precio blando queda atrás del sharp; con umbral > 0 % el EV de cierre cae a +0,6 % (3.685 apuestas).
+- "Mejor precio entre casas" parece mejor en EV de cierre (+2,2 %) pero su ROI realizado es -1,2 % (z -0,9): ese máximo incluye cuotas obsoletas o erróneas que no se pueden coger.
+- Lectura: la ventaja de comprar caro contra el sharp existe en fútbol pero es de ~+2 % y de pocas apuestas; con 100 EUR por apuesta serían ~340 EUR al año. No es una vía para vivir de ello, y Bet365 limita a quien gana.

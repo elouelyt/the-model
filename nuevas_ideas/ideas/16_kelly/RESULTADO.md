@@ -1,6 +1,6 @@
 # Idea 16 - tamaño de apuesta por confianza (Kelly 1/4)
 
-Generado 2026-10-27 22:40. Banco de referencia 100 u, límites 0.25-2.5 u por apuesta.
+Generado 2026-10-27 23:19. Banco de referencia 100 u, límites 0.25-2.5 u por apuesta.
 
 | Deporte | Combinadas | Plano: u apostadas / resultado | Kelly: u apostadas / resultado | ROI plano | ROI Kelly |
 |---|---|---|---|---|---|
