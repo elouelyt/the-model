@@ -150,3 +150,10 @@ Lo único aplicable, anotado como posible prueba (NO implementado):
 - **Mercados de partido** (total de puntos, spread, moneyline) Stake vs Pinnacle sin margen, con el mismo método de valor que las piernas de jugador. Sería una prueba en papel de 5-7 días
   con combinadas de 2-3 patas de partidos distintos; ya lo cubre en parte la idea 10 (moneyline).
 - Lo demás ya lo hace el modelo: anuladas/empates se quitan de la combinada y la cuota se recalcula; líneas con .5 (sin empate).
+
+## Idea 13 - Combinadas solo con piernas de cuota baja (retrospectivo 24-26/10, 2026-10-27)
+Prueba hecha sobre el histórico (no es producción): combinadas de 3 piernas, Win >= 54 %, una pierna por jugador, máx. 2 por partido, piernas sin repetir entre combinadas.
+- Piernas < 1,5: NBA 19 combinadas, 3 ganadas, -9,9 u; NFL 8 combinadas, 4 ganadas, +4,2 u; juntas 28 combinadas, 7 ganadas, -6,9 u (ROI -25 %).
+- Piernas < 1,7: NBA 56 combinadas, -6,2 u; NFL 24, +17,6 u; juntas 83 combinadas, 29 % ganadas, +3,8 u (ROI +5 %).
+- Piernas < 1,9: NBA 75 combinadas, -9,6 u; NFL 32, +28,0 u; juntas 109 combinadas, 26 % ganadas, +0,7 u (ROI +1 %).
+Lectura: el corte se eligió mirando los datos (sesgo); en NBA no mejora, el beneficio sale del NFL de un domingo. Pendiente: prueba en papel 5-7 días antes de tocar nada.
