@@ -117,8 +117,14 @@ def main() -> list[dict]:
     old = {b["id"]: b for b in json.loads(OUT.read_text(encoding="utf-8"))} if OUT.exists() else {}
     nba, nfl = nba_settle.Espn(), nfl_settle.Espn()
     out = []
+    seen: list[tuple[str, datetime]] = []       # the extension can record one bet twice (click + receipt): same legs and amount within 3 min
     for f in files:
         bet = json.loads(f.read_text(encoding="utf-8"))
+        sig = "|".join(sorted(f'{l["player"]}{l["stat"]}{l["side"]}{l["line"]}' for l in bet["legs"])) + f'|{bet.get("amount")}'
+        when = datetime.fromisoformat(bet["placed_at"].replace("Z", "+00:00"))
+        if any(s == sig and abs((when - t).total_seconds()) < 180 for s, t in seen):
+            continue
+        seen.append((sig, when))
         prev = old.get(bet["id"])
         if prev and prev["status"] in ("won", "lost", "void"):
             out.append(prev)
