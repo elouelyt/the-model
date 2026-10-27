@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import BASE, ROOT  # noqa: E402
 
-FILES = ["nba_stake_cache.json", "nba_fanduel_cache.json", "nba_pinnacle_cache.json", "nba_bettingpros_cache.json", "nba_picks.json"]
+FILES = ["nba_stake_cache.json", "nba_fanduel_cache.json", "nba_pinnacle_cache.json", "nba_bettingpros_cache.json", "nba_bettingpros_web_cache.json", "nba_picks.json"]
 ARCHIVE = BASE / "archive" / "batches"
 
 

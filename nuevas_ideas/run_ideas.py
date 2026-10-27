@@ -14,7 +14,7 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent
 
 
-NFL_IDEAS = ("03", "06", "07", "08", "09")   # ideas that make sense with the single reference book NFL has (02 and 04 are NBA-only)
+NFL_IDEAS = ("03", "06", "07", "08", "09", "18")   # ideas that make sense with the single reference book NFL has (02 and 04 are NBA-only)
 
 
 def run_one(run: Path, sport: str) -> None:

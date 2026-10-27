@@ -179,3 +179,10 @@ tiempo/meteorología (API gratuita del National Weather Service), y alertas en v
 - Idea 18 (nueva, solo papel): meteorología para el NFL (viento/lluvia/frío en partidos al aire libre) como filtro de piernas de pase y yardas; comprobar si las piernas Over de pase/yardas
   con viento fuerte aciertan menos que lo esperado. El propio vídeo avisa de que el mercado ya lo incorpora en buena parte.
 - No aplica: apuestas en vivo (requieren atención y rapidez; fuera de nuestro método).
+
+### Implementadas el 2026-10-27 (todo en papel, sin tocar producción ni la web)
+Carpetas `ideas/14_clv_sharp`, `15_consenso_ponderado`, `16_kelly`, `17_noticias_tardias`, `18_clima_nfl`, cada una con `run.py` y `RESULTADO.md`; `run_ideas.py` las ejecuta con el resto
+(18 solo en NFL). Primeros resultados: 14) 9 líneas recomendables con 2+ tandas, EV con prob. de cierre +3,8 % (muestra mínima); 15) ponderar por margen no cambia nada
+(Brier 0,2452 igual, 457 líneas); 16) Kelly 1/4 sobre las 29 combinadas: -2,3 u frente a +7,4 u plano (muestra mínima, solo muestra cómo se habría comportado);
+17) hoy 7 piernas del panel con jugador en el parte de lesiones (p. ej. Ausar Thompson y Derrick White, Day-To-Day); 18) guarda la previsión del Panthers @ Packers (5 mph, 0 % lluvia).
+Falta registrar la tarea `TheModel-Ideas-Late` (23:15, tanda tardía): `C:\Users\ojiyo\Scripts\register_late_task.ps1`.
