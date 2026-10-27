@@ -136,3 +136,9 @@ Pendiente: comprobar si Stake expone el moneyline NBA en su API y compararlo con
 - 2026-10-25: creada la carpeta; ideas 02-08 con código; 01 en producción como familia de papel; 05 descartada con datos;
   tareas programadas nuevas; primer análisis de 6 vídeos.
 - 2026-10-25 (noche, 2): copia de seguridad fechada (`scripts/backup_data.py`), combinadas fijas se retiran si Stake quita una pierna, idea 10 (reembolso al descanso) medida.
+
+## Idea 11 - Registro automático de las apuestas reales (2026-10-27)
+Herramienta, no cambio de reglas. La extensión 1.3.0 (`nuevas_ideas/stake-guide-registro/`) lee el cupón de Stake (solo lectura) y, al confirmar Stake
+la apuesta, la guarda en el repo privado `elouelyt/the-model-bets`. `scripts/real_bets.py` la descarga cada mañana (tarea `TheModel-Resultados`), la liquida
+con ESPN (piernas anuladas fuera, cuota recalculada) y entra en «Mis apuestas reales» de la pestaña Resultados. Pendiente: crear el repo y el token
+(`LEEME_REGISTRO.md`) y probar con la primera apuesta real. Probado: lectura del cupón en vivo y liquidación con un registro de prueba.
