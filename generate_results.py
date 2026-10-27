@@ -93,21 +93,32 @@ def sport_section(name: str, b: dict | None, legs_note: str = "") -> str:
 def mine_section(mine: dict) -> str:
     if not mine:
         return ""
-    rows = [[date_es(d), str(m["placed"]), str(m["won"]), pct(m["won"] / m["placed"]), units(m["profit"]), pct(m["roi"], True)]
+    rows = [[date_es(d), str(m["placed"]), str(m["won"]), pct(m["won"] / m["placed"]) if m["placed"] else "–", units(m["profit"]),
+             pct(m["roi"], True) if m["placed"] else "–"] + ([str(m["pending"])] if any(x.get("pending") for x in mine.values()) else [])
             for d, m in sorted(mine.items(), reverse=True)]
     n = sum(m["placed"] for m in mine.values())
     w = sum(m["won"] for m in mine.values())
     p = sum(m["profit"] for m in mine.values())
-    if len(mine) > 1:
-        rows.append(["<b>Total</b>", f"<b>{n}</b>", f"<b>{w}</b>", f"<b>{pct(w / n)}</b>", f"<b>{units(p)}</b>", f"<b>{pct(p / n, True)}</b>"])
-    detail = "".join(
-        f'<details><summary>{date_es(d)}: combinadas ganadas ({len(m["winners"])})</summary>' + "".join(
-            f'<p>{w2["odds"]:.2f} · ' + " · ".join(escape(x) for x in w2["legs"]) +
-            (f'<br><span class="note">{escape(w2["note"])}</span>' if w2["note"] else "") + "</p>" for w2 in m["winners"]) + "</details>"
-        for d, m in sorted(mine.items(), reverse=True))
-    return ("<h2>Mis apuestas reales en Stake</h2>" + table(["Día", "Apostadas", "Ganadas", "Acierto", "Resultado (1 u c/u)", "ROI"], rows) + detail +
-            '<p class="note">Datos pegados a mano desde «Mis Apuestas» de Stake: solo las combinadas que apostaste, con la cuota que te dio Stake '
-            "(suele ser algo más baja que la del panel). Las perdidas se cuentan sin detalle.</p>")
+    show_pending = any(x.get("pending") for x in mine.values())
+    if len(mine) > 1 and n:
+        rows.append(["<b>Total</b>", f"<b>{n}</b>", f"<b>{w}</b>", f"<b>{pct(w / n)}</b>", f"<b>{units(p)}</b>", f"<b>{pct(p / n, True)}</b>"] + (["" ] if show_pending else []))
+
+    def bet_line(b: dict) -> str:
+        mark = {"won": "✓", "lost": "✗", "void": "·"}.get(b.get("status"), "…")
+        return f'<p>{mark} {b["odds"]:.2f} · ' + " · ".join(escape(x) for x in b["legs"]) + "</p>"
+
+    detail = ""
+    for d, m in sorted(mine.items(), reverse=True):
+        if m.get("all"):
+            detail += f'<details><summary>{date_es(d)}: todas las apuestas registradas ({len(m["all"])})</summary>' + "".join(bet_line(b) for b in m["all"]) + "</details>"
+        else:
+            detail += f'<details><summary>{date_es(d)}: combinadas ganadas ({len(m["winners"])})</summary>' + "".join(
+                f'<p>{w2["odds"]:.2f} · ' + " · ".join(escape(x) for x in w2["legs"]) +
+                (f'<br><span class="note">{escape(w2["note"])}</span>' if w2["note"] else "") + "</p>" for w2 in m["winners"]) + "</details>"
+    head = ["Día", "Apostadas", "Ganadas", "Acierto", "Resultado (1 u c/u)", "ROI"] + (["Pendientes"] if show_pending else [])
+    return ("<h2>Mis apuestas reales en Stake</h2>" + table(head, rows) + detail +
+            '<p class="note">Las apuestas que haces en Stake: las registradas por la extensión llevan la cuota que te dio Stake y todas las piernas; '
+            "las anteriores (25/10) se pegaron a mano y las perdidas no tienen detalle.</p>")
 
 
 STAT_ES = {"assists": "asistencias", "rebounds": "rebotes", "points": "puntos", "receptions": "recepciones", "assists+rebounds": "asist.+rebotes",

@@ -74,9 +74,39 @@ def sport_block(a: dict) -> dict:
             "tracking_total": summarize_combos([c for c in cur if c["tracking"]])}
 
 
-def mine() -> dict:
-    if not MINE.exists():
+REAL = ROOT / "nuevas_ideas" / "data" / "real_bets.json"
+
+
+def recorded() -> dict:
+    """Bets the extension recorded and scripts/real_bets.py settled (every bet, won or lost, with the real odds)."""
+    if not REAL.exists():
         return {}
+    days: dict[str, dict] = {}
+    for b in json.loads(REAL.read_text(encoding="utf-8")):
+        d = days.setdefault(b["day"], {"placed": 0, "won": 0, "profit": 0.0, "pending": 0, "winners": [], "all": []})
+        legs = [f'{l["player"]} {"Over" if l["side"] == "Over" else "Under"} {l["line"]} {l["stat"]}' + (" (ANULADA)" if l["status"] == "void" else "") for l in b["legs"]]
+        d["all"].append({"odds": b["odds"], "legs": legs, "status": b["status"]})
+        if b["status"] in ("won", "lost", "void"):
+            d["placed"] += 1
+            d["won"] += b["status"] == "won"
+            d["profit"] += b["profit_u"] or 0.0
+            if b["status"] == "won":
+                d["winners"].append({"odds": b["odds"], "legs": legs, "note": ""})
+        else:
+            d["pending"] += 1
+    return {k: {**v, "profit": round(v["profit"], 2), "roi": round(v["profit"] / v["placed"], 3) if v["placed"] else 0.0}
+            for k, v in days.items() if v["placed"] or v["pending"]}
+
+
+def mine() -> dict:
+    out = {}
+    if MINE.exists():
+        out = _manual()
+    out.update(recorded())
+    return out
+
+
+def _manual() -> dict:
     raw = json.loads(MINE.read_text(encoding="utf-8"))
     out = {}
     for day, d in raw.items():
