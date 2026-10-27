@@ -200,3 +200,13 @@ ni se ejecutó nada. Lo útil:
 - **Idea 20 - De-vig Shin** además de proporcional/potencia (idea 09): ellos usan Shin como estándar. Pendiente de añadir como variante en `09_devig_potencia`.
 - Disparador por lesión de titular -> volver a mirar las líneas (su `nba_injury`): refuerza la idea 17 (tanda tardía).
 - No aplica: motor de contenido, facturación, Discord, afiliados, simuladores de fútbol/hockey, y depender de The Odds API de pago.
+
+## Ideas 21-22 - Lectura completa del README de EdgeDesk (`nba/0.00012461.txt`, 903 líneas, 2026-10-27)
+- **Idea 21 - EV enorme = precio a verificar, no apuesta.** EdgeDesk marca "WATCH · PRICE ANOMALY" cuando el EV es muy alto y no sube la apuesta. En nuestros datos (24-26/10, NBA):
+  piernas con EV >= 10 %: 17 piernas, acierto 33 % frente a 54 % esperado, ROI -27 % (casi todas con < 3 casas de referencia). Prueba en papel: excluir de las combinadas las piernas con EV >= 10 %
+  salvo que tengan >= 3 casas. Muestra pequeña, no tocar producción.
+- **Idea 22 - parte de lesiones oficial de la NBA + probabilidad de jugar.** Su fuente primaria es el PDF oficial (ak-static.cms.nba.com/referee/injury/Injury-Report_AAAA-MM-DD_HH[_MM]AM|PM.pdf),
+  con ESPN solo de reserva (ESPN "Day-To-Day" = desconocido). Probabilidades de jugar registradas por ellos: OUT 0, DOUBTFUL 0,25, QUESTIONABLE 0,50, PROBABLE 0,90, DISPONIBLE 1.
+  Para la idea 17: usar esas probabilidades para estimar cuántas piernas se anularían, y leer el PDF oficial (más completo que ESPN).
+- Confirmaciones: su "staking engine" (Kelly 1/4) admite "un motor de tamaño que no bate al importe plano es decoración; hoy no lo hace" = lo que salió en la idea 16; y sus notas honestas dicen
+  que la ventaja de comparar precios blandos con el consenso sharp es "real pero fina" y que el registro de CLV de unos cientos de apuestas es el veredicto = nuestro protocolo.
