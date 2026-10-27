@@ -219,3 +219,12 @@ frente a la cuota; Kelly completo opcional; app Flask. Se leyó README, `notes.t
 - Buena práctica que sí tiene: validación de series temporales (TimeSeriesSplit), último 10 % como test y calibración sigmoide. Si algún día entrenamos un modelo propio, usar eso.
 - No aplica: no tiene props de jugador, ni Stake, ni combinadas; Kelly completo es más agresivo que lo que ya probamos (idea 16, peor que importe plano).
 - Idea 23 (solo nota, sin implementar): un modelo de partido calibrado podría alimentar la promo "reembolso al descanso" (idea 10) para estimar quién llega a +16 al descanso; hoy no compensa el esfuerzo.
+
+## Repo ccooddeerr/world-cup-2026-ai-predictor (2026-10-27): NO usar, dependencia maliciosa
+Se leyó solo por la API de GitHub (nada instalado ni ejecutado). 1 estrella y 248 forks, creado 09/06/2026, 75 commits de los cuales 68 de una sola cuenta.
+- `package.json` y `src/utils/redis.ts` importan **`ioredis-os`** (no `ioredis`). En npm ese paquete es hoy un "security holding package" (0.0.1-security, creado 16/06/2026, sin mantenedores):
+  la señal típica de que npm retiró un paquete malicioso (typosquat de ioredis). Un `npm install` de este repo habría ejecutado/descargado código ajeno. **No clonar ni instalar.**
+- `scripts/build-history.sh` (58 KB) fabrica el historial de commits uno a uno (relleno artificial de actividad).
+- Lo "útil" que enseña es casi nada: prior Elo con ventaja de local de 65 puntos y empate fijo 25 %, y una mezcla 65 % estadística + 35 % de un LLM (gpt-4o-mini) al que se le pide una probabilidad
+  "con conocimiento general de fútbol". No hay cuotas, EV, validación ni resultados. Un LLM no tiene información que el mercado no tenga ya (vídeo de Pizzola).
+- Idea 24 (solo nota): el prior Elo + mezcla con el mercado sí es razonable como base para tenis (superficie) si algún día medimos tenis en la fase de medición por deporte.
