@@ -94,7 +94,7 @@ def mine_section(mine: dict) -> str:
     if not mine:
         return ""
     rows = [[date_es(d), str(m["placed"]), str(m["won"]), pct(m["won"] / m["placed"]) if m["placed"] else "–", units(m["profit"]),
-             pct(m["roi"], True) if m["placed"] else "–"] + ([str(m["pending"])] if any(x.get("pending") for x in mine.values()) else [])
+             pct(m["roi"], True) if m["placed"] else "–"] + ([str(m.get("pending", 0))] if any(x.get("pending") for x in mine.values()) else [])
             for d, m in sorted(mine.items(), reverse=True)]
     n = sum(m["placed"] for m in mine.values())
     w = sum(m["won"] for m in mine.values())
@@ -116,9 +116,16 @@ def mine_section(mine: dict) -> str:
                 f'<p>{w2["odds"]:.2f} · ' + " · ".join(escape(x) for x in w2["legs"]) +
                 (f'<br><span class="note">{escape(w2["note"])}</span>' if w2["note"] else "") + "</p>" for w2 in m["winners"]) + "</details>"
     head = ["Día", "Apostadas", "Ganadas", "Acierto", "Resultado (1 u c/u)", "ROI"] + (["Pendientes"] if show_pending else [])
+    if any(x.get("staked_usd") for x in mine.values()):
+        head += ["Apostado ($)", "Resultado ($)"]
+        for r, (d, m) in zip(rows, sorted(mine.items(), reverse=True)):
+            r += [f'{m.get("staked_usd", 0):.2f}' if m.get("staked_usd") else "–", f'<span class="{cls(m.get("profit_usd"))}">{m.get("profit_usd", 0):+.2f}</span>' if m.get("staked_usd") else "–"]
+        if len(rows) > len(mine):                     # the total row
+            sa = sum(m.get("staked_usd", 0) for m in mine.values()); sp = sum(m.get("profit_usd", 0) for m in mine.values())
+            rows[-1] += [f"<b>{sa:.2f}</b>", f'<b class="{cls(sp)}">{sp:+.2f}</b>']
     return ("<h2>Mis apuestas reales en Stake</h2>" + table(head, rows) + detail +
             '<p class="note">Las apuestas que haces en Stake: las registradas por la extensión llevan la cuota que te dio Stake y todas las piernas; '
-            "las anteriores (25/10) se pegaron a mano y las perdidas no tienen detalle.</p>")
+            "las anteriores (25/10) se pegaron a mano y las perdidas no tienen detalle. Los dólares se calculan con el precio de BNB (Binance) en el minuto de la apuesta.</p>")
 
 
 STAT_ES = {"assists": "asistencias", "rebounds": "rebotes", "points": "puntos", "receptions": "recepciones", "assists+rebounds": "asist.+rebotes",

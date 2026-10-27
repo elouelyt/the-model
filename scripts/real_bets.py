@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import requests
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "nfl"))
@@ -70,6 +72,17 @@ def find_event(espn, teams: list[str], placed: datetime):
     return None
 
 
+def bnb_usd(placed: datetime) -> float | None:
+    """BNB/USDT price (Binance public candle, no key) at the minute the bet was placed. The user bets in BNB."""
+    try:
+        r = requests.get("https://api.binance.com/api/v3/klines", timeout=15,
+                         params={"symbol": "BNBUSDT", "interval": "1m", "startTime": int(placed.timestamp() * 1000), "limit": 1})
+        return float(r.json()[0][4])
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("no BNB price: %s", str(exc)[:80])
+        return None
+
+
 def settle_bet(bet: dict, nba, nfl) -> dict:
     placed = datetime.fromisoformat(bet["placed_at"].replace("Z", "+00:00"))
     legs, pending, unknown = [], False, False
@@ -106,9 +119,13 @@ def settle_bet(bet: dict, nba, nfl) -> dict:
     else:
         status = "won"
     profit = {"won": odds - 1, "lost": -1.0, "void": 0.0}.get(status)
+    price = bnb_usd(placed)
+    amount_usd = round(bet["amount"] * price, 4) if price and bet.get("amount") else None
+    profit_usd = None if profit is None or amount_usd is None else round(profit * amount_usd, 4)
     return {"id": bet["id"], "placed_at": bet["placed_at"], "day": placed.astimezone(MADRID).strftime("%Y-%m-%d"), "kind": bet["kind"],
             "stake_odds": bet["odds"], "odds": round(odds, 2), "amount": bet.get("amount"), "currency": bet.get("currency"),
-            "status": status, "profit_u": None if profit is None else round(profit, 2), "legs": legs}
+            "status": status, "profit_u": None if profit is None else round(profit, 2), "bnb_usd": price, "amount_usd": amount_usd,
+            "profit_usd": profit_usd, "legs": legs}
 
 
 def main() -> list[dict]:

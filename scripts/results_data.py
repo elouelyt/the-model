@@ -83,18 +83,20 @@ def recorded() -> dict:
         return {}
     days: dict[str, dict] = {}
     for b in json.loads(REAL.read_text(encoding="utf-8")):
-        d = days.setdefault(b["day"], {"placed": 0, "won": 0, "profit": 0.0, "pending": 0, "winners": [], "all": []})
+        d = days.setdefault(b["day"], {"placed": 0, "won": 0, "profit": 0.0, "pending": 0, "winners": [], "all": [], "staked_usd": 0.0, "profit_usd": 0.0})
         legs = [f'{l["player"]} {"Over" if l["side"] == "Over" else "Under"} {l["line"]} {l["stat"]}' + (" (ANULADA)" if l["status"] == "void" else "") for l in b["legs"]]
-        d["all"].append({"odds": b["odds"], "legs": legs, "status": b["status"]})
+        d["all"].append({"odds": b["odds"], "legs": legs, "status": b["status"], "amount_usd": b.get("amount_usd"), "profit_usd": b.get("profit_usd")})
         if b["status"] in ("won", "lost", "void"):
             d["placed"] += 1
             d["won"] += b["status"] == "won"
             d["profit"] += b["profit_u"] or 0.0
+            d["staked_usd"] += b.get("amount_usd") or 0.0
+            d["profit_usd"] += b.get("profit_usd") or 0.0
             if b["status"] == "won":
                 d["winners"].append({"odds": b["odds"], "legs": legs, "note": ""})
         else:
             d["pending"] += 1
-    return {k: {**v, "profit": round(v["profit"], 2), "roi": round(v["profit"] / v["placed"], 3) if v["placed"] else 0.0}
+    return {k: {**v, "profit": round(v["profit"], 2), "staked_usd": round(v["staked_usd"], 2), "profit_usd": round(v["profit_usd"], 2), "roi": round(v["profit"] / v["placed"], 3) if v["placed"] else 0.0}
             for k, v in days.items() if v["placed"] or v["pending"]}
 
 
