@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-27",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Frances Tiafoe",
+          "rank": 9,
+          "points": 3380,
+          "opponent": "Lorenzo Musetti",
+          "opponent_rank": 26,
+          "model_prob": 0.6121,
+          "raw_implied": 0.5462,
+          "edge": 0.0659,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 1.82,
+          "stake_price": 1.82,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Frances Tiafoe reaches 2026 US Open Round 4 with victory over Vacherot - US Open.org",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Tiafoe's model edge is positive due to his superior ranking (#9 vs #26) and strong form, which the market slightly undervalues at 54.6% implied probability. His 61.2% model probability reflects his expected dominance on indoor hard, a surface that suits his powerful game, despite no H2H data.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.82,
+      "total_odds": 1.82
+    }
+  ]
+}
