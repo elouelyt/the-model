@@ -210,3 +210,12 @@ ni se ejecutó nada. Lo útil:
   Para la idea 17: usar esas probabilidades para estimar cuántas piernas se anularían, y leer el PDF oficial (más completo que ESPN).
 - Confirmaciones: su "staking engine" (Kelly 1/4) admite "un motor de tamaño que no bate al importe plano es decoración; hoy no lo hace" = lo que salió en la idea 16; y sus notas honestas dicen
   que la ventaja de comparar precios blandos con el consenso sharp es "real pero fina" y que el registro de CLV de unos cientos de apuestas es el veredicto = nuestro protocolo.
+
+## Repo kyleskom/NBA-Machine-Learning-Sports-Betting (2026-10-27): no aporta
+Popular (1.763 estrellas, 572 forks, último push 12/09/2026). Solo partido: moneyline y total (XGBoost y red neuronal) con estadísticas de equipo de stats.nba.com y cuotas de SBR; EV = probabilidad del modelo
+frente a la cuota; Kelly completo opcional; app Flask. Se leyó README, `notes.txt`, Kelly/EV y el entrenamiento por la API; NO se cargó ni ejecutó ningún modelo (.keras/.pkl) ni código.
+- Los nombres de sus modelos delatan el resultado: moneyline 64,6-68,9 % de acierto (similar a elegir siempre al favorito, sin comparar con el cierre) y totales 49,2-50,1 % (sin ninguna habilidad).
+  No hay ROI, CLV ni comparación con casas sharp en el repo: "acierto" no es beneficio.
+- Buena práctica que sí tiene: validación de series temporales (TimeSeriesSplit), último 10 % como test y calibración sigmoide. Si algún día entrenamos un modelo propio, usar eso.
+- No aplica: no tiene props de jugador, ni Stake, ni combinadas; Kelly completo es más agresivo que lo que ya probamos (idea 16, peor que importe plano).
+- Idea 23 (solo nota, sin implementar): un modelo de partido calibrado podría alimentar la promo "reembolso al descanso" (idea 10) para estimar quién llega a +16 al descanso; hoy no compensa el esfuerzo.
