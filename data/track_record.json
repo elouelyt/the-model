@@ -1113,11 +1113,11 @@
               ],
               "stake_odds": 2.01,
               "best_odds": 2.01,
-              "won": null,
+              "won": false,
               "opponent": "Kym, Jerome"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "26": {
           "parlays": [
