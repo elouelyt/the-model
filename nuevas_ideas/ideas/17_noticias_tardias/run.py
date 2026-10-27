@@ -26,16 +26,19 @@ def norm(s: str) -> str:
     return "".join(c for c in s if c.isalnum() or c == " ").replace(" jr", "").replace(" sr", "").replace(" ii", "").strip()
 
 
-def fetch() -> dict[str, str]:
+def fetch() -> tuple[dict[str, str], dict[str, list]]:
+    """(player -> status for everyone on the report, team -> [(player, status)] for Out/Doubtful only: the 'role shift' trigger)."""
     d = requests.get(URL, timeout=30).json()
-    out = {}
+    out, absent = {}, {}
     for team in d.get("injuries", []):
         for it in team.get("injuries", []):
             name = it.get("athlete", {}).get("displayName")
             status = it.get("status") or (it.get("type") or {}).get("description")
             if name and status:
                 out[norm(name)] = status
-    return out
+                if status.lower() in ("out", "doubtful"):
+                    absent.setdefault(team.get("displayName", ""), []).append((name, status))
+    return out, absent
 
 
 def day_key() -> str:
@@ -44,16 +47,16 @@ def day_key() -> str:
 
 def snapshot() -> None:
     HIST.mkdir(exist_ok=True)
-    inj = fetch()
+    inj, absent = fetch()
     picks_path = ROOT / "data" / "nba_picks.json"
     legs = []
     if picks_path.exists():
         doc = json.loads(picks_path.read_text(encoding="utf-8"))
         for p in doc.get("picks", []) + doc.get("high_prob", []):
-            legs.append({"player": p["player"], "stat": p["stat"], "side": p["side"], "line": p["line"], "fair_prob": p["fair_prob"], "status": inj.get(norm(p["player"]))})
+            legs.append({"player": p["player"], "stat": p["stat"], "side": p["side"], "line": p["line"], "fair_prob": p["fair_prob"], "team": p.get("team"), "status": inj.get(norm(p["player"]))})
     path = HIST / f"{day_key()}.json"
     snap = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"date": day_key(), "runs": []}
-    snap["runs"].append({"at": datetime.now().isoformat(timespec="seconds"), "injuries": inj, "legs_flagged": [l for l in legs if l["status"]]})
+    snap["runs"].append({"at": datetime.now().isoformat(timespec="seconds"), "injuries": inj, "absent_by_team": absent, "legs": legs, "legs_flagged": [l for l in legs if l["status"]]})
     path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
     flagged = [l for l in legs if l["status"]]
     print(f"[17_noticias_tardias] {len(inj)} injury-report entries, {len(flagged)} of {len(legs)} current pick/high-prob legs flagged: " +

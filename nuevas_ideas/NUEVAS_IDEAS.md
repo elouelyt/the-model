@@ -186,3 +186,17 @@ Carpetas `ideas/14_clv_sharp`, `15_consenso_ponderado`, `16_kelly`, `17_noticias
 (Brier 0,2452 igual, 457 líneas); 16) Kelly 1/4 sobre las 29 combinadas: -2,3 u frente a +7,4 u plano (muestra mínima, solo muestra cómo se habría comportado);
 17) hoy 7 piernas del panel con jugador en el parte de lesiones (p. ej. Ausar Thompson y Derrick White, Day-To-Day); 18) guarda la previsión del Panthers @ Packers (5 mph, 0 % lluvia).
 Falta registrar la tarea `TheModel-Ideas-Late` (23:15, tanda tardía): `C:\Users\ojiyo\Scripts\register_late_task.ps1`.
+
+## Repo EdgeDeskSports (github.com/dsrackler17/EdgeDeskSports, 2026-10-27): qué aprovechar
+Plataforma comercial enorme (23.000 archivos, 1,7 GB; sobre todo modelos de partido spread/total/moneyline, contenido y suscripciones). Se leyó solo por la API de GitHub; no se descargó
+ni se ejecutó nada. Lo útil:
+- **Protocolo de validación (adoptado, fijado ANTES de ver resultados):** una idea solo se propone para producción si (a) tiene >= 200 piernas liquidadas, (b) el límite inferior del IC 95 %
+  (bootstrap por partido) del CLV medio contra el cierre sharp es > 0 (idea 14) y (c) el resultado sobrevive a la penalización por probar varias ideas (alfa/k con k = nº de ideas probadas).
+  Lo hacen ellos con sus modelos y casi todo lo que prueban falla: spread y moneyline NBA FAIL, totales PASS en CLV pero con `clv_ev` negativo (-1,9 %); props NFL/CFB baten la apertura
+  (+0,5 pp) pero quedan ~5 % por debajo del margen de la casa.
+- **Idea 19 - role shift** (`nba/props/role_shift.js` del repo): cuando un titular de la rotación está Out/Doubtful, los minutos y el uso de sus compañeros suben y sus props de volumen
+  (rebotes, asistencias, triples, PRA) se desfasan hasta que mueve la línea. Prueba en papel ya enganchada a la idea 17: compara el acierto de nuestras piernas en equipos con un Out/Doubtful
+  frente al resto (limitación: el parte de ESPN incluye suplentes, no solo la rotación).
+- **Idea 20 - De-vig Shin** además de proporcional/potencia (idea 09): ellos usan Shin como estándar. Pendiente de añadir como variante en `09_devig_potencia`.
+- Disparador por lesión de titular -> volver a mirar las líneas (su `nba_injury`): refuerza la idea 17 (tanda tardía).
+- No aplica: motor de contenido, facturación, Discord, afiliados, simuladores de fútbol/hockey, y depender de The Odds API de pago.
