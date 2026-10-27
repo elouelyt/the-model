@@ -228,3 +228,14 @@ Se leyó solo por la API de GitHub (nada instalado ni ejecutado). 1 estrella y 2
 - Lo "útil" que enseña es casi nada: prior Elo con ventaja de local de 65 puntos y empate fijo 25 %, y una mezcla 65 % estadística + 35 % de un LLM (gpt-4o-mini) al que se le pide una probabilidad
   "con conocimiento general de fútbol". No hay cuotas, EV, validación ni resultados. Un LLM no tiene información que el mercado no tenga ya (vídeo de Pizzola).
 - Idea 24 (solo nota): el prior Elo + mezcla con el mercado sí es razonable como base para tenis (superficie) si algún día medimos tenis en la fase de medición por deporte.
+
+## Repo dpk1212/nhl-savant (2026-10-27): no aporta edge; ejemplo de sobreajuste
+Leído por API (1.089 archivos, 99 MB; nada clonado/ejecutado). 1 estrella, 99 de 100 últimos commits son de GitHub Actions ("Auto-update: Kalshi board…"). Dependencias npm revisadas en el registro: las 32 son paquetes
+normales con millones de descargas, sin `postinstall` (sin señales de malware, a diferencia de ioredis-os).
+- Nació como dashboard de xG/PDO de NHL y es hoy "Sharp Flow": sigue a carteras rentables de Polymarket (leaderboard) y mide su consenso como señal, con tablas de Kalshi y Pinnacle, Firebase/Stripe y un
+  motor de crecimiento en Twitter (guías de psicología/algoritmo de X).
+- **Sus propios informes no muestran ventaja**: muestra completa desde el 18/04 N=1918, acierto 49,8 %, y los picks publicados (v7) 112 con acierto 45 % y ROI -9,7 %.
+  Los "+58 % ROI" salen de reglas buscadas DESPUÉS sobre 59-231 picks (replay contrafactual con las mismas apuestas), y ellos mismos avisan de la fuga de información en la versión "L1".
+  Varias tablas imprimen "+Infinity %" (error de cálculo), así que no son fiables.
+- Útil como contraejemplo de lo que NO hacer: elegir reglas mirando resultados con pocas decenas de apuestas. Nuestro protocolo (>= 200 liquidadas, IC95 % del CLV sharp > 0, penalización por nº de pruebas) lo evita.
+- Idea 25 (solo nota): "dinero sharp concentrado" (carteras/órdenes de Novig, ProphetX, Polymarket) como señal extra frente a Stake; no accesible ni demostrada hoy.
