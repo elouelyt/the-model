@@ -58,16 +58,20 @@ def sport_block(a: dict) -> dict:
             fam.setdefault(f, []).append(c)
     cur_legs = [l for l in legs if l["date"] > BASELINE_DAY]
 
-    def group(key):
+    def group(key, only54=False):
         g: dict[str, list] = {}
         for l in cur_legs:
+            if only54 and l["win"] < 0.54:
+                continue
             g.setdefault(l[key], []).append(l)
         return sorted(({"name": k, **summarize_legs(v)} for k, v in g.items()), key=lambda r: -r["n"])
     return {"days": per_day,
             "bettable_total": summarize_combos([c for c in cur if not c["tracking"]]),
             "families": sorted(({"name": f, **summarize_combos(v)} for f, v in fam.items()), key=lambda r: -r["n"]),
             "legs_total": summarize_legs(cur_legs), "legs54_total": summarize_legs([l for l in cur_legs if l["win"] >= 0.54]),
-            "by_stat": group("stat"), "by_side": group("side")}
+            "by_stat": group("stat"), "by_side": group("side"),
+            "by_stat54": group("stat", True), "by_side54": group("side", True),
+            "tracking_total": summarize_combos([c for c in cur if c["tracking"]])}
 
 
 def mine() -> dict:

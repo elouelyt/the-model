@@ -21,6 +21,7 @@ table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font
 th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}th:first-child,td:first-child{text-align:left}
 th{color:var(--muted);font-weight:500;font-size:12px;background:var(--surface)}tr:last-child td{border-bottom:0}
 .pos{color:var(--good)}.neg{color:var(--bad)}.mut{color:var(--muted)}.tag{font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 5px;margin-left:6px}
+.read{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 16px}.read p{margin:10px 0}h3{font-size:14px;color:var(--muted);margin:16px 0 6px;font-weight:500}
 details{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-top:8px}summary{cursor:pointer}
 """
 
@@ -109,35 +110,115 @@ def mine_section(mine: dict) -> str:
             "(suele ser algo más baja que la del panel). Las perdidas se cuentan sin detalle.</p>")
 
 
-def all_section(doc: dict) -> str:
-    """Everything the model recommends, NBA + NFL + mixed, day by day (without the 23/10 old-rules day): combos you can bet,
-    paper combos, and every single leg as a flat 1 u bet."""
+STAT_ES = {"assists": "asistencias", "rebounds": "rebotes", "points": "puntos", "receptions": "recepciones", "assists+rebounds": "asist.+rebotes",
+           "passing touchdowns": "TD de pase", "interceptions": "intercepciones", "rushing yards": "yardas de carrera",
+           "receiving yards": "yardas de recepción", "passing yards": "yardas de pase", "passing attempts": "pases intentados",
+           "passing completions": "pases completados", "rushing attempts": "acarreos"}
+
+
+def current_days(doc: dict) -> dict[str, dict]:
+    """Per day, summed over NBA + NFL + mixed (the 23/10 old-rules day is left out)."""
     days: dict[str, dict] = {}
     for key in ("NBA", "NFL", "Mezcla"):
         for d in (doc.get(key) or {}).get("days", []):
             if d["baseline"]:
                 continue
-            r = days.setdefault(d["date"], dict(bn=0, bw=0, bp=0.0, tn=0, tw=0, tp=0.0, ln=0, lp=0.0, sn=0, sp=0.0))
+            r = days.setdefault(d["date"], dict(bn=0, bw=0, bp=0.0, tn=0, tw=0, tp=0.0, ln=0, lp=0.0, sn=0, sp=0.0, sh=0.0, se=0.0))
             r["bn"] += d["bettable"]["n"]; r["bw"] += d["bettable"]["won"]; r["bp"] += d["bettable"]["profit"]
             r["tn"] += d["tracking"]["n"]; r["tw"] += d["tracking"]["won"]; r["tp"] += d["tracking"]["profit"]
             if d["legs"].get("n"):
                 r["ln"] += d["legs"]["n"]; r["lp"] += d["legs"]["n"] * d["legs"]["roi"]
             if d["legs54"].get("n"):
-                r["sn"] += d["legs54"]["n"]; r["sp"] += d["legs54"]["n"] * d["legs54"]["roi"]
+                n = d["legs54"]["n"]
+                r["sn"] += n; r["sp"] += n * d["legs54"]["roi"]; r["sh"] += n * d["legs54"]["hit"]; r["se"] += n * d["legs54"]["expected"]
+    return days
+
+
+def totals(days: dict) -> dict:
+    return {k: sum(r[k] for r in days.values()) for k in next(iter(days.values()))} if days else {}
+
+
+def conclusions(doc: dict) -> str:
+    days = current_days(doc)
     if not days:
         return ""
-    tot = {k: sum(r[k] for r in days.values()) for k in next(iter(days.values()))}
+    t = totals(days)
+    nd = len(days)
+    out = []
+    if t["bn"]:
+        out.append(f'<b>Combinadas que se apuestan:</b> {t["bw"]} de {t["bn"]} ganadas ({t["bw"] / t["bn"] * 100:.0f} %), {units(t["bp"])}. '
+                   "Con cuotas de 5 a 7 basta acertar entre 1 de cada 5 y 1 de cada 7 para no perder, así que el resultado es "
+                   + ("bueno por ahora." if t["bp"] > 0 else "malo por ahora."))
+    if t["sn"]:
+        hit, exp = t["sh"] / t["sn"], t["se"] / t["sn"]
+        out.append(f'<b>Piernas elegidas (Win ≥ 54 %):</b> aciertan {hit * 100:.0f} % frente a {exp * 100:.0f} % esperado y dan {units(t["sp"])} como apuestas sueltas. '
+                   f'Por deporte: ' + ", ".join(f'{k} {units(doc[k]["legs54_total"]["n"] * doc[k]["legs54_total"]["roi"])}' for k in ("NBA", "NFL") if doc.get(k) and doc[k]["legs54_total"].get("n")) +
+                   f'. Sin ese filtro (todas las piernas) el resultado es {units(t["lp"])}: el filtro hace su trabajo.')
+    watch, good = [], []
+    for sp in ("NBA", "NFL"):
+        b = doc.get(sp) or {}
+        for r in b.get("by_stat54", []) + b.get("by_side54", []):
+            if r["n"] < 30:
+                continue
+            diff = r["hit"] - r["expected"]
+            label = f'{sp} {STAT_ES.get(r["name"], r["name"])} ({r["n"]} piernas, {pct(r["hit"])} frente a {pct(r["expected"])})'
+            if diff <= -0.04:
+                watch.append(label)
+            elif diff >= 0.05:
+                good.append(label)
+    if watch:
+        out.append("<b>A vigilar (acierto por debajo de lo esperado):</b> " + "; ".join(watch) + ". Todavía no son suficientes piernas para descartarlos.")
+    if good:
+        out.append("<b>Funcionando bien por ahora:</b> " + "; ".join(good) + ". El NFL sale de pocos días: no me fío de él todavía.")
+    out.append(f'<b>Qué haría:</b> hay solo {nd} día{"s" if nd != 1 else ""} de datos' +
+               (" y pocas combinadas, " if t["bn"] < 60 else ", ") +
+               ("así que no cambiaría ninguna regla todavía: " if nd < 7 else "") +
+               "seguir apostando con las reglas actuales y revisar en una semana mercado por mercado. Cualquier cambio se prueba antes en papel durante 5-7 días.")
+    return '<h2>Mi lectura</h2><div class="read">' + "".join(f"<p>{x}</p>" for x in out) + "</div>"
 
-    def line(label: str, r: dict) -> list[str]:
-        return [label, f'{r["bw"]}/{r["bn"]}', units(r["bp"]), f'{r["tw"]}/{r["tn"]}', units(r["tp"]),
-                f'{r["sn"]}', units(r["sp"]), f'{r["ln"]}', units(r["lp"])]
 
-    rows = [line(date_es(dt), r) for dt, r in sorted(days.items(), reverse=True)]
-    rows.append(line("<b>Total</b>", tot))
-    return ("<h2>Todas las apuestas del modelo (NBA + NFL + mezcla)</h2>" + table(
-        ["Día", "Combinadas apostables", "Resultado", "Combinadas en papel", "Resultado", "Piernas Win ≥ 54 %", "1 u c/u", "Todas las piernas", "1 u c/u"], rows) +
-        '<p class="note">Cada pierna cuenta como una apuesta simple de 1 u con la cuota guardada. Las combinadas de NBA, NFL y mezcla comparten piernas: '
-        "no se pueden sumar como si fueran apuestas independientes.</p>")
+def combos_section(doc: dict) -> str:
+    days = current_days(doc)
+    if not days:
+        return ""
+    rows = []
+    for dt, r in sorted(days.items(), reverse=True):
+        rows.append([date_es(dt), f'{r["bw"]}/{r["bn"]}', units(r["bp"]) if r["bn"] else "–", f'{r["tw"]}/{r["tn"]}', units(r["tp"]) if r["tn"] else "–"])
+    t = totals(days)
+    rows.append(["<b>Total</b>", f'<b>{t["bw"]}/{t["bn"]}</b>', units(t["bp"]), f'<b>{t["tw"]}/{t["tn"]}</b>', units(t["tp"])])
+    by_sport = []
+    for key in ("NBA", "NFL", "Mezcla"):
+        b = doc.get(key)
+        if b:
+            bt, tr = b["bettable_total"], b.get("tracking_total") or {"n": 0, "won": 0, "profit": 0}
+            by_sport.append([key, combos_cell(bt), units(bt["profit"]) if bt["n"] else "–", combos_cell(tr), units(tr["profit"]) if tr["n"] else "–"])
+    head = ["Apostables (ganadas)", "Resultado", "En papel (ganadas)", "Resultado"]
+    return ("<h2>Combinadas</h2>" + table(["Día"] + head, rows) + "<h3>Por deporte, desde el 24/10</h3>" + table(["Deporte"] + head, by_sport) +
+            '<p class="note">1 u por combinada, cuota guardada al publicarla. «Apostables» son las del panel con partidos sin empezar; «en papel» incluyen partidos ya '
+            "empezados o reglas alternativas y no se apuestan. Las combinadas de NBA, NFL y mezcla comparten piernas: no son independientes.</p>")
+
+
+def singles_section(doc: dict) -> str:
+    days = current_days(doc)
+    if not days:
+        return ""
+    rows = []
+    for dt, r in sorted(days.items(), reverse=True):
+        rows.append([date_es(dt), str(r["sn"]), pct(r["sh"] / r["sn"]) if r["sn"] else "–", units(r["sp"]) if r["sn"] else "–", str(r["ln"]), units(r["lp"]) if r["ln"] else "–"])
+    t = totals(days)
+    rows.append(["<b>Total</b>", f'<b>{t["sn"]}</b>', f'<b>{pct(t["sh"] / t["sn"])}</b>', units(t["sp"]), f'<b>{t["ln"]}</b>', units(t["lp"])])
+    out = ["<h2>Apuestas sueltas (piernas una a una)</h2>",
+           table(["Día", "Piernas Win ≥ 54 %", "Acierto", "1 u c/u", "Todas las piernas", "1 u c/u"], rows)]
+    for sp in ("NBA", "NFL"):
+        b = doc.get(sp) or {}
+        mk = b.get("by_stat54", []) + b.get("by_side54", [])
+        if mk:
+            out.append(f"<details><summary>{sp}: por mercado y lado (solo piernas Win ≥ 54 %)</summary>" + table(
+                ["Mercado / lado", "Piernas", "Acierto", "Esperado", "ROI plano"],
+                [[escape(STAT_ES.get(r["name"], r["name"])), str(r["n"]), pct(r["hit"]), pct(r["expected"]),
+                  f'<span class="{cls(r["roi"])}">{pct(r["roi"], True)}</span>'] for r in mk]) + "</details>")
+    out.append('<p class="note">Cada pierna cuenta como una apuesta simple de 1 u con la cuota guardada. «Win ≥ 54 %» son las piernas que el modelo usa para armar combinadas.</p>')
+    return "".join(out)
 
 
 def build(doc: dict) -> str:
@@ -163,7 +244,8 @@ def build(doc: dict) -> str:
              "(incluyen partidos ya empezados o reglas alternativas) y no se apuestan. Resultado en unidades, con 1 u por combinada y la cuota guardada al "
              "publicarla; una pierna anulada se quita de la combinada. El 23/10 se jugó con las reglas antiguas: se muestra aparte y no entra en los totales. "
              "Son pocos días: una racha buena o mala no demuestra nada todavía.</p>")
-    body = (head + f'<div class="tiles">{"".join(tiles)}</div>' + notes + all_section(doc) + mine_section(mine) + sport_section("NBA", nba) + sport_section("NFL", nfl) +
+    body = (head + f'<div class="tiles">{"".join(tiles)}</div>' + notes + conclusions(doc) + combos_section(doc) + singles_section(doc) + mine_section(mine) +
+            "<h2>Detalle por deporte</h2>" + sport_section("NBA", nba) + sport_section("NFL", nfl) +
             sport_section(MIX, mix, "Las mezcladas repiten piernas de las combinadas de NBA y NFL: no suman como resultados independientes."))
     return (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f"<style>{CSS}</style></head><body><main>{body}</main></body></html>")
