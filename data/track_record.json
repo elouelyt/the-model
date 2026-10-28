@@ -1132,6 +1132,20 @@
             }
           ],
           "resolved": true
+        },
+        "28": {
+          "parlays": [
+            {
+              "legs": [
+                "Flavio Cobolli"
+              ],
+              "stake_odds": 1.89,
+              "best_odds": 1.89,
+              "won": null,
+              "opponent": "Matteo Berrettini"
+            }
+          ],
+          "resolved": false
         }
       }
     }

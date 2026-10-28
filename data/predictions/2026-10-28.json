@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-28",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Flavio Cobolli",
+          "rank": 6,
+          "points": 3690,
+          "opponent": "Matteo Berrettini",
+          "opponent_rank": 48,
+          "model_prob": 0.7265,
+          "raw_implied": 0.5226,
+          "edge": 0.2039,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 1.89,
+          "stake_price": 1.89,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Alcaraz, Zverev and Cobolli selected for Davis Cup Final 8 - Davis Cup - The World Cup of Tennis - Davis Cup",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Cobolli's significant model edge is driven by his strong current form and much higher ranking (#6 vs #48), suggesting he's a clear favorite despite no prior H2H on indoor hard.",
+          "is_struggling": true
+        }
+      ],
+      "stake_total_odds": 1.89,
+      "total_odds": 1.89
+    }
+  ]
+}
