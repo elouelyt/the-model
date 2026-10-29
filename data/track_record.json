@@ -1141,8 +1141,22 @@
               ],
               "stake_odds": 1.89,
               "best_odds": 1.89,
-              "won": null,
+              "won": true,
               "opponent": "Matteo Berrettini"
+            }
+          ],
+          "resolved": true
+        },
+        "29": {
+          "parlays": [
+            {
+              "legs": [
+                "Taylor Fritz"
+              ],
+              "stake_odds": 1.46,
+              "best_odds": 1.46,
+              "won": null,
+              "opponent": "Denis Shapovalov"
             }
           ],
           "resolved": false

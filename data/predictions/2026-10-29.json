@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-29",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Taylor Fritz",
+          "rank": 13,
+          "points": 2995,
+          "opponent": "Denis Shapovalov",
+          "opponent_rank": 52,
+          "model_prob": 0.6967,
+          "raw_implied": 0.6667,
+          "edge": 0.03,
+          "signal": "marginal",
+          "surface": "hard",
+          "sport_title": "",
+          "best_price": 1.46,
+          "stake_price": 1.46,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Taylor Fritz criticised after what happened during his defeat in Lyon final, ‘he is so stubborn’ - Tennishead",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Fritz's +3.0% edge is driven by his superior ranking (#13 vs #52) and strong hard court form, which the model sees as slightly undervalued by the market despite both players having positive sentiment.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.46,
+      "total_odds": 1.46
+    }
+  ]
+}
