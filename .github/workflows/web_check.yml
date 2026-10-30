@@ -1,0 +1,38 @@
+name: Web check
+
+# Every 2 hours: is the published private web complete and fresh? A failed run e-mails the repo owner (GitHub default notification).
+on:
+  schedule:
+    - cron: "23 */2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pages: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Rebuild the panel in a scratch copy (a skipped tab shows up in its log)
+        env:
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: |
+          pip install beautifulsoup4 python-dotenv requests
+          python scripts/build_private.py > build.log 2>&1 || (cat build.log; exit 1)
+          cat build.log
+
+      - name: Check the live web
+        env:
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/web_check.py --build-log build.log
