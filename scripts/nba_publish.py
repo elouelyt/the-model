@@ -20,6 +20,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from git_sync import sync_push  # noqa: E402
 from private_crypto import encrypt_file  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -79,8 +80,7 @@ def main() -> None:
         return
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     run("git", "commit", "-m", f"chore: update NBA picks {stamp}")
-    run("git", "pull", "--rebase", "--autostash", "origin", "main")
-    run("git", "push", "origin", "main")
+    sync_push()
     logger.info("Published NBA picks; the panel rebuilds in GitHub Actions (~2 min)")
 
 

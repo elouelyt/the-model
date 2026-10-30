@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import results_data  # noqa: E402
+from git_sync import sync_push  # noqa: E402
 from private_crypto import encrypt_file  # noqa: E402
 
 
@@ -29,6 +30,5 @@ if __name__ == "__main__":
         subprocess.run(["git", "add", *files], cwd=ROOT, check=True)
         if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=ROOT).returncode:
             subprocess.run(["git", "commit", "-m", "chore: update results tab"], cwd=ROOT, check=True)
-            subprocess.run(["git", "pull", "--rebase", "--autostash", "origin", "main"], cwd=ROOT, check=True)
-            subprocess.run(["git", "push", "origin", "main"], cwd=ROOT, check=True)
+            sync_push()
     print(files)

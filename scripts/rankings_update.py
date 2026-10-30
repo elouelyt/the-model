@@ -16,6 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from git_sync import sync_push  # noqa: E402
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -201,10 +204,9 @@ def main() -> None:
             ["git", "commit", "-m", f"data: rankings_cache.json ({ts}) — {len(rankings)} players"],
             cwd=ROOT, check=True,
         )
-        subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT, check=True)
-        subprocess.run(["git", "push", "origin", "main"], cwd=ROOT, check=True)
+        sync_push()
         logger.info("Done")
-    except subprocess.CalledProcessError as exc:
+    except (subprocess.CalledProcessError, RuntimeError) as exc:
         logger.error("Git step failed: %s", exc)
         sys.exit(1)
 

@@ -1169,11 +1169,11 @@
               ],
               "stake_odds": 1.82,
               "best_odds": 1.82,
-              "won": null,
+              "won": false,
               "opponent": "Lorenzo Musetti"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }

@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 ROOT = Path(__file__).parent.parent
 CACHE_PATH = ROOT / "data" / "stake_cache.json"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from git_sync import sync_push  # noqa: E402
+
 
 def main() -> None:
     sys.path.insert(0, str(ROOT))
@@ -83,10 +86,9 @@ def main() -> None:
              f"data: update stake_cache.json ({ts}) — {len(odds)} players"],
             cwd=ROOT, check=True,
         )
-        subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT, check=True)
-        subprocess.run(["git", "push", "origin", "main"], cwd=ROOT, check=True)
+        sync_push()
         logger.info("Done — stake_cache.json live on GitHub")
-    except subprocess.CalledProcessError as exc:
+    except (subprocess.CalledProcessError, RuntimeError) as exc:
         logger.error("Git step failed: %s", exc)
         logger.info(
             "Cache file was written locally. Push manually:\n"
