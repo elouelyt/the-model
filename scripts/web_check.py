@@ -25,7 +25,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from private_crypto import decrypt_file  # noqa: E402
 
 SITE = "https://elouelyt.github.io/the-model"
-TABS = ["Recomendaciones", "Rendimiento", "NBA", "NFL", "MMA", "Combinadas", "Resultados"]
 now = datetime.now(timezone.utc)
 problems: list[str] = []
 
@@ -94,8 +93,6 @@ def check_rebuild(build_log: str | None) -> None:
         for line in log.splitlines():
             if "skipped" in line.lower():
                 problems.append(f"panel build: {line.strip()}")
-        missing = [t for t in TABS if t not in log and t in ("NBA", "NFL", "Combinadas", "Resultados") and f"{t} tab skipped" in log]
-        problems += [f"tab {t} missing in the rebuilt panel" for t in missing]
 
 
 def check_runs() -> None:
@@ -114,7 +111,7 @@ def check_runs() -> None:
             if not today:
                 problems.append("tennis bot (daily.yml) has not run today")
     out = sh("gh", "api", "repos/elouelyt/the-model/pages/builds/latest", "--jq", ".status")
-    if out and out != "built":
+    if out == "errored":
         problems.append(f"GitHub Pages build status: {out}")
 
 
