@@ -1155,11 +1155,11 @@
               ],
               "stake_odds": 1.46,
               "best_odds": 1.46,
-              "won": null,
+              "won": true,
               "opponent": "Denis Shapovalov"
             }
           ],
-          "resolved": false
+          "resolved": true
         }
       }
     }
