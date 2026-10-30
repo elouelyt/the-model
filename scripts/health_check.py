@@ -45,7 +45,7 @@ def run(*cmd: str, timeout: int = 900) -> subprocess.CompletedProcess:
 def job_running() -> bool:
     """True while one of the scheduled jobs (the_model_job.ps1) is running: do not repair under its feet."""
     r = run("powershell", "-NoProfile", "-Command",
-            "(Get-CimInstance Win32_Process -Filter \"Name='powershell.exe'\" | Where-Object { $_.CommandLine -match 'the_model_job' }).Count", timeout=60)
+            "(Get-CimInstance Win32_Process -Filter \"Name='powershell.exe'\" | Where-Object { $_.CommandLine -match 'the_model_job' -and $_.CommandLine -notmatch '-Job health' }).Count", timeout=60)
     return r.stdout.strip() not in ("", "0")
 
 
