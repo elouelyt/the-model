@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-31",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Adolfo Daniel Vallejo",
+          "rank": 56,
+          "points": 947,
+          "opponent": "Grigor Dimitrov",
+          "opponent_rank": 124,
+          "model_prob": 0.612,
+          "raw_implied": 0.5086,
+          "edge": 0.1034,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 1.92,
+          "stake_price": 1.92,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "neutral",
+            "label": null,
+            "headline": null,
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Vallejo's model edge of +10.3% likely stems from his significantly higher ranking (#56 vs #124) and points total, suggesting a stronger overall season despite no H2H data to consider.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.92,
+      "total_odds": 1.92
+    }
+  ]
+}

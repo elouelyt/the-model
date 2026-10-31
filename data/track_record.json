@@ -1174,6 +1174,20 @@
             }
           ],
           "resolved": true
+        },
+        "31": {
+          "parlays": [
+            {
+              "legs": [
+                "Adolfo Daniel Vallejo"
+              ],
+              "stake_odds": 1.92,
+              "best_odds": 1.92,
+              "won": null,
+              "opponent": "Grigor Dimitrov"
+            }
+          ],
+          "resolved": false
         }
       }
     }
