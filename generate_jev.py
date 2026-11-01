@@ -91,16 +91,16 @@ def build(doc: dict) -> str:
     track = base[base.index('<h2 class="sec">Mis apuestas'):base.index("</main>")]
     stamp = datetime.fromisoformat(doc["timestamp"]).astimezone()
     sections = "".join(generate_combos._section(mod, doc.get(scope, []), f"Jev · {LABEL[scope]}", sub) for scope, sub in (
-        ("nba", "Combinadas de NBA elegidas con la probabilidad de Jev."),
-        ("nfl", "Combinadas de NFL elegidas con la probabilidad de Jev."),
-        ("total", "Combinadas que mezclan NBA y NFL, con la probabilidad de Jev.")))
+        ("nba", "Combinadas de NBA: Jev elige las 3 piernas con todo el historial; no se aplican nuestras reglas de EV ni de probabilidad mínima."),
+        ("nfl", "Combinadas de NFL: Jev elige las 3 piernas con todo el historial; no se aplican nuestras reglas."),
+        ("total", "Combinadas que mezclan NBA y NFL: Jev elige las piernas; la probabilidad de la combinada es la que da Jev.")))
     extra_css = ".cmp{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}.cmp th,.cmp td{border-bottom:1px solid #2f4553;padding:5px 8px;text-align:left}.cmp th{color:#8aa0ad;font-weight:600}"
     return f"""<title>Jev</title>
 <meta name="robots" content="noindex,nofollow">
 <style>{css}{extra_css}</style>
 <main>
 <h1>Jev · combinadas de TypeSafe</h1>
-<p class="sub">Jev (modelo de decisiones de TypeSafe) recibe todo el historial y valora cada pierna; con su probabilidad se arman las combinadas · {doc.get("legs_evaluated", 0)} piernas valoradas · actualizado {stamp:%d/%m %H:%M}</p>
+<p class="sub">Jev (modelo de decisiones de TypeSafe) recibe todo el historial y elige él mismo las piernas de cada combinada (3 por apartado) · {doc.get("legs_evaluated", 0)} piernas valoradas · actualizado {stamp:%d/%m %H:%M}</p>
 {comparison_html(doc.get("analysis"))}
 {bankroll}
 {sections}

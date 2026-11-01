@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Jev's own combos (NBA, NFL and NBA+NFL), built next to - never instead of - the ones from our rules, to compare them every day.
 
-Jev (TypeSafe) answers yes/no questions with a probability. So it plays the role of an independent evaluator of every candidate leg:
+Jev (TypeSafe) is a classifier (yes/no probabilities, or a choice among named options), so it decides in two ways:
   1. state = everything we know (settled-results tables for NBA / NFL / mixed, the lessons learned, the open candidate legs with
      Stake odds, the books' fair probability and the line prices of each book);
   2. one `noul` question per leg: "will this leg hit?"  -> Jev's probability;
-  3. the same combo engine (scripts/nba_combos.py, 3 legs, different games and players) is run on Jev's probabilities.
+  3. JEV ITSELF PICKS the 3 legs of each combo (choice questions, one per slot, over the legs still allowed) and gives the combo's probability;
+     our engine/rules (win >= 54 %, EV, families) are NOT applied: only the physical rules (different games and players, leg used once).
 Legs keep our probability as `our_prob` so the settlement can also tell who was better calibrated (Brier).
 Output: data/jev_picks.json = {timestamp, nba, nfl, total, ...}; the daily snapshot goes to data/jev_history/<date>.json (settled by jev/jev_settle.py).
     python jev/jev_combos.py [--no-snapshot]
@@ -146,23 +147,56 @@ def jev_pool(pool: list[dict], probs: dict[str, float]) -> list[dict]:
     return out
 
 
-def scope_combos(pool: list[dict], scope: str) -> list[dict]:
+PER_SCOPE = 3           # combos Jev builds per scope (nba / nfl / total) in a day
+GOAL = ("Eres quien decide las combinadas de 3 piernas (cada una con su cuota de Stake, que se multiplican). Objetivo: maximizar el beneficio "
+        "esperado a largo plazo y el porcentaje de acierto. Usa TODO el historial y las lecciones del estado; no copies sin más la probabilidad de las casas. "
+        "Reglas físicas: las 3 piernas de una combinada son de partidos y jugadores distintos, y una pierna no se repite entre combinadas.")
+
+
+def leg_desc(p: dict) -> str:
+    return describe(0, p).split(" | ", 1)[1]
+
+
+def choose_combos(pool: list[dict], scope: str, n_wanted: int, used_keys: set, used_players: set, knowledge_text: str) -> list[dict]:
+    """Jev picks every leg itself: for each slot a `choice` question over the legs still allowed (only the physical rules filter the list),
+    then a `noul` question gives its probability that the whole combo hits."""
     legs = [p for p in pool if scope == "total" or p["sport"] == scope]
-    sport_of = {nc.leg_key(p): p["sport"] for p in legs}
-
-    def mixed(c: dict) -> bool:
-        return len({sport_of[k] for k in c["legs"]}) > 1
-
-    fams = {f"{scope}:{name}": ((lambda c, keep=keep: mixed(c) and keep(c)) if scope == "total" else keep, score)
-            for name, (keep, score) in nc.FAMILIES.items()}
-    combos = nc.build_combos(legs, families=fams, min_books=1)
-    by_key = {nc.leg_key(p): p for p in legs}
-    for c in combos:
-        c["scope"] = scope
-        for l in c["legs"]:
-            src = by_key[l["key"]]
-            l.update({"sport": src["sport"], "our_prob": src["our_prob"], "team": src.get("team"), "books": src.get("books", 1)})
-    return combos
+    out: list[dict] = []
+    for _ in range(n_wanted):
+        picked: list[dict] = []
+        for slot in (1, 2, 3):
+            cands = [p for p in legs if nc.leg_key(p) not in used_keys and p["player"] not in used_players
+                     and p["game"] not in {q["game"] for q in picked} and p["player"] not in {q["player"] for q in picked}]
+            if scope == "total" and slot == 3 and len({q["sport"] for q in picked}) == 1:
+                cands = [p for p in cands if p["sport"] != picked[0]["sport"]]   # a 'total' combo must mix NBA and NFL
+            if not cands:
+                break
+            ids = {f"L{i:03d}": p for i, p in enumerate(cands, 1)}
+            so_far = "\n".join(f"- {leg_desc(q)}" for q in picked) or "(ninguna todavía)"
+            state = knowledge_text + f"\n\n=== COMBINADA EN CONSTRUCCIÓN ({scope.upper()}) ===\nPiernas ya elegidas:\n{so_far}"
+            q = {"eleccion": {"type": "choice", "instructions": f"{GOAL} Elige la pierna nº {slot} de 3 de esta combinada.",
+                              "criteria": {lid: leg_desc(p) for lid, p in ids.items()}}}
+            answer = jev_client.ask(state, q)["answers"]["eleccion"]
+            picked.append(ids[answer["choice"]])
+        if len(picked) < 3:
+            break
+        desc = "\n".join(f"- {leg_desc(q)}" for q in picked)
+        res = jev_client.ask(knowledge_text + f"\n\n=== COMBINADA ===\n{desc}",
+                             {"acierta": {"type": "noul", "instructions": "¿Acertarán las 3 piernas de esta combinada a la vez? Da la probabilidad real."}})
+        prob = float(res["answers"]["acierta"]["noul"])
+        odds = 1.0
+        for q in picked:
+            odds *= q["stake_odds"]
+        out.append({"legs": [{"key": nc.leg_key(q), "player": q["player"], "stat": q["stat"], "side": q["side"], "line": q["line"],
+                              "stake_odds": q["stake_odds"], "fair_prob": q["fair_prob"], "ev": q["ev"], "game": q["game"], "start": q["start"],
+                              "outcome_id": q.get("outcome_id"), "event_id": q.get("event_id"), "fixture": q.get("fixture"),
+                              "cons_prob": q.get("cons_prob"), "cons_age_h": q.get("cons_age_h"), "sport": q["sport"],
+                              "our_prob": q["our_prob"], "team": q.get("team"), "books": q.get("books", 1)} for q in picked],
+                    "prob": round(prob, 4), "odds": round(odds, 2), "ev": round(prob * odds - 1, 4), "families": [f"{scope}:jev"],
+                    "units": nc.UNITS, "tracking": False, "scope": scope})
+        used_keys |= {nc.leg_key(q) for q in picked}
+        used_players |= {q["player"] for q in picked}
+    return out
 
 
 def main() -> None:
@@ -183,9 +217,14 @@ def main() -> None:
     available = nc.available_lines(ROOT / "data" / "nba_stake_cache.json", ROOT / "nfl" / "data" / "nfl_stake_cache.json")
     result: dict[str, list] = {}
     snap_for = lambda scope: {"runs": [{"combos": [c for c in r["combos"] if c.get("scope") == scope]} for r in snap["runs"]]}  # noqa: E731
+    kn = knowledge()
     for scope in SCOPES:
-        fresh = scope_combos(jp, scope)
-        result[scope] = nc.freeze_combos(fresh, snap_for(scope), available=available)
+        # combos already shown stay while their games are to start; Jev only builds the missing ones, with legs not used by those
+        kept = nc.freeze_combos([], snap_for(scope), available=available)
+        used_keys = {l["key"] for c in kept for l in c["legs"]}
+        used_players = {l["player"] for c in kept for l in c["legs"]}
+        fresh = choose_combos(jp, scope, PER_SCOPE - len(kept), used_keys, used_players, kn) if len(kept) < PER_SCOPE else []
+        result[scope] = kept + fresh
         for c in result[scope]:
             c["scope"] = scope
     if "--no-snapshot" in sys.argv:
