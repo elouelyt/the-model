@@ -24,6 +24,7 @@ venv/
 !data/rankings_cache.json
 # Exception: daily predictions and track record (written by GitHub Actions)
 !data/track_record.json
+!data/tennis_links.json
 !data/manual_odds.json
 !data/ufc_fighters_cache.json
 !data/ufc_fights_history.json
