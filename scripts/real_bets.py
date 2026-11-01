@@ -83,13 +83,37 @@ def bnb_usd(placed: datetime) -> float | None:
         return None
 
 
+TRACK = ROOT / "data" / "track_record.json"
+
+
+def tennis_result(player: str, placed: datetime) -> bool | None:
+    """Result of a tennis 'Ganador' leg from the bot's track record (only the daily picks are resolved there): True/False, None if unknown."""
+    try:
+        months = json.loads(TRACK.read_text(encoding="utf-8"))["months"]
+    except Exception:  # noqa: BLE001
+        return None
+    surname = player.lower().split()[-1]
+    for back in range(-1, 5):
+        day = (placed.astimezone(MADRID) + timedelta(days=back)).date()
+        for p in months.get(day.strftime("%Y-%m"), {}).get("days", {}).get(str(day.day), {}).get("parlays", []):
+            if p.get("won") is not None and any(surname in leg.lower() for leg in p.get("legs", [])):
+                return p["won"]
+    return None
+
+
 def settle_bet(bet: dict, nba, nfl) -> dict:
     placed = datetime.fromisoformat(bet["placed_at"].replace("Z", "+00:00"))
     legs, pending, unknown = [], False, False
     for leg in bet["legs"]:
         key = stat_key(leg["stat"])
         row = {"player": leg["player"], "stat": leg["stat"], "side": leg["side"], "line": leg["line"], "odds": leg.get("odds"), "status": "pending"}
-        if key is None:
+        if leg["stat"] == "Ganador":                # tennis match winner
+            won = tennis_result(leg["player"], placed)
+            if won is None:
+                pending = True
+            else:
+                row["status"] = "won" if won else "lost"
+        elif key is None:
             unknown = True
             row["status"] = "unknown"
         else:

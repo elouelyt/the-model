@@ -182,6 +182,15 @@ def check_tennis() -> None:
             problems.append(f"tennis: restored entry not pushed ({exc})")
 
 
+def check_tennis_link(stake_ok: bool) -> None:
+    """The side panel opens the tennis pick's Stake match page from data/tennis_links.json: publish the link once the bot's pick exists."""
+    if not (FIX and stake_ok):
+        return
+    r = run(PY, "scripts/tennis_link.py", timeout=300)
+    if "INFO " in r.stderr and "link for" not in r.stderr and r.returncode == 0 and "no tennis pick" not in r.stderr:
+        repaired.append("tennis: Stake match link published")
+
+
 def check_tasks() -> None:
     r = run("powershell", "-NoProfile", "-Command",
             "Get-ScheduledTask | Where-Object { $_.TaskName -like 'the-model*' -or $_.TaskName -like 'TheModel*' } | "
@@ -208,7 +217,7 @@ def main() -> int:
     for name, fn in (("git", check_git),):
         fn()
     stake_ok = check_stake()
-    for fn in (lambda: check_nba(stake_ok), check_results, check_tennis, check_tasks):
+    for fn in (lambda: check_nba(stake_ok), check_results, check_tennis, lambda: check_tennis_link(stake_ok), check_tasks):
         try:
             fn()
         except Exception as exc:  # noqa: BLE001

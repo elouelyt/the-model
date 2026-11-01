@@ -84,7 +84,8 @@ def recorded() -> dict:
     days: dict[str, dict] = {}
     for b in json.loads(REAL.read_text(encoding="utf-8")):
         d = days.setdefault(b["day"], {"placed": 0, "won": 0, "profit": 0.0, "pending": 0, "winners": [], "all": [], "staked_usd": 0.0, "profit_usd": 0.0})
-        legs = [f'{l["player"]} {"Over" if l["side"] == "Over" else "Under"} {l["line"]} {l["stat"]}' + (" (ANULADA)" if l["status"] == "void" else "") for l in b["legs"]]
+        legs = [(f'{l["player"]} gana (tenis)' if l["stat"] == "Ganador" else f'{l["player"]} {"Over" if l["side"] == "Over" else "Under"} {l["line"]} {l["stat"]}')
+                + (" (ANULADA)" if l["status"] == "void" else "") for l in b["legs"]]
         d["all"].append({"odds": b["odds"], "legs": legs, "status": b["status"], "amount_usd": b.get("amount_usd"), "profit_usd": b.get("profit_usd")})
         if b["status"] in ("won", "lost", "void"):
             d["placed"] += 1
