@@ -587,10 +587,8 @@ def process_pending(tr: dict) -> int:
         month_str = day_str[:7]
         day_num   = int(day_str[8:10])
 
-        tr["months"].setdefault(month_str, {"days": {}})
-        month = tr["months"][month_str]
         day_key = str(day_num)
-        existing = month["days"].get(day_key, {})
+        existing = tr["months"].get(month_str, {}).get("days", {}).get(day_key, {})  # no empty month is created for days without bets
 
         if existing.get("resolved"):
             continue
@@ -628,7 +626,7 @@ def process_pending(tr: dict) -> int:
                 all_resolved = False
 
         if any_updated or not existing:
-            month["days"][day_key] = {"parlays": day_results, "resolved": all_resolved}
+            tr["months"].setdefault(month_str, {"days": {}})["days"][day_key] = {"parlays": day_results, "resolved": all_resolved}
             updated += 1
 
     return updated
