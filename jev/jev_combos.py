@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "jev"))
 import jev_client  # noqa: E402
+import jev_context  # noqa: E402
 import nba_combos as nc  # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ LESSONS = """LECCIONES APRENDIDAS (de 2 semanas de resultados reales):
 - Una combinada de 3 piernas acierta de media muy por debajo de lo que sugiere el producto de probabilidades si las piernas están correlacionadas: piernas de partidos y jugadores distintos.
 - Si el jugador no juega, la pierna se anula (no pierde).
 - NFL solo tiene Pinnacle como casa de referencia (1 casa); NBA tiene hasta 10.
+- Los minutos importan: un jugador con pocos minutos o con rol incierto (lesión, compañeros fuera) rinde menos de lo que dice su línea; si un compañero titular está fuera, su rol y sus números suben.
 - Una cuota de Stake con margen: EV = probabilidad × cuota − 1. Solo interesa si la probabilidad real supera 1/cuota."""
 
 
@@ -109,7 +111,7 @@ def describe(i: int, p: dict) -> str:
     start = parsedate_to_datetime(p["start"]).strftime("%d/%m %H:%MZ")
     return (f'L{i:03d} | {p["sport"].upper()} | {p["player"]} ({p.get("team", "")}) | {p["stat"]} {p["side"]} {p["line"]} | '
             f'cuota Stake {p["stake_odds"]} (otro lado {p.get("stake_opp")}) | prob. justa casas {p["fair_prob"]:.3f} en {p.get("books", 1)} casa(s) | '
-            f'consenso BP {p.get("cons_prob")} | {p["game"]} {start} | líneas: {p.get("fanduel", "")}')
+            f'consenso BP {p.get("cons_prob")} | {p["game"]} {start} | líneas: {p.get("fanduel", "")} | {jev_context.context(p)}')
 
 
 def evaluate(pool: list[dict], day: str) -> dict[str, float]:
