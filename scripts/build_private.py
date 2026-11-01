@@ -31,6 +31,7 @@ NBA_ENC = ROOT / "data" / "nba_picks.enc"
 NFL_ENC = ROOT / "data" / "nfl_picks.enc"
 MIX_ENC = ROOT / "data" / "mix_picks.enc"
 RESULTS_ENC = ROOT / "data" / "results.enc"
+JEV_ENC = ROOT / "data" / "jev_picks.enc"
 SALT = "8669795df810e4666e526fa8a931d9da"
 STATICRYPT = "staticrypt@3.5.4"
 
@@ -91,6 +92,14 @@ def main() -> None:
             tabs.append(("Resultados", generate_results.build(json.loads(res_path.read_text(encoding="utf-8")))))
         except Exception as exc:  # noqa: BLE001
             print(f"Resultados tab skipped: {exc}")
+    if JEV_ENC.exists():
+        try:  # Jev's combos and the daily comparison with our method; its failure must not break the panel
+            import generate_jev
+            jev_path = BUILD / "jev_picks.json"
+            decrypt_file(JEV_ENC, jev_path)
+            tabs.append(("Jev", generate_jev.build(json.loads(jev_path.read_text(encoding="utf-8")))))
+        except Exception as exc:  # noqa: BLE001
+            print(f"Jev tab skipped: {exc}")
     if mma:
         tabs.append(("MMA", mma))
 

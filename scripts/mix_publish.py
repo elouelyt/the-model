@@ -41,6 +41,12 @@ def update() -> list[str]:
         files += results_publish.update()
     except Exception as exc:  # noqa: BLE001
         logger.warning("results tab data skipped: %s", exc)
+    try:  # Jev's own combos (jev/): their failure must not stop the normal flow
+        sys.path.insert(0, str(ROOT / "jev"))
+        import jev_publish
+        files += jev_publish.update()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Jev tab data skipped: %s", exc)
     return files
 
 
