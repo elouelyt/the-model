@@ -571,8 +571,29 @@
               ],
               "stake_odds": 1.92,
               "best_odds": 1.92,
-              "won": null,
+              "won": true,
               "opponent": "Grigor Dimitrov"
+            }
+          ],
+          "resolved": true
+        }
+      }
+    },
+    "2026-07": {
+      "days": {}
+    },
+    "2026-11": {
+      "days": {
+        "1": {
+          "parlays": [
+            {
+              "legs": [
+                "Brandon Nakashima"
+              ],
+              "stake_odds": 1.61,
+              "best_odds": 1.61,
+              "won": null,
+              "opponent": "Matteo Berrettini"
             }
           ],
           "resolved": false

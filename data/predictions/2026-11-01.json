@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-01",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Brandon Nakashima",
+          "rank": 17,
+          "points": 2375,
+          "opponent": "Matteo Berrettini",
+          "opponent_rank": 48,
+          "model_prob": 0.6481,
+          "raw_implied": 0.6172,
+          "edge": 0.0309,
+          "signal": "marginal",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 1.61,
+          "stake_price": 1.61,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Nakashima riding wave of career-best tennis - Cincinnati Open",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Nakashima's positive sentiment and higher ranking (17 vs 48) on indoor hard, a surface he generally performs well on, supports the model's edge over the lower-ranked Berrettini.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.61,
+      "total_odds": 1.61
+    }
+  ]
+}
