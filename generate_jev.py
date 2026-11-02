@@ -66,6 +66,20 @@ def comparison_html(analysis: dict | None) -> str:
             f'{total}{brier}<h2 class="sec">Día a día</h2>{daily}')
 
 
+def priority_html(analysis: dict | None) -> str:
+    pr = (analysis or {}).get("priority")
+    if not pr:
+        return ""
+    def rows(res):
+        return "".join(f'<tr><td>{r["rank"]}</td><td>{r["won"]}/{r["n"]}</td><td>{pct(r["hit"])}</td><td>{pct(r["avg_prob"])}</td>'
+                       f'<td>{unit(r["profit"])}</td><td>{unit(r["weighted"])}</td></tr>' for r in res)
+    head = '<tr><th>Prioridad</th><th>Acertadas</th><th>%</th><th>Prob. media</th><th>Beneficio (1 u)</th><th>Beneficio con el importe sugerido</th></tr>'
+    return ('<h2 class="sec">¿Aciertan más las que llevan más importe?</h2><p class="note" style="margin-top:0">La extensión ordena las combinadas de cada día por '
+            'probabilidad × cuota y sugiere 1,5× / 1,0× / 0,5× del importe base (1.ª, 2.ª, resto). Aquí se repite ese orden con todas las combinadas ya liquidadas.</p>'
+            f'<h3 style="margin:10px 0 0;font-size:14px">Jev ({pr["jev_n"]} combinadas)</h3><table class="cmp">{head}{rows(pr["jev"])}</table>'
+            f'<h3 style="margin:10px 0 0;font-size:14px">Nuestro método ({pr["ours_n"]} combinadas apostables)</h3><table class="cmp">{head}{rows(pr["ours"])}</table>')
+
+
 def diffs_html(doc: dict) -> str:
     legs = {}
     for scope in ("nba", "nfl", "total"):
@@ -102,6 +116,7 @@ def build(doc: dict) -> str:
 <h1>Jev · combinadas de TypeSafe</h1>
 <p class="sub">Jev (modelo de decisiones de TypeSafe) recibe todo el historial y elige él mismo las piernas de cada combinada (3 por apartado) · {doc.get("legs_evaluated", 0)} piernas valoradas · actualizado {stamp:%d/%m %H:%M}</p>
 {comparison_html(doc.get("analysis"))}
+{priority_html(doc.get("analysis"))}
 {bankroll}
 {sections}
 {diffs_html(doc)}

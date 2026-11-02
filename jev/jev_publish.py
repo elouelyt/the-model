@@ -19,12 +19,16 @@ def update() -> list[str]:
     py = sys.executable
     subprocess.run([py, "jev/jev_settle.py"], cwd=ROOT, check=False)
     subprocess.run([py, "jev/jev_combos.py"], cwd=ROOT, check=True)
+    subprocess.run([py, "scripts/priority_analysis.py"], cwd=ROOT, check=False)   # do the top-ranked (bigger stake) combos hit more?
     picks = ROOT / "data" / "jev_picks.json"
     analysis = ROOT / "data" / "jev_analysis.json"
     doc = json.loads(picks.read_text(encoding="utf-8"))
     if analysis.exists():
         a = json.loads(analysis.read_text(encoding="utf-8"))
         doc["analysis"] = {k: a.get(k) for k in ("legs_settled", "combos_settled", "brier", "comparison", "combo_families", "calibration")}
+        prio = ROOT / "data" / "priority_analysis.json"
+        if prio.exists():
+            doc["analysis"]["priority"] = json.loads(prio.read_text(encoding="utf-8"))
         picks.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
     encrypt_file(picks, ROOT / "data" / "jev_picks.enc")
     bundle = {p.name: json.loads(p.read_text(encoding="utf-8")) for p in sorted((ROOT / "data" / "jev_history").glob("*.json"))}

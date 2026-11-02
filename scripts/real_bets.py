@@ -149,7 +149,7 @@ def settle_bet(bet: dict, nba, nfl) -> dict:
     return {"id": bet["id"], "placed_at": bet["placed_at"], "day": placed.astimezone(MADRID).strftime("%Y-%m-%d"), "kind": bet["kind"],
             "stake_odds": bet["odds"], "odds": round(odds, 2), "amount": bet.get("amount"), "currency": bet.get("currency"),
             "status": status, "profit_u": None if profit is None else round(profit, 2), "bnb_usd": price, "amount_usd": amount_usd,
-            "profit_usd": profit_usd, "legs": legs}
+            "profit_usd": profit_usd, "legs": legs, "suggested": bet.get("suggested")}
 
 
 def main() -> list[dict]:
