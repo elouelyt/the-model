@@ -594,6 +594,20 @@
             }
           ],
           "resolved": false
+        },
+        "2": {
+          "parlays": [
+            {
+              "legs": [
+                "Alexander Zverev"
+              ],
+              "stake_odds": 1.38,
+              "best_odds": 1.38,
+              "won": null,
+              "opponent": "Lorenzo Musetti"
+            }
+          ],
+          "resolved": false
         }
       }
     }
