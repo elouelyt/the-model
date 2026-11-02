@@ -8,6 +8,7 @@ on:
       - "data/mix_picks.enc"   # mixed NBA+NFL combos
       - "data/results.enc"     # results tab
       - "data/jev_picks.enc"   # Jev tab
+      - "data/mma_picks.enc"   # MMA Jev tab (our model vs Jev)
   workflow_dispatch:
 
 concurrency:

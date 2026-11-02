@@ -32,6 +32,7 @@ NFL_ENC = ROOT / "data" / "nfl_picks.enc"
 MIX_ENC = ROOT / "data" / "mix_picks.enc"
 RESULTS_ENC = ROOT / "data" / "results.enc"
 JEV_ENC = ROOT / "data" / "jev_picks.enc"
+MMA_TRACK_ENC = ROOT / "data" / "mma_picks.enc"
 SALT = "8669795df810e4666e526fa8a931d9da"
 STATICRYPT = "staticrypt@3.5.4"
 
@@ -102,6 +103,14 @@ def main() -> None:
             print(f"Jev tab skipped: {exc}")
     if mma:
         tabs.append(("MMA", mma))
+    if MMA_TRACK_ENC.exists():
+        try:  # our MMA model vs Jev, fight by fight; its failure must not break the panel
+            import generate_mma_track
+            mt_path = BUILD / "mma_picks.json"
+            decrypt_file(MMA_TRACK_ENC, mt_path)
+            tabs.append(("MMA Jev", generate_mma_track.build(json.loads(mt_path.read_text(encoding="utf-8")))))
+        except Exception as exc:  # noqa: BLE001
+            print(f"MMA Jev tab skipped: {exc}")
 
     src = BUILD / "panel_src.html"
     src.write_text(build(tabs), encoding="utf-8")

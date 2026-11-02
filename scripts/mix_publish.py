@@ -47,6 +47,12 @@ def update() -> list[str]:
         files += jev_publish.update()
     except Exception as exc:  # noqa: BLE001
         logger.warning("Jev tab data skipped: %s", exc)
+    try:  # MMA tracking, our model vs Jev (mma/): same rule, it must not stop the normal flow
+        sys.path.insert(0, str(ROOT / "mma"))
+        import mma_publish
+        files += mma_publish.update()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("MMA tracking skipped: %s", exc)
     return files
 
 
