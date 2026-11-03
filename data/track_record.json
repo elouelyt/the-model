@@ -589,11 +589,11 @@
               ],
               "stake_odds": 1.61,
               "best_odds": 1.61,
-              "won": null,
+              "won": false,
               "opponent": "Matteo Berrettini"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "2": {
           "parlays": [
@@ -605,6 +605,20 @@
               "best_odds": 1.38,
               "won": null,
               "opponent": "Lorenzo Musetti"
+            }
+          ],
+          "resolved": false
+        },
+        "3": {
+          "parlays": [
+            {
+              "legs": [
+                "Frances Tiafoe"
+              ],
+              "stake_odds": 1.67,
+              "best_odds": 1.67,
+              "won": null,
+              "opponent": "Quentin Halys"
             }
           ],
           "resolved": false

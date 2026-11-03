@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-03",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Frances Tiafoe",
+          "rank": 8,
+          "points": 3430,
+          "opponent": "Quentin Halys",
+          "opponent_rank": 46,
+          "model_prob": 0.7083,
+          "raw_implied": 0.5917,
+          "edge": 0.1166,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 1.67,
+          "stake_price": 1.67,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "concern",
+            "label": "Form concern",
+            "headline": "November 4, 2026: Quentin Halys vs Frances Tiafoe: Set 1 Winner Tennis Prediction Market - Robinhood",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Tiafoe's superior ranking (#8 vs #46) and the model's strong positive edge suggest value, even with his recent 'out of form' sentiment, as the market may be overreacting to his current struggles.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.67,
+      "total_odds": 1.67
+    }
+  ]
+}
