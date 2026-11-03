@@ -1,5 +1,5 @@
 {
- "timestamp": "2026-11-02T19:19:42.737270+00:00",
+ "timestamp": "2026-11-03T19:40:56.068776+00:00",
  "links": {
   "2026-11-01": {
    "player": "Brandon Nakashima",
@@ -14,6 +14,14 @@
    "opponent": "Lorenzo Musetti",
    "url": "https://stake.com/es/sports/tennis/atp/atp-paris-france-men-singles/1793782800000-r32p1-r32p2",
    "name": "Alexander Zverev - Lorenzo Musetti",
+   "start": "Wed, 04 Nov 2026 10:00:00 GMT",
+   "tournament": "ATP Paris, France Men Singles"
+  },
+  "2026-11-03": {
+   "player": "Frances Tiafoe",
+   "opponent": "Quentin Halys",
+   "url": "https://stake.com/es/sports/tennis/atp/atp-paris-france-men-singles/1793782800000-r32p15-r32p16",
+   "name": "Quentin Halys - Frances Tiafoe",
    "start": "Wed, 04 Nov 2026 10:00:00 GMT",
    "tournament": "ATP Paris, France Men Singles"
   }
