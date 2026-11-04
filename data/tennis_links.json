@@ -1,5 +1,5 @@
 {
- "timestamp": "2026-11-03T19:40:56.068776+00:00",
+ "timestamp": "2026-11-04T19:18:12.568642+00:00",
  "links": {
   "2026-11-01": {
    "player": "Brandon Nakashima",
@@ -23,6 +23,14 @@
    "url": "https://stake.com/es/sports/tennis/atp/atp-paris-france-men-singles/1793782800000-r32p15-r32p16",
    "name": "Quentin Halys - Frances Tiafoe",
    "start": "Wed, 04 Nov 2026 10:00:00 GMT",
+   "tournament": "ATP Paris, France Men Singles"
+  },
+  "2026-11-04": {
+   "player": "Arthur Fils",
+   "opponent": "Tomas Machac",
+   "url": "https://stake.com/es/sports/tennis/atp/atp-paris-france-men-singles/1793782800000-r32p25-r32p26",
+   "name": "Arthur Fils - Tomas Machac",
+   "start": "Wed, 04 Nov 2026 19:30:00 GMT",
    "tournament": "ATP Paris, France Men Singles"
   }
  }
