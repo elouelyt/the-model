@@ -603,11 +603,11 @@
               ],
               "stake_odds": 1.38,
               "best_odds": 1.38,
-              "won": null,
+              "won": false,
               "opponent": "Lorenzo Musetti"
             }
           ],
-          "resolved": false
+          "resolved": true
         },
         "3": {
           "parlays": [
@@ -617,8 +617,22 @@
               ],
               "stake_odds": 1.67,
               "best_odds": 1.67,
-              "won": null,
+              "won": false,
               "opponent": "Quentin Halys"
+            }
+          ],
+          "resolved": true
+        },
+        "4": {
+          "parlays": [
+            {
+              "legs": [
+                "Arthur Fils"
+              ],
+              "stake_odds": 1.55,
+              "best_odds": 1.55,
+              "won": null,
+              "opponent": "Tomas Machac"
             }
           ],
           "resolved": false

@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-04",
+  "parlays": [
+    {
+      "picks": [
+        {
+          "player": "Arthur Fils",
+          "rank": 7,
+          "points": 3525,
+          "opponent": "Tomas Machac",
+          "opponent_rank": 69,
+          "model_prob": 0.746,
+          "raw_implied": 0.6404,
+          "edge": 0.1056,
+          "signal": "value_bet",
+          "surface": "indoor_hard",
+          "sport_title": "",
+          "best_price": 1.55,
+          "stake_price": 1.55,
+          "best_bookmaker": "Stake",
+          "sentiment": {
+            "available": true,
+            "flag": "positive",
+            "label": "In form",
+            "headline": "Arthur Fils qualifies for the Nitto ATP Finals, first Frenchman since Monfils in 2016 - Tennis Majors",
+            "withdrawn": false,
+            "withdrawal_headline": null
+          },
+          "recommendation": "Fils' significant model edge stems from his superior ranking (#7 vs #69) and current positive form, suggesting he's undervalued on indoor hard despite no prior H2H against Machac.",
+          "is_struggling": false
+        }
+      ],
+      "stake_total_odds": 1.55,
+      "total_odds": 1.55
+    }
+  ]
+}
