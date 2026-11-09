@@ -402,7 +402,7 @@ def _daily_pick_html(pick: dict | None) -> str:
     bk_html = f'<span class="dp-bk">@ {bk_label}</span>' if bk_label else ""
 
     return f"""
-<div class="daily-pick-card">
+<div class="daily-pick-card" data-start="{pick.get("commence_time") or ""}">
     <div class="dp-eyebrow">APUESTA DEL DÍA</div>
     <div class="dp-main">
         <div class="dp-player">
@@ -452,6 +452,16 @@ def _daily_pick_html(pick: dict | None) -> str:
     </div>
     {struggling_banner}
 </div>
+<script>
+(function () {{
+  // The page is only rebuilt once a day: once the match has started, this card is no longer a recommendation.
+  var c = document.querySelector(".daily-pick-card"), t = c && Date.parse(c.dataset.start);
+  if (!t || Date.now() < t) return;
+  c.style.opacity = ".45";
+  c.querySelector(".dp-eyebrow").textContent = "PICK DE AYER — PARTIDO YA JUGADO, NO APOSTAR";
+  c.querySelector(".dp-eyebrow").style.color = "#f87171";
+}})();
+</script>
 <style>
 .daily-pick-card {{
     background: var(--surface);

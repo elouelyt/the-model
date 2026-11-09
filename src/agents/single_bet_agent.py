@@ -141,6 +141,7 @@ def select_daily_pick(results: list[dict]) -> dict | None:
                 "sentiment":      p.get("sentiment", {}),
                 "recommendation": p.get("recommendation", ""),
                 "is_struggling":  is_struggling,
+                "commence_time":  match.get("commence_time"),
             })
 
     if not candidates:
@@ -205,5 +206,6 @@ def select_pick_for_player(results: list[dict], player: str) -> dict | None:
                 ),
                 "sentiment": p.get("sentiment", {}), "recommendation": p.get("recommendation", ""),
                 "is_struggling": is_struggling,
+                "commence_time": match.get("commence_time"),
             }
     return None

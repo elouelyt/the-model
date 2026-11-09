@@ -31,7 +31,7 @@ SCRAPE_JS = r"""
       method: "POST", headers: {"Content-Type": "application/json"},
       body: JSON.stringify({variables, query})
     });
-    return (await r.json())?.data;
+    try { return (await r.json())?.data; } catch (e) { return null; }   // Stake sometimes answers a rate-limit HTML page: skip that call
   }
   const QF = `query { slugTournament(sport: "american-football", category: "usa", tournament: "nfl") {
     fixtureList(type: popular, limit: 30, offset: 0) { id name slug status data { ... on SportFixtureDataMatch { startTime competitors { name } } } } } }`;

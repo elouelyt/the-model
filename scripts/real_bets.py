@@ -86,19 +86,45 @@ def bnb_usd(placed: datetime) -> float | None:
 TRACK = ROOT / "data" / "track_record.json"
 
 
+def espn_tennis_result(player: str, placed: datetime) -> bool | None:
+    """First finished ATP match of `player` that starts after the bet was placed (ESPN scoreboard): True/False, None if not played yet."""
+    surname = player.lower().split()[-1]
+    best = None
+    for back in range(0, 4):
+        day = (placed + timedelta(days=back)).strftime("%Y%m%d")
+        try:
+            data = requests.get(f"https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard?dates={day}", timeout=20).json()
+        except Exception:  # noqa: BLE001
+            continue
+        for ev in data.get("events", []):
+            for grp in ev.get("groupings", []):
+                for comp in grp.get("competitions", []):
+                    start = datetime.fromisoformat(comp["date"].replace("Z", "+00:00"))
+                    if start <= placed or comp["status"]["type"]["state"] != "post":
+                        continue
+                    for c in comp["competitors"]:
+                        if surname in c.get("athlete", {}).get("displayName", "").lower() and (best is None or start < best[0]):
+                            best = (start, bool(c.get("winner")))
+    return best[1] if best else None
+
+
 def tennis_result(player: str, placed: datetime) -> bool | None:
-    """Result of a tennis 'Ganador' leg from the bot's track record (only the daily picks are resolved there): True/False, None if unknown."""
+    """Result of a tennis 'Ganador' leg: the bot's daily pick of the day the bet was placed (or later), else the first match played after the bet (ESPN).
+
+    Never an earlier day's pick: a bet on the same player the day after would otherwise inherit the previous match's result.
+    """
     try:
         months = json.loads(TRACK.read_text(encoding="utf-8"))["months"]
     except Exception:  # noqa: BLE001
-        return None
+        months = {}
     surname = player.lower().split()[-1]
-    for back in range(-1, 5):
-        day = (placed.astimezone(MADRID) + timedelta(days=back)).date()
+    local = placed.astimezone(MADRID)
+    for back in range(-1 if local.hour < 6 else 0, 5):
+        day = (local + timedelta(days=back)).date()
         for p in months.get(day.strftime("%Y-%m"), {}).get("days", {}).get(str(day.day), {}).get("parlays", []):
             if p.get("won") is not None and any(surname in leg.lower() for leg in p.get("legs", [])):
                 return p["won"]
-    return None
+    return espn_tennis_result(player, placed)
 
 
 def settle_bet(bet: dict, nba, nfl) -> dict:
