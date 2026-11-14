@@ -188,7 +188,7 @@ def _rate_with_gemini(parlay: dict) -> dict:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(api_key=api_key, http_options=types.HttpOptions(api_version="v1beta"))
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
