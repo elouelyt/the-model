@@ -6949,7 +6949,7 @@
         "ventaja -15.8 % < 3 %",
         "cuota 1.27 < 1.30"
        ],
-       "model_prob": 0.6214,
+       "model_prob": 0.6213,
        "name": "Daniil Medvedev",
        "price": 1.27,
        "signal": "no_bet"
@@ -7001,7 +7001,7 @@
    "pick": null,
    "source": "pipeline",
    "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 2 la ventaja). Más cercano: Flavio Cobolli (modelo 43 %, ventaja +15.5 %, cuota 3.65), falla: probabilidad 43 % < 61 %.",
-   "updated": "2026-11-15 14:28 UTC"
+   "updated": "2026-11-15 14:31 UTC"
   }
  }
 }
