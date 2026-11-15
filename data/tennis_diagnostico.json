@@ -6914,22 +6914,22 @@
     {
      "players": [
       {
-       "edge": -0.0605,
+       "edge": -0.0596,
        "fails": [
         "el modelo marca «no apostar»",
         "probabilidad 58 % < 61 %",
         "ventaja -6.0 % < 3 %"
        ],
-       "model_prob": 0.5819,
+       "model_prob": 0.5817,
        "name": "Ben Shelton",
        "price": 1.57,
        "signal": "no_bet"
       },
       {
-       "edge": 0.0195,
+       "edge": 0.0183,
        "fails": [
         "probabilidad 42 % < 61 %",
-        "ventaja +1.9 % < 3 %"
+        "ventaja +1.8 % < 3 %"
        ],
        "model_prob": 0.4247,
        "name": "Arthur Fils",
@@ -6943,23 +6943,23 @@
     {
      "players": [
       {
-       "edge": -0.1581,
+       "edge": -0.158,
        "fails": [
         "el modelo marca «no apostar»",
         "ventaja -15.8 % < 3 %",
         "cuota 1.27 < 1.30"
        ],
-       "model_prob": 0.6207,
+       "model_prob": 0.6221,
        "name": "Daniil Medvedev",
        "price": 1.27,
        "signal": "no_bet"
       },
       {
-       "edge": 0.1546,
+       "edge": 0.1548,
        "fails": [
         "probabilidad 43 % < 61 %"
        ],
-       "model_prob": 0.4263,
+       "model_prob": 0.4255,
        "name": "Flavio Cobolli",
        "price": 3.65,
        "signal": "value_bet"
@@ -6971,23 +6971,23 @@
     {
      "players": [
       {
-       "edge": -0.0848,
+       "edge": -0.0853,
        "fails": [
         "el modelo marca «no apostar»",
         "ventaja -8.5 % < 3 %",
         "cuota 1.10 < 1.30"
        ],
-       "model_prob": 0.8209,
+       "model_prob": 0.822,
        "name": "Carlos Alcaraz",
        "price": 1.1,
        "signal": "no_bet"
       },
       {
-       "edge": 0.0939,
+       "edge": 0.0937,
        "fails": [
         "probabilidad 24 % < 61 %"
        ],
-       "model_prob": 0.2385,
+       "model_prob": 0.2363,
        "name": "Frances Tiafoe",
        "price": 7.0,
        "signal": "value_bet"
@@ -7001,7 +7001,7 @@
    "pick": null,
    "source": "pipeline",
    "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 2 la ventaja). Más cercano: Flavio Cobolli (modelo 43 %, ventaja +15.5 %, cuota 3.65), falla: probabilidad 43 % < 61 %.",
-   "updated": "2026-11-15 15:14 UTC"
+   "updated": "2026-11-15 17:01 UTC"
   }
  }
 }
