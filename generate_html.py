@@ -1502,7 +1502,8 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
     try:
         sys.path.insert(0, str(Path(__file__).parent / "scripts"))
         import tennis_audit
-        tennis_diary_html = tennis_audit.diary_html()
+        import web_diario
+        tennis_diary_html = web_diario.diary_html() + tennis_audit.diary_html()
     except Exception:
         tennis_diary_html = ""
     strategy_html = ""

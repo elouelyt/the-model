@@ -1,0 +1,45 @@
+{
+ "days": {
+  "2026-11-15": {
+   "hora": "14:30 UTC",
+   "secciones": {
+    "Apuestas reales": {
+     "estado": "ok",
+     "nota": "Tus apuestas registradas: 39; la última fue el 2026-11-09."
+    },
+    "GitHub": {
+     "estado": "ok",
+     "nota": "GitHub: últimos 5 workflows diarios correctos."
+    },
+    "Jev": {
+     "estado": "ok",
+     "nota": "Jev: 9 combinadas (16 h)."
+    },
+    "MMA": {
+     "estado": "ok",
+     "nota": "MMA: datos de hace 16 h."
+    },
+    "Mezcla": {
+     "estado": "ok",
+     "nota": "Mezcla: 13 combinadas (16 h)."
+    },
+    "NBA": {
+     "estado": "ok",
+     "nota": "NBA: 2 combinada(s) apostable(s), 9 en seguimiento, 65 piernas con valor (actualizado hace 16 h)."
+    },
+    "NFL": {
+     "estado": "ok",
+     "nota": "NFL: 3 combinada(s) apostable(s), 16 en seguimiento, 183 piernas con valor (actualizado hace 16 h)."
+    },
+    "Resultados": {
+     "estado": "ok",
+     "nota": "Resultados: liquidados hace 4 h."
+    },
+    "Tenis": {
+     "estado": "aviso",
+     "nota": "Tenis: 3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 2 la ventaja). Más cercano: Flavio Cobolli (modelo 43 %, ventaja +15.5 %, cuota 3.65), falla: probabilidad 43 % < 61 %."
+    }
+   }
+  }
+ }
+}
