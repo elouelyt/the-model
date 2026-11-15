@@ -149,7 +149,7 @@ def diary_html(max_days: int = 14) -> str:
                  f'<span style="color:var(--muted)">{days[d]["hora"]}</span></td><td>{cells}</td></tr>')
     return ('<section style="margin:16px 0;padding:12px 14px;border:1px solid var(--border,#2a2f3a);border-radius:10px;">'
             '<h2 style="font-size:15px;margin:0 0 4px">Estado diario de la web</h2>'
-            '<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Revisión de las 10:00: qué funciona, qué no y por qué no hay picks. '
+            '<p style="font-size:12px;color:var(--muted);margin:0 0 8px">Revisión a las 10:00, 16:00 y 22:00 (se muestra la última): qué funciona, qué no y por qué no hay picks. '
             'Verde = bien · ámbar = sin picks o aviso · rojo = fallo.</p>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><tbody>{rows}</tbody></table></div></section>')
 
