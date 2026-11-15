@@ -41,7 +41,7 @@ def load() -> dict:
 
 def save(diag: dict) -> None:
     DIAG.parent.mkdir(parents=True, exist_ok=True)
-    DIAG.write_text(json.dumps(diag, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
+    DIAG.write_text(json.dumps(diag, ensure_ascii=False, indent=1, sort_keys=True, default=str), encoding="utf-8")
 
 
 def fails(model_prob, edge, price, signal) -> list[str]:
