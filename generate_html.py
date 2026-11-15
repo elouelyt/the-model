@@ -1499,6 +1499,12 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
         content = "\n".join(_match_card_html(m) for m in results)
 
     track_record_html = _track_record_html(track_record or {})
+    try:
+        sys.path.insert(0, str(Path(__file__).parent / "scripts"))
+        import tennis_audit
+        tennis_diary_html = tennis_audit.diary_html()
+    except Exception:
+        tennis_diary_html = ""
     strategy_html = ""
 
     from src.agents.mma_odds_agent import fetch_mma_odds
@@ -2306,6 +2312,7 @@ def generate_html(results: list[dict] | None, parlays: list[dict] | None = None,
   {strategy_html}
   {parlays_html}
   {safe_parlays_html}
+  {tennis_diary_html}
   {track_record_html}
   {mma_html}
   {content}
@@ -2390,6 +2397,14 @@ def main() -> None:
     if daily_pick:
         _log_daily_pick_to_track_record(daily_pick, track_record)
         _save_track_record(track_record)
+
+    # Diario de picks de tenis (por qué hubo / no hubo pick hoy) - se muestra en Recomendaciones
+    try:
+        sys.path.insert(0, str(Path(__file__).parent / "scripts"))
+        import tennis_audit
+        tennis_audit.record(results, daily_pick, error)
+    except Exception as exc:  # nunca romper el pipeline por el diario
+        logger.warning("tennis_audit failed: %s", exc)
 
     html = generate_html(
         results, parlays=parlays, safe_parlays=safe_parlays,

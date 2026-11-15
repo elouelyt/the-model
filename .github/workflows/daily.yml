@@ -73,6 +73,7 @@ jobs:
           cp -f data/site.enc /tmp/site_generated.enc 2>/dev/null || true
           cp data/track_record.json /tmp/track_record_generated.json
           cp -r data/predictions /tmp/predictions_generated
+          cp -f data/tennis_diagnostico.json /tmp/tennis_diag_generated.json 2>/dev/null || true
           cp -f data/scores_cache.json /tmp/scores_cache_generated.json 2>/dev/null || true
           cp -f data/rankings_cache.json /tmp/rankings_cache_generated.json 2>/dev/null || true
           git fetch origin main
@@ -82,12 +83,14 @@ jobs:
           cp -f /tmp/site_generated.enc data/site.enc 2>/dev/null || true
           cp /tmp/track_record_generated.json data/track_record.json
           cp -r /tmp/predictions_generated/. data/predictions/
+          cp -f /tmp/tennis_diag_generated.json data/tennis_diagnostico.json 2>/dev/null || true
           cp -f /tmp/scores_cache_generated.json data/scores_cache.json 2>/dev/null || true
           cp -f /tmp/rankings_cache_generated.json data/rankings_cache.json 2>/dev/null || true
           git add index.html || true
           git add panel.html || true
           git add data/site.enc || true
           git add data/predictions/ || true
+          git add data/tennis_diagnostico.json || true
           git add data/track_record.json || true
           git add data/scores_cache.json || true
           git add data/rankings_cache.json || true
