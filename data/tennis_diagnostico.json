@@ -7014,7 +7014,7 @@
         "ventaja -15.7 % < 3 %",
         "cuota 1.27 < 1.30"
        ],
-       "model_prob": 0.6354,
+       "model_prob": 0.6345,
        "name": "Daniil Medvedev",
        "price": 1.27,
        "signal": "no_bet"
@@ -7024,9 +7024,9 @@
        "fails": [
         "probabilidad 41 % < 61 %"
        ],
-       "model_prob": 0.4121,
+       "model_prob": 0.4122,
        "name": "Flavio Cobolli",
-       "price": 4.0,
+       "price": 3.95,
        "signal": "value_bet"
       }
      ],
@@ -7036,7 +7036,7 @@
     {
      "players": [
       {
-       "edge": 0.0023,
+       "edge": 0.0021,
        "fails": [
         "probabilidad 52 % < 61 %",
         "ventaja +0.2 % < 3 %"
@@ -7047,7 +7047,7 @@
        "signal": "marginal"
       },
       {
-       "edge": -0.052,
+       "edge": -0.0519,
        "fails": [
         "el modelo marca «no apostar»",
         "probabilidad 48 % < 61 %",
@@ -7065,18 +7065,18 @@
     {
      "players": [
       {
-       "edge": -0.0373,
+       "edge": -0.0367,
        "fails": [
         "el modelo marca «no apostar»",
         "ventaja -3.7 % < 3 %"
        ],
-       "model_prob": 0.6315,
+       "model_prob": 0.6313,
        "name": "Alexander Zverev",
        "price": 1.51,
        "signal": "no_bet"
       },
       {
-       "edge": -0.004,
+       "edge": -0.0043,
        "fails": [
         "el modelo marca «no apostar»",
         "probabilidad 38 % < 61 %",
@@ -7095,8 +7095,8 @@
    "n_matches": 3,
    "pick": null,
    "source": "pipeline",
-   "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 1 la ventaja). Más cercano: Flavio Cobolli (modelo 41 %, ventaja +15.7 %, cuota 4.00), falla: probabilidad 41 % < 61 %.",
-   "updated": "2026-11-16 17:01 UTC"
+   "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 1 la ventaja). Más cercano: Flavio Cobolli (modelo 41 %, ventaja +15.7 %, cuota 3.95), falla: probabilidad 41 % < 61 %.",
+   "updated": "2026-11-16 17:49 UTC"
   }
  }
 }
