@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "nfl"))
 import nba_settle  # noqa: E402
 import nfl_settle  # noqa: E402
+from safe_json import save_json  # noqa: E402
 
 HISTORY = ROOT / "data" / "jev_history"
 ANALYSIS = ROOT / "data" / "jev_analysis.json"
@@ -47,7 +48,7 @@ def settle_file(path: Path, nba: "nba_settle.Espn", nfl: "nfl_settle.Espn") -> i
             results[key] = nba_settle.settle_leg(leg, box) if sport == "nba" else nfl_settle.settle_leg(leg, box)
             done += 1
     if done:
-        path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
+        save_json(path, snap, ensure_ascii=False)
     return done
 
 
@@ -107,7 +108,7 @@ def main() -> None:
         l["our_prob"] = ours.get((l["date"], l["player"], l["stat"], l["side"], l["line"]))
     analysis["brier"] = brier(analysis["legs"])
     analysis["comparison"] = comparison(analysis)
-    ANALYSIS.write_text(json.dumps(analysis, ensure_ascii=False), encoding="utf-8")
+    save_json(ANALYSIS, analysis, ensure_ascii=False)
     print(f"Jev: settled {done} new legs; {analysis['legs_settled']} legs / {analysis['combos_settled']} combos in analysis; brier {analysis['brier']}")
 
 

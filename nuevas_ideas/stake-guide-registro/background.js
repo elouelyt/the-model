@@ -6,7 +6,11 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 const REPO = "elouelyt/the-model-bets";
 const get = (k) => new Promise((r) => chrome.storage.local.get(k, (v) => r(v[k])));
 const set = (o) => new Promise((r) => chrome.storage.local.set(o, r));
-const b64 = (s) => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+const b64 = (s) => {   // byte by byte: spreading a large array into fromCharCode() throws RangeError
+  let bin = "";
+  for (const byte of new TextEncoder().encode(s)) bin += String.fromCharCode(byte);
+  return btoa(bin);
+};
 let flushing = false;
 let again = false;
 
@@ -44,12 +48,16 @@ async function sendQueue() {
       const bet = queue[0];
       if (!bet) break;
       const month = bet.placed_at.slice(0, 7);
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/bets/${month}/${bet.id}.json`, {
+      const url = `https://api.github.com/repos/${REPO}/contents/bets/${month}/${bet.id}.json`;
+      const headers = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" };
+      const res = await fetch(url, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ message: `bet ${bet.id}`, content: b64(JSON.stringify(bet, null, 1)) }),
       });
-      if (res.ok || res.status === 422) {          // 422 = that file already exists (sent before)
+      // 422 also covers other invalid requests: only drop the bet if its file really is in the repo already
+      const alreadySent = res.status === 422 && (await fetch(url, { headers })).ok;
+      if (res.ok || alreadySent) {
         const left = await dequeue(bet.id);
         st = { sent: (st.sent || 0) + 1, last: bet.id, error: "" };
         await set({ betStats: { ...st, pending: left } });

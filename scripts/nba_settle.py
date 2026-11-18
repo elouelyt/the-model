@@ -19,6 +19,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from nba_ev import norm_name  # noqa: E402
+from safe_json import save_json  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -122,7 +123,7 @@ def settle_file(path: Path, espn: Espn) -> int:
             results[key] = settle_leg(leg, box)
             done += 1
     if done:
-        path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
+        save_json(path, snap, ensure_ascii=False)
     return done
 
 
@@ -287,7 +288,7 @@ def main() -> None:
         except Exception as exc:  # noqa: BLE001
             logger.warning("settle %s failed: %s", path.name, str(exc)[:120])
     analysis = analyse()
-    ANALYSIS.write_text(json.dumps(analysis, ensure_ascii=False), encoding="utf-8")
+    save_json(ANALYSIS, analysis, ensure_ascii=False)
     logger.info("Settled %d new legs; %d legs / %d combos in analysis", total,
                 analysis["legs_settled"], analysis["combos_settled"])
 

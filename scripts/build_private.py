@@ -65,9 +65,12 @@ def main() -> None:
 
     tabs = [("Recomendaciones", rec), ("Rendimiento", generate_dashboard.build(generate_dashboard.load_bets()))]
     if NBA_ENC.exists():
-        picks_path = BUILD / "nba_picks.json"
-        decrypt_file(NBA_ENC, picks_path)
-        tabs.append(("NBA", generate_nba.build(json.loads(picks_path.read_text(encoding="utf-8")))))
+        try:  # like the other tabs: a bad nba_picks.enc must not break the whole panel (web_check flags "skipped")
+            picks_path = BUILD / "nba_picks.json"
+            decrypt_file(NBA_ENC, picks_path)
+            tabs.append(("NBA", generate_nba.build(json.loads(picks_path.read_text(encoding="utf-8")))))
+        except Exception as exc:  # noqa: BLE001
+            print(f"NBA tab skipped: {exc}")
     if NFL_ENC.exists():
         try:  # a problem in the NFL tab must never break the rest of the panel
             sys.path.insert(0, str(ROOT / "nfl"))

@@ -28,6 +28,7 @@ sys.path.insert(0, str(ROOT / "jev"))
 import jev_client  # noqa: E402
 import jev_context  # noqa: E402
 import nba_combos as nc  # noqa: E402
+from safe_json import save_json  # noqa: E402
 
 logger = logging.getLogger(__name__)
 NBA_PICKS = ROOT / "data" / "nba_picks.json"
@@ -134,7 +135,7 @@ def evaluate(pool: list[dict], day: str) -> dict[str, float]:
         for lid, p in ids.items():
             if lid in probs:
                 cache[sig(p)] = {"day": day, "prob": round(probs[lid], 4)}
-        CACHE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
+        save_json(CACHE, cache, ensure_ascii=False)
     return {nc.leg_key(p): cache[sig(p)]["prob"] for p in pool if sig(p) in cache}
 
 
@@ -238,11 +239,11 @@ def main() -> None:
     known_legs = {nc.leg_key(p) for r in snap["runs"] for p in r["picks"]}
     new_picks = [p for p in jp if nc.leg_key(p) not in known_legs]   # every leg Jev judged: used to measure its calibration vs ours
     snap["runs"].append({"at": now.isoformat(), "picks": new_picks, "combos": new_combos, "quotes": {}})
-    snap_path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
+    save_json(snap_path, snap, ensure_ascii=False)
 
     doc = {"timestamp": now.isoformat(), **result, "legs_evaluated": len(jp),
            "context_hash": hashlib.sha1(knowledge().encode()).hexdigest()[:8]}
-    OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_json(OUT, doc, ensure_ascii=False, indent=1)
     print(f"Jev: {len(jp)} legs judged; combos " + ", ".join(f"{s} {len(result[s])}" for s in SCOPES) + f" ({len(new_combos)} new)")
     for s in SCOPES:
         for c in result[s]:

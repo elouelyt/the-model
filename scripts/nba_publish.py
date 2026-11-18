@@ -44,7 +44,7 @@ def main() -> None:
     run(py, "scripts/nba_settle.py", check=False)  # settle yesterday's legs and combos with real box scores
     if "--skip-fetch" not in sys.argv:
         run(py, "scripts/nba_stake_scraper.py")
-        run(py, "scripts/nba_fanduel.py")
+        run(py, "scripts/nba_fanduel.py", check=False)  # optional book: Firecrawl out of credits must not stop the batch
     # The free BettingPros key allows 50 requests/day and a full pass costs ~37: spend it once a day, in the first batch from
     # 17:00 (nba_bettingpros.py then skips while its cache is < 7 h old). Morning runs use FanDuel (Firecrawl) + Pinnacle. Force with --bp.
     if "--bp" in sys.argv or datetime.now().hour >= 17:   # first afternoon batch; the 7 h cache then serves the later ones

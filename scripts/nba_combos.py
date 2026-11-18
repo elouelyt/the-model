@@ -18,6 +18,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
+from safe_json import save_json  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 PICKS = ROOT / "data" / "nba_picks.json"
@@ -215,7 +216,7 @@ def main() -> None:
         else:
             tracking.append(c)
     doc["combos_tracking"] = tracking
-    PICKS.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_json(PICKS, doc, ensure_ascii=False, indent=1)
 
     # keep every leg/combo ever recommended that day (first sighting wins), settled later
     known_legs = {leg_key(p) for r in snap["runs"] for p in r["picks"]}
@@ -231,7 +232,7 @@ def main() -> None:
     new_combos = [c for c in combos + tracking if tuple(sorted(l["key"] for l in c["legs"])) not in known_combos]
     quotes = {leg_key(p): [p["stake_odds"], p.get("stake_opp"), p["fair_prob"]] for p in doc["picks"]}
     snap["runs"].append({"at": doc["timestamp"], "picks": new_picks, "combos": new_combos, "quotes": quotes})
-    snap_path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
+    save_json(snap_path, snap, ensure_ascii=False)
 
     print(f"{len(combos)} bettable combos + {len(tracking)} tracking combos (new today: {len(new_combos)}), snapshot {snap_path.name}")
     for c in combos + tracking:

@@ -104,6 +104,9 @@ def main() -> None:
         for r in rows:
             out_rows.append({"fixture": game["fixture"], **r})
 
+    if not out_rows:   # e.g. Firecrawl out of credits: keep the previous cache (nba_ev skips it by age)
+        logger.warning("0 FanDuel lines — %s left unchanged", OUT.name)
+        return
     OUT.write_text(json.dumps({"timestamp": datetime.now(timezone.utc).isoformat(),
                                "source": "FanDuel via Firecrawl", "rows": out_rows},
                               ensure_ascii=False), encoding="utf-8")

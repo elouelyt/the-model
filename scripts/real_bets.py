@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT / "nfl"))
 
 import nba_settle  # noqa: E402
 import nfl_settle  # noqa: E402
+from safe_json import save_json  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -229,7 +230,7 @@ def main() -> list[dict]:
             continue
         out.append(settle_bet(bet, nba, nfl))
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_json(OUT, out, ensure_ascii=False, indent=1)
     done = sum(b["status"] in ("won", "lost", "void") for b in out)
     logger.info("%d bets recorded, %d settled, %d pending/unknown", len(out), done, len(out) - done)
     return out

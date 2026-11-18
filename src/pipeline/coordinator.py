@@ -20,6 +20,31 @@ from langgraph.graph import StateGraph, END
 
 logger = logging.getLogger(__name__)
 
+_STAKE_CACHE_MAX_AGE_H = 18   # older Stake odds are stale (moved lines, finished matches)
+
+
+def _load_stake_cache() -> dict | None:
+    """data/stake_cache.json if it exists, parses and is younger than _STAKE_CACHE_MAX_AGE_H; else None."""
+    import json
+    from datetime import datetime, timezone
+    from pathlib import Path
+
+    cache_path = Path(__file__).parent.parent.parent / "data" / "stake_cache.json"
+    if not cache_path.exists():
+        logger.info("[coordinator] No stake_cache.json found — run scripts/stake_update.py with VPN")
+        return None
+    try:
+        cache = json.loads(cache_path.read_text(encoding="utf-8-sig"))
+        written = datetime.fromisoformat(cache["timestamp"].replace("Z", "+00:00"))
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("[coordinator] stake_cache.json unreadable: %s", exc)
+        return None
+    age_h = (datetime.now(timezone.utc) - written).total_seconds() / 3600
+    if age_h > _STAKE_CACHE_MAX_AGE_H:
+        logger.warning("[coordinator] stake_cache.json is %.0f h old (max %d h) — ignored", age_h, _STAKE_CACHE_MAX_AGE_H)
+        return None
+    return cache
+
 # ── State schema ───────────────────────────────────────────────────────────────
 
 
@@ -102,12 +127,9 @@ def fetch_odds_node(state: PipelineState) -> PipelineState:
 
     # Tier 3: stake_cache.json written locally by scripts/stake_scraper.py (CDP)
     if df is None or df.empty:
-        import json
-        from pathlib import Path
-        cache_path = Path(__file__).parent.parent.parent / "data" / "stake_cache.json"
-        if cache_path.exists():
+        cache = _load_stake_cache()
+        if cache:
             try:
-                cache = json.loads(cache_path.read_text(encoding="utf-8"))
                 matches = cache.get("matches", [])
                 if matches:
                     from datetime import datetime, timezone, timedelta
@@ -121,12 +143,12 @@ def fetch_odds_node(state: PipelineState) -> PipelineState:
                         t = m.get("tournament", "").lower()
                         if "wta" in t or "women" in t:
                             continue
-                        # Parse start_time; default to now+6h if missing
+                        # No usable start_time: skip (inventing one could pass a finished match as upcoming)
                         st_str = m.get("start_time", "")
                         try:
-                            ct = datetime.fromisoformat(st_str.replace("Z", "+00:00")) if st_str else now + timedelta(hours=6)
+                            ct = datetime.fromisoformat(st_str.replace("Z", "+00:00"))
                         except ValueError:
-                            ct = now + timedelta(hours=6)
+                            continue
                         if ct <= now or ct > cutoff:
                             continue
                         stake_events.append({
@@ -247,10 +269,9 @@ def fetch_stake_odds_node(state: PipelineState) -> PipelineState:
 
     # ── Fallback: stake_cache.json ────────────────────────────────────────────
     if not stake_odds:
-        cache_path = Path(__file__).parent.parent.parent / "data" / "stake_cache.json"
-        if cache_path.exists():
+        cached = _load_stake_cache()
+        if cached:
             try:
-                cached = json.loads(cache_path.read_text())
                 cached_odds: dict[str, float] = cached.get("odds", {})
                 stake_odds = {p: cached_odds[p] for p in players if p in cached_odds}
                 if stake_odds:
@@ -266,8 +287,6 @@ def fetch_stake_odds_node(state: PipelineState) -> PipelineState:
                     )
             except Exception as exc:  # noqa: BLE001
                 logger.warning("[coordinator] Failed to load stake_cache.json: %s", exc)
-        else:
-            logger.info("[coordinator] No stake_cache.json found — run scripts/stake_update.py with VPN")
 
     logger.info(
         "[coordinator] Stake odds source=%s, %d / %d players",

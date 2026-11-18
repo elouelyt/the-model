@@ -27,6 +27,7 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from safe_json import save_json  # noqa: E402
 
 load_dotenv()
 
@@ -550,7 +551,7 @@ def load_track_record() -> dict:
 
 def save_track_record(tr: dict) -> None:
     _TRACK_FILE.parent.mkdir(parents=True, exist_ok=True)
-    _TRACK_FILE.write_text(json.dumps(tr, indent=2, ensure_ascii=False), encoding="utf-8")
+    save_json(_TRACK_FILE, tr, indent=2, ensure_ascii=False)
 
 
 def process_pending(tr: dict) -> int:
@@ -651,7 +652,7 @@ def save_scores_cache(events: list[dict]) -> None:
             existing.append(ev)
             existing_ids.add(ev["id"])
     _SCORES_CACHE.parent.mkdir(parents=True, exist_ok=True)
-    _SCORES_CACHE.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
+    save_json(_SCORES_CACHE, existing, indent=2, ensure_ascii=False)
     logger.info("[scores-cache] saved %d total events", len(existing))
 
 

@@ -14,12 +14,15 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def load_json(path: Path, default):
+def load_json(path: Path, default, strict: bool = False):
+    """strict=True raises on a corrupt file instead of moving it aside (for records that must never restart empty)."""
     if not path.exists():
         return default
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8-sig"))   # -sig: some files were saved with a BOM
     except Exception as exc:  # noqa: BLE001
+        if strict:
+            raise RuntimeError(f"{path} is corrupt, refusing to overwrite it: {exc}") from exc
         aside = path.with_name(f"{path.name}.corrupt-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}")
         os.replace(path, aside)
         logger.warning("%s unreadable (%s): moved to %s, starting a new one", path.name, str(exc)[:80], aside.name)

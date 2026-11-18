@@ -25,7 +25,9 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "jev"))
+sys.path.insert(0, str(ROOT / "scripts"))
 import jev_client  # noqa: E402
+from safe_json import save_json  # noqa: E402
 
 logger = logging.getLogger(__name__)
 HISTORY = ROOT / "data" / "mma_history"
@@ -92,7 +94,7 @@ def load_day(day: str) -> dict:
 
 def save_day(doc: dict) -> None:
     HISTORY.mkdir(parents=True, exist_ok=True)
-    (HISTORY / f"{doc['date']}.json").write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_json((HISTORY / f"{doc['date']}.json"), doc, ensure_ascii=False, indent=1)
 
 
 def record_ours(rec: dict, f: dict, now: str) -> None:
@@ -288,7 +290,7 @@ def main() -> None:
         save_day(doc)
     settle_all(sorted(p.stem for p in HISTORY.glob("*.json")))
     a = analyse()
-    ANALYSIS.write_text(json.dumps(a, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_json(ANALYSIS, a, ensure_ascii=False, indent=1)
     c = a["comparison"]
     logger.info("MMA: %d fights tracked; Jev %s; ours(value) %s; brier %s", len(a["fights"]), c["jev"], c["ours_value"], a["brier"])
 

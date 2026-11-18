@@ -19,6 +19,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+sys.path.append(str(Path(__file__).parent / "scripts"))
+from safe_json import load_json, save_json  # noqa: E402
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -2462,24 +2465,17 @@ def _save_predictions(parlays: list[dict]) -> None:
             for parl in parlays
         ],
     }
-    pred_file.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    save_json(pred_file, payload, indent=2, ensure_ascii=False)
     logger.info("Saved predictions to %s", pred_file)
 
 
 def _load_track_record() -> dict:
-    track_file = Path("data/track_record.json")
-    if track_file.exists():
-        try:
-            return json.loads(track_file.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return {"months": {}}
+    # strict: a corrupt record stops the run (exit 1) instead of being replaced by an empty one and committed
+    return load_json(Path("data/track_record.json"), {"months": {}}, strict=True)
 
 
 def _save_track_record(track_record: dict) -> None:
-    track_file = Path("data/track_record.json")
-    track_file.parent.mkdir(parents=True, exist_ok=True)
-    track_file.write_text(json.dumps(track_record, indent=2, ensure_ascii=False), encoding="utf-8")
+    save_json(Path("data/track_record.json"), track_record, indent=2, ensure_ascii=False)
 
 
 def _pick_already_pending(player: str, track_record: dict, lookback_days: int = 6) -> bool:
@@ -2547,12 +2543,7 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     # Save minimal prediction file so check_results.py can look up the match result
     pred_path = Path("data/predictions") / f"{date_str}.json"
     pred_path.parent.mkdir(exist_ok=True)
-    existing: dict = {}
-    if pred_path.exists():
-        try:
-            existing = json.loads(pred_path.read_text(encoding="utf-8"))
-        except Exception:
-            existing = {}
+    existing: dict = load_json(pred_path, {})
     existing["date"] = date_str
     existing.setdefault("parlays", [])
     pick_parlay = {
@@ -2565,7 +2556,7 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
         for p in existing["parlays"]
     ):
         existing["parlays"].append(pick_parlay)
-    pred_path.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
+    save_json(pred_path, existing, indent=2, ensure_ascii=False)
     logger.info("Auto-logged daily pick: %s @ %s (pending)", pick["player"], best_odds)
 
 

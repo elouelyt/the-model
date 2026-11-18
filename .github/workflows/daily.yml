@@ -15,6 +15,7 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30   # a hung scrape must fail fast, not hold the concurrency queue for 6 h
 
     steps:
       - name: Checkout
@@ -33,13 +34,18 @@ jobs:
       - name: Update ATP rankings cache
         run: python scripts/rankings_update.py || echo "Rankings update failed — using cached data"
 
+      # These two must not cost today's picks; if they fail, the last step turns the run red anyway.
       - name: Health check
+        id: health
+        continue-on-error: true
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
           THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 || secrets.THE_ODDS_API_KEY2 }}
         run: python scripts/daily_health_check.py
 
       - name: Check yesterday's results
+        id: results
+        continue-on-error: true
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
           THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 || secrets.THE_ODDS_API_KEY2 }}
@@ -104,6 +110,15 @@ jobs:
           git diff --cached --quiet \
             && echo "No changes to commit." \
             || git commit -m "chore: update predictions $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
-          git fetch origin main
-          git rebase origin/main
-          git push
+          # a local publish (nba_publish, nfl_publish) can push in between: retry instead of losing the day
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            echo "push attempt $i failed, retrying"; sleep 10
+          done
+          exit 1
+
+      - name: Flag failed checks
+        if: steps.health.outcome == 'failure' || steps.results.outcome == 'failure'
+        run: |
+          echo "Health check: ${{ steps.health.outcome }} / yesterday's results: ${{ steps.results.outcome }}"
+          exit 1

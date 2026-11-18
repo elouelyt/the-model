@@ -18,6 +18,7 @@ import requests
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import nba_settle  # noqa: E402
 from nba_ev import norm_name  # noqa: E402
+from safe_json import save_json  # noqa: E402
 
 BASE = Path(__file__).resolve().parent
 HISTORY = BASE / "data" / "nfl_history"
@@ -117,7 +118,7 @@ def settle_file(path: Path, espn: Espn) -> int:
             results[key] = settle_leg(leg, box)
             done += 1
     if done:
-        path.write_text(json.dumps(snap, ensure_ascii=False), encoding="utf-8")
+        save_json(path, snap, ensure_ascii=False)
     return done
 
 
@@ -127,7 +128,7 @@ def main() -> None:
     nba_settle.HISTORY = HISTORY          # reuse the NBA analysis on the NFL history
     nba_settle.ANALYSIS = ANALYSIS
     analysis = nba_settle.analyse()
-    ANALYSIS.write_text(json.dumps(analysis, ensure_ascii=False), encoding="utf-8")
+    save_json(ANALYSIS, analysis, ensure_ascii=False)
     print(f"Settled {done} new NFL legs; {analysis['legs_settled']} legs / {analysis['combos_settled']} combos in analysis")
 
 

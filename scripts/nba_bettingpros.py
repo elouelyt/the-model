@@ -17,6 +17,7 @@ from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
+from safe_json import save_json  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -58,7 +59,7 @@ def _spend() -> None:
     if used["n"] >= DAILY_BUDGET:
         raise RuntimeError(f"BettingPros daily budget of {DAILY_BUDGET} requests used")
     used["n"] += 1
-    USAGE.write_text(json.dumps(used), encoding="utf-8")
+    save_json(USAGE, used)
 
 
 def get(path: str, headers: dict, **params) -> dict:

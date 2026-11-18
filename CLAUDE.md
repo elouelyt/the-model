@@ -119,6 +119,8 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 
 **Key lesson (18/11, revisión ECC python-reviewer):** todo texto externo (nombres, titulares RSS, Gemini, errores) va por `_e()` (html.escape) en `generate_html.py`; si el pipeline falla, `main()` sale con código 1 sin sobrescribir la web (el commit de `daily.yml` corre igual para guardar el diario); los registros diarios (`tennis_diagnostico.json`, `web_diario.json`) se leen/escriben con `scripts/safe_json.py` (escritura atómica; un JSON corrupto se aparta como `.corrupt-<fecha>`, no se machaca). Emparejar tenistas con `real_bets.same_player()` (apellido exacto + inicial), nunca por subcadena: Stake y el track record escriben distinto algunos nombres ("Francis"/"Frances Tiafoe").
 
+**Key lesson (18/11, fiabilidad):** todos los JSON de historial/registro se escriben con `safe_json.save_json` (atómico); `track_record.json` se lee con `load_json(..., strict=True)`: si está corrupto el proceso para en vez de subir uno vacío. La caché de Stake de tenis se ignora con más de 18 h (`coordinator._load_stake_cache`). Pinnacle/FanDuel no escriben caché si no hay líneas (el EV descarta por antigüedad la anterior). En `daily.yml`, health check y check_results no bloquean el día pero el run acaba en rojo si fallan; push con 3 reintentos; timeouts en los 3 workflows.
+
 **Key lesson:** `staticrypt` pide confirmación interactiva si la contraseña tiene menos de 14 caracteres y se cuelga en CI — usar siempre `--short`. Fijar `--salt` para que "recordar contraseña" no caduque cada día.
 
 ## NBA player props (value finder) — IN PROGRESS
