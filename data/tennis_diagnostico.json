@@ -7190,6 +7190,100 @@
    "source": "pipeline",
    "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 2 la ventaja). Más cercano: Flavio Cobolli (modelo 52 %, ventaja +4.3 %, cuota 2.09), falla: probabilidad 52 % < 61 %.",
    "updated": "2026-11-17 17:18 UTC"
+  },
+  "2026-11-18": {
+   "matches": [
+    {
+     "players": [
+      {
+       "edge": 0.0548,
+       "fails": [
+        "probabilidad 52 % < 61 %"
+       ],
+       "model_prob": 0.5168,
+       "name": "Flavio Cobolli",
+       "price": 2.2,
+       "signal": "value_bet"
+      },
+      {
+       "edge": -0.1049,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "probabilidad 48 % < 61 %",
+        "ventaja -10.5 % < 3 %"
+       ],
+       "model_prob": 0.4832,
+       "name": "Frances Tiafoe",
+       "price": 1.71,
+       "signal": "no_bet"
+      }
+     ],
+     "teams": "Flavio Cobolli vs Frances Tiafoe",
+     "time": "2026-11-18 19:30:00+00:00"
+    },
+    {
+     "players": [
+      {
+       "edge": -0.0211,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "ventaja -2.1 % < 3 %"
+       ],
+       "model_prob": 0.7008,
+       "name": "Alexander Zverev",
+       "price": 1.43,
+       "signal": "no_bet"
+      },
+      {
+       "edge": -0.0178,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "probabilidad 31 % < 61 %",
+        "ventaja -1.8 % < 3 %"
+       ],
+       "model_prob": 0.3111,
+       "name": "Arthur Fils",
+       "price": 3.25,
+       "signal": "no_bet"
+      }
+     ],
+     "teams": "Alexander Zverev vs Arthur Fils",
+     "time": "2026-11-19 19:30:00+00:00"
+    },
+    {
+     "players": [
+      {
+       "edge": -0.0629,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "ventaja -6.3 % < 3 %"
+       ],
+       "model_prob": 0.6109,
+       "name": "Ben Shelton",
+       "price": 1.49,
+       "signal": "no_bet"
+      },
+      {
+       "edge": 0.026,
+       "fails": [
+        "probabilidad 40 % < 61 %",
+        "ventaja +2.6 % < 3 %"
+       ],
+       "model_prob": 0.4006,
+       "name": "Rafael Jodar",
+       "price": 2.65,
+       "signal": "marginal"
+      }
+     ],
+     "teams": "Ben Shelton vs Rafael Jodar",
+     "time": "2026-11-19 13:00:00+00:00"
+    }
+   ],
+   "n_matches": 3,
+   "pick": null,
+   "source": "pipeline",
+   "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 1 la ventaja). Más cercano: Flavio Cobolli (modelo 52 %, ventaja +5.5 %, cuota 2.20), falla: probabilidad 52 % < 61 %.",
+   "updated": "2026-11-18 16:54 UTC"
   }
  }
 }
