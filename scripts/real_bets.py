@@ -194,18 +194,33 @@ def settle_bet(bet: dict, nba, nfl) -> dict:
     return add_usd(row, placed)
 
 
+LEGACY_MAX_USD = 50   # the bankroll is ~15 $: an old record without unit that would be worth more than this as BNB was typed in dollars
+
+
+def bet_currency(row: dict, price: float | None) -> str:
+    """Unit of `amount`. The extension stores it from 1.10 on (Stake can show dollars or BNB); older records have none: BNB,
+    unless as BNB the bet would be impossible for the bankroll (17/11: 0.25 typed in dollars was read as 0.25 BNB = 147 $)."""
+    cur = (row.get("currency") or "").upper()
+    if cur:
+        return cur
+    return "USD" if price and row.get("amount") and row["amount"] * price > LEGACY_MAX_USD else "BNB"
+
+
 def add_usd(row: dict, placed: datetime) -> dict:
-    """Fill bnb_usd / amount_usd / profit_usd. The extension records BNB amounts (an empty currency means BNB)."""
-    currency = (row.get("currency") or "BNB").upper()
-    if currency != "BNB":
-        logger.warning("bet %s in %s: no USD conversion", row["id"], currency)
-        price = None
+    """Fill bnb_usd / amount_usd / profit_usd / currency_used (reuses a stored BNB price; Binance only when there is none)."""
+    declared = (row.get("currency") or "").upper()
+    price = None if declared == "USD" else row.get("bnb_usd") or bnb_usd(placed)
+    currency = bet_currency(row, price)
+    if currency == "USD":
+        amount_usd = round(row["amount"], 4) if row.get("amount") else None
+    elif currency == "BNB":
+        amount_usd = round(row["amount"] * price, 4) if price and row.get("amount") else None
     else:
-        price = bnb_usd(placed)
-    amount_usd = round(row["amount"] * price, 4) if price and row.get("amount") else None
+        logger.warning("bet %s in %s: no USD conversion", row["id"], currency)
+        amount_usd = None
     profit = row.get("profit_u")
     profit_usd = None if profit is None or amount_usd is None else round(profit * amount_usd, 4)
-    return {**row, "bnb_usd": price, "amount_usd": amount_usd, "profit_usd": profit_usd}
+    return {**row, "currency_used": currency, "bnb_usd": price, "amount_usd": amount_usd, "profit_usd": profit_usd}
 
 
 def main() -> list[dict]:
@@ -224,7 +239,7 @@ def main() -> list[dict]:
         seen.append((sig, when))
         prev = old.get(bet["id"])
         if prev and prev["status"] in ("won", "lost", "void"):
-            if prev.get("amount_usd") is None and prev.get("amount"):   # a transient Binance failure: retry the conversion
+            if prev.get("amount"):   # recompute the dollar figures (unit rule may have changed; retries a missing Binance price)
                 prev = add_usd(prev, when)
             out.append(prev)
             continue

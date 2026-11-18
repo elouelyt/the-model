@@ -12,6 +12,12 @@
   const FAILURE = /saldo insuficiente|insufficient|cuotas? (han )?cambiado|odds (have )?changed|no se pudo|rechazad|rejected/i;
   const REUSE = /Reutilizar Tal[oó]n|Reuse Bet ?slip/i;
   const DUP_MS = 180000;                            // the same bet (legs + amount) is recorded once per 3 minutes
+  // unit of the amounts Stake shows (side panel setting, dollars by default): stored with every bet so the amount is never misread
+  let unit = "USD";
+  try {
+    chrome.storage.local.get("stakeCurrency", (o) => { unit = o && o.stakeCurrency === "BNB" ? "BNB" : "USD"; });
+    chrome.storage.onChanged.addListener((c) => { if (c.stakeCurrency) unit = c.stakeCurrency.newValue === "BNB" ? "BNB" : "USD"; });
+  } catch (e) { /* extension reloaded */ }
 
   // one selection from consecutive text lines: [game, "Sobre 7.5 Puntos", player, odds] in the slip, [game, market, odds, player] in the receipt
   function parseLeg(lines, i) {
@@ -77,7 +83,7 @@
     if (recent.has(key) && Date.now() - recent.get(key) < DUP_MS) return;
     recent.set(key, Date.now());
     const bet = { id: `${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}-${Math.random().toString(36).slice(2, 7)}`, placed_at: new Date().toISOString(),
-                  kind, odds, amount, currency, legs, page: location.pathname };
+                  kind, odds, amount, currency: unit, currency_icon: currency || "", legs, page: location.pathname };
     // what the side panel suggested for this combo (tab, priority among the shown ones, suggested stake): lets the comparison check whether
     // the combos ranked first (bigger stake) hit more often. Matched by the set of players; missing when the combo was not picked from the panel.
     const send = (suggested) => { try { chrome.runtime.sendMessage({ type: "bet", bet: suggested ? { ...bet, suggested } : bet }); } catch (e) { /* extension reloaded */ } };

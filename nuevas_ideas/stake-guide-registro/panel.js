@@ -75,7 +75,8 @@ async function pick(leg) {
   await store.set("stakeTabId", shown.id);
 }
 
-// ---- bankroll and suggested stake: balance (BNB) read from Stake's top bar by balance.js, BNB price from Binance's public ticker
+// ---- bankroll and suggested stake: balance (in the unit Stake shows: dollars or BNB) read from Stake's top bar by balance.js,
+// BNB price from Binance's public ticker (only needed in BNB mode)
 const DEFAULTS = { pctCombo: 1.5, pctTennis: 10 };
 async function bnbPrice() {
   const c = await store.get("bnbPrice");
@@ -88,17 +89,28 @@ async function bnbPrice() {
   return c ? c.v : null;
 }
 async function bankroll() {
-  const [auto, manual, price, pc, pt] = await Promise.all([store.get("stakeBalance"), store.get("manualBnb"), bnbPrice(), store.get("pctCombo"), store.get("pctTennis")]);
-  const bnb = manual > 0 ? manual : auto ? auto.amount : null;
+  let [auto, manual, price, pc, pt, cur] = await Promise.all([store.get("stakeBalance"), store.get("manualBnb"), bnbPrice(), store.get("pctCombo"), store.get("pctTennis"), store.get("stakeCurrency")]);
+  if (cur === undefined) {   // first run of 1.10: a manual balance saved before was in BNB, not in the new default (dollars)
+    if (manual > 0) { await store.del("manualBnb"); manual = null; }
+    await store.set("stakeCurrency", "USD");
+  }
+  const currency = cur === "BNB" ? "BNB" : "USD";   // what Stake shows: dollars (default) or the coin; balance and stakes are in that unit
+  const bal = manual > 0 ? manual : auto && (auto.currency || "BNB") === currency ? auto.amount : null;
   // stakes are sized on the balance at the first look of the day, so placing one bet does not shrink the amounts of the next ones
   const day = new Date().toLocaleDateString("sv");
   let base = await store.get("dayBase");
-  // new base: new day, manual balance changed, balance grew (deposit / win) or fell under half of it (a wrong earlier reading)
-  if (bnb && (!base || base.day !== day || manual > 0 && base.manual !== manual || bnb > base.bnb || bnb < base.bnb * 0.5)) { base = { day, bnb, manual: manual > 0 ? manual : 0 }; await store.set("dayBase", base); }
-  const baseBnb = base && base.day === day ? base.bnb : bnb;
-  return { bnb, price, usd: bnb && price ? bnb * price : null, baseUsd: baseBnb && price ? baseBnb * price : null, src: manual > 0 ? "manual" : auto ? "Stake" : null, at: auto && auto.at,
+  // new base: new day, other currency, manual balance changed, balance grew (deposit / win) or fell under half of it (a wrong earlier reading)
+  if (bal && (!base || base.day !== day || base.currency !== currency || manual > 0 && base.manual !== manual || bal > base.bal || bal < base.bal * 0.5)) {
+    base = { day, currency, bal, manual: manual > 0 ? manual : 0 };
+    await store.set("dayBase", base);
+  }
+  const baseBal = base && base.day === day && base.currency === currency ? base.bal : bal;
+  const toUsd = (v) => (!v ? null : currency === "USD" ? v : price ? v * price : null);
+  return { bal, currency, price, usd: toUsd(bal), baseUsd: toUsd(baseBal), src: manual > 0 ? "manual" : bal ? "Stake" : null, at: auto && auto.at,
            pctCombo: pc > 0 ? pc : DEFAULTS.pctCombo, pctTennis: pt > 0 ? pt : DEFAULTS.pctTennis };
 }
+// a stake (in $) as Stake wants it typed: dollars with 2 decimals, or BNB with 8
+const inStakeUnit = (bank, usdAmount) => (bank.currency === "USD" ? +usdAmount.toFixed(2) : bank.price ? +(usdAmount / bank.price).toFixed(8) : null);
 const usd = (v) => v.toFixed(2).replace(".", ",") + " $";
 // stake suggestion: fixed % of the balance, plus the quarter-Kelly stake of the model's probability as a reference
 // weight: priority of the combo among the ones shown (1st 1.5x ... last 0.5x of the base %, so the total staked is the same as with a flat %)
@@ -107,17 +119,20 @@ function suggest(bank, kind, prob, odds, weight = 1) {
   const pct = +((kind === "tennis" ? bank.pctTennis : bank.pctCombo) * weight).toFixed(2);
   const stake = bank.baseUsd * pct / 100;
   const kelly = prob && odds > 1 ? bank.baseUsd * 0.25 * Math.max(0, (prob * odds - 1) / (odds - 1)) : null;
-  const bnb = (stake / bank.price).toFixed(8);       // Stake takes the amount in BNB (up to 8 decimals)
-  return `<span class="sugl">Apuesta sugerida · clic para copiar</span><span class="sugv" data-v="${bnb}">${bnb} BNB</span>` +
+  const amt = inStakeUnit(bank, stake);
+  if (amt === null) return "Precio de BNB desconocido: no puedo pasar la apuesta a BNB.";
+  const shown = bank.currency === "USD" ? amt.toFixed(2) : amt.toFixed(8);
+  return `<span class="sugl">Apuesta sugerida · clic para copiar</span><span class="sugv" data-v="${shown}">${shown} ${bank.currency === "USD" ? "$" : "BNB"}</span>` +
          `<span class="sugd">≈ ${usd(stake)} · ${pct} % del saldo del día` + (kelly !== null ? ` · Kelly ¼ del modelo: ${usd(kelly)}` : "") + `</span>`;
 }
 async function showBank() {
   const b = await bankroll();
   const el = $("bank");
-  if (!b.bnb) { el.className = "step"; el.textContent = "Saldo: aún no lo he leído. Abre Stake con la sesión iniciada (o escríbelo en «Tamaño de las apuestas»)."; return; }
+  if (!b.bal) { el.className = "step"; el.textContent = `Saldo en ${b.currency === "USD" ? "dólares" : "BNB"}: aún no lo he leído. Abre Stake con la sesión iniciada (o escríbelo en «Tamaño de las apuestas»).`; return; }
   el.className = "step ok";
   const age = b.src === "Stake" && b.at ? ` · leído hace ${Math.max(0, Math.round((Date.now() - b.at) / 60000))} min` : "";
-  el.textContent = `Saldo: ${b.bnb} BNB ≈ ${b.usd ? usd(b.usd) : "?"} (BNB ${b.price ? b.price.toFixed(2) : "?"} $) · ${b.src}${age}`;
+  el.textContent = b.currency === "USD" ? `Saldo: ${usd(b.bal)} · ${b.src}${age}`
+    : `Saldo: ${b.bal} BNB ≈ ${b.usd ? usd(b.usd) : "?"} (BNB ${b.price ? b.price.toFixed(2) : "?"} $) · ${b.src}${age}`;
 }
 
 async function render(doc) {
@@ -133,12 +148,12 @@ async function render(doc) {
   combos.sort((a, b) => b.prob * b.odds - a.prob * a.odds);
   const weight = (i) => combos.length > 1 ? 1.5 - i / (combos.length - 1) : 1;
   // remember what is suggested for each combo: bets.js attaches it to the bet record when the bet is placed (see priority analysis)
-  if (bank.baseUsd && bank.price) {
+  if (bank.baseUsd) {
     const sugg = (await store.get("sugg")) || {};
     combos.forEach((c, i) => {
       const pct = +(bank.pctCombo * weight(i)).toFixed(2);
       sugg[c.legs.map((l) => l.player).sort().join("|")] = { section, rank: i + 1, of: combos.length, weight: +weight(i).toFixed(2), pct,
-        bnb: +(bank.baseUsd * pct / 100 / bank.price).toFixed(8), prob: c.prob, odds: c.odds, at: Date.now() };
+        amount: inStakeUnit(bank, bank.baseUsd * pct / 100), currency: bank.currency, prob: c.prob, odds: c.odds, at: Date.now() };
     });
     const keep = Object.entries(sugg).sort((x, y) => y[1].at - x[1].at).slice(0, 60);
     await store.set("sugg", Object.fromEntries(keep));
@@ -282,7 +297,7 @@ store.get("guideState").then(showState);
 $("ver").textContent = "v" + chrome.runtime.getManifest().version;
 store.get("section").then((s) => selectSection(SECTIONS[s] || s === "tennis" ? s : "nba"));
 
-// click on the suggested stake = Ctrl+C of the amount in BNB with a dot ("0.00210800"), ready to paste into Stake's amount box
+// click on the suggested stake = Ctrl+C of the amount with a dot ("0.25" in dollars, "0.00210800" in BNB), ready to paste into Stake
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* fall back to the old way */ }
   const t = document.createElement("textarea");
@@ -304,14 +319,18 @@ $("list").addEventListener("click", async (ev) => {
 });
 
 // stake sizing settings
-Promise.all([store.get("pctCombo"), store.get("pctTennis"), store.get("manualBnb")]).then(([a, b, m]) => {
+Promise.all([store.get("pctCombo"), store.get("pctTennis"), store.get("manualBnb"), store.get("stakeCurrency")]).then(([a, b, m, cur]) => {
   $("pctcombo").value = a > 0 ? a : DEFAULTS.pctCombo;
   $("pcttennis").value = b > 0 ? b : DEFAULTS.pctTennis;
   $("manualbnb").value = m > 0 ? m : "";
+  $("currency").value = cur === "BNB" ? "BNB" : "USD";
 });
 $("sizesave").onclick = async () => {
   await store.set("pctCombo", parseFloat($("pctcombo").value) || DEFAULTS.pctCombo);
   await store.set("pctTennis", parseFloat($("pcttennis").value) || DEFAULTS.pctTennis);
+  const cur = $("currency").value === "BNB" ? "BNB" : "USD";
+  if (cur !== ((await store.get("stakeCurrency")) || "USD")) { await store.del("stakeBalance"); await store.del("dayBase"); }  // a reading in the other unit is meaningless
+  await store.set("stakeCurrency", cur);
   const m = parseFloat($("manualbnb").value);
   if (m > 0) await store.set("manualBnb", m); else await store.del("manualBnb");
   await showBank();
