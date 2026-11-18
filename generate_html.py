@@ -450,13 +450,11 @@ def _daily_pick_html(pick: dict | None) -> str:
         <span class="dp-edge-val">+{edge_pct:.1f} pp</span>
     </div>
     <div class="dp-firstset">
-        <div class="dp-firstset-badge">STAKE · PRIMER SET</div>
+        <div class="dp-firstset-badge">STAKE · PAGO ANTICIPADO</div>
         <div class="dp-firstset-text">
-            Apostar como <strong>Ganador del 1er Set</strong> en Stake.
-            Si el jugador gana el primer set, la apuesta se cobra —
-            aunque pierda el 2º set o el partido.
-            La probabilidad de ganar el primer set es mayor que ganar el partido
-            (~70% vs ~63%), lo que mejora el EV real de la apuesta.
+            Apostar a <strong>Ganador</strong> (del partido) en Stake.
+            Pago anticipado: si el jugador gana el 1er set <strong>6-0 o 6-1</strong>, Stake paga la apuesta
+            aunque luego pierda el partido (un 6-2 no cuenta).
         </div>
     </div>
     {struggling_banner}
@@ -985,8 +983,8 @@ def _strategy_html() -> str:
     <div class="srule srule-green">
       <div class="srule-num">02</div>
       <div class="srule-body">
-        <strong>Apostar siempre en Stake — Ganador del 1er Set</strong>
-        <p>En Stake, la apuesta cuenta como ganada si el jugador elegido gana el primer set, aunque pierda el segundo set o el partido completo. Esto aumenta la tasa de acierto efectiva de ~63% (victoria en partido) a ~70% (victoria en 1er set), mejorando el EV real de cada apuesta.</p>
+        <strong>Apostar siempre en Stake — mercado Ganador (del partido)</strong>
+        <p>Stake tiene pago anticipado: si el jugador elegido gana el 1er set 6-0 o 6-1, la apuesta se paga aunque luego pierda el partido (un 6-2 o más ajustado no cuenta). Ocurre en pocos partidos, así que el acierto y el historial se miden por el ganador del partido.</p>
       </div>
     </div>
     <div class="srule srule-amber">

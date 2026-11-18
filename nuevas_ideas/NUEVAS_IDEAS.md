@@ -271,3 +271,40 @@ Datos: 132 CSV públicos de football-data.co.uk descargados a una carpeta tempor
   significativo). Hay señal pequeña de que el precio blando queda atrás del sharp; con umbral > 0 % el EV de cierre cae a +0,6 % (3.685 apuestas).
 - "Mejor precio entre casas" parece mejor en EV de cierre (+2,2 %) pero su ROI realizado es -1,2 % (z -0,9): ese máximo incluye cuotas obsoletas o erróneas que no se pueden coger.
 - Lectura: la ventaja de comprar caro contra el sharp existe en fútbol pero es de ~+2 % y de pocas apuestas; con 100 EUR por apuesta serían ~340 EUR al año. No es una vía para vivir de ello, y Bet365 limita a quien gana.
+
+## Idea 28 - Cortes por segmento sobre las piernas liquidadas (2026-11-14)
+Script: `ideas/28_cortes_por_segmento/run.py` (lee `data/nba_analysis.json` y `nfl/data/nfl_analysis.json`; ROI de 1 u a la cuota de Stake; compara dos mitades del periodo para no tomar ruido por señal).
+- NBA (3.701 piernas, 23/10-12/11): ROI base -7,6 % (= margen de Stake). Ningun corte es positivo en las dos mitades. Over pierde siempre (-7,7 % y -10,9 %); Under pasa de -10,6 % a -3,0 %. Las piernas con EV > 0 aciertan ~46 % frente al ~51 % previsto (sesgo de seleccion). Brier de Stake sin margen 0,2439 contra 0,2453 de las casas de referencia: Stake ya esta tan bien calibrado como ellas. CLV medio -0,0004.
+- NFL (1.946 piernas, 25/10-12/11): la ventaja de los Under no se mantuvo: Under +13,8 % en la 1.a mitad y -2,4 % en la 2.a; ev>0&Under +18,7 % y +0,3 %. Lo que parecia lo mas prometedor era en buena parte regresion a la media.
+- Cambios candidatos (sin aplicar, solo papel): no usar Over en NBA; exigir >= 3 casas en NBA; seguir midiendo NFL Under >= 2 semanas mas antes de darlo por bueno; las combinadas de 3 piernas multiplican el margen (ROI de familias -17 %/-21 % frente a -7,6 % por pierna).
+
+## Idea 29 - Seis repos de NBA puestos a prueba con cuotas historicas reales (2026-11-14)
+Repos: kyleskom/NBA-Machine-Learning-Sports-Betting, NBA-Betting/NBA_Betting, saccofrancesco/deepshot, cmunch1/nba-prediction, BenBrostoff/draftfast, matsonj/nba-monte-carlo.
+Leidos por la API de GitHub; no se instalo ni ejecuto su codigo (kyleskom: solo llamadas a stats.nba.com y una clave RapidAPI suya dentro de `Flask/app.py`; sus modelos incluyen `.pkl`, que NO se cargan). Solo se uso su DATA: `Data/OddsData.sqlite` (moneylines SBR 2007-2026, 23.549 partidos) y `Data/dataset.sqlite` (estadisticas de ambos equipos por partido 2012-2026), en un entorno aparte (`%TEMP%/yt_bq/ks_venv`).
+Scripts: `ideas/29_repos_nba/backtest_odds.py` (Elo propio) y `xgb_walkforward.py` (metodo de kyleskom: XGBoost con 107 variables de equipo, entrenado con las temporadas anteriores y evaluado en la siguiente).
+Resultados (ROI de 1 u por apuesta a la cuota real; el margen del mercado ronda el -3,1 % a -3,5 %):
+- Elo propio: acierto 65,7 % frente a 68,0 % del favorito del mercado; Brier 0,2166 contra 0,2043 del mercado. Regla del tenis: 4.782 apuestas, acierto 58,6 %, ROI -3,08 %, 4 de 16 temporadas en positivo.
+- XGBoost estilo kyleskom (2015-2024, 12.555 partidos): acierto 64,4 %; Brier 0,2210 contra 0,2063 del mercado. Regla del tenis: 2.580 apuestas, ROI -3,98 %, 2 de 10 temporadas positivas. Unica variante en torno a cero: mezcla 50/50 modelo+mercado con ventaja >= 2 puntos, ROI +0,21 % (6.697 apuestas, 7 de 10 temporadas): sube de -3,1 % al margen a casi 0, pero Stake cobra ~6 % de margen en el moneyline, asi que no es explotable.
+- Nota: el "68,9 %" que anuncia kyleskom para su modelo equivale al acierto del favorito del mercado (67,8-68,0 % aqui); acertar a ese nivel no es ventaja, es copiar al mercado.
+- cmunch1: README con 58-59 % de acierto, por debajo del mercado. NBA_Betting: archivado, apunta al spread (no a lo que ofrece Stake). draftfast: optimizador de alineaciones DFS (no es un modelo de apuestas). nba-monte-carlo: simulacion de temporada con ratings tipo Elo; no da cuotas de partido.
+Conclusion: ningun modelo de partido basado en estadisticas de equipo supera al mercado; la unica forma de obtener algo es mezclar con el mercado, y la mejora es menor que el margen de Stake. La prueba en papel en vivo (idea 10, tareas `nba-ml-papel` y `nba-ml-liquidar`) sigue acumulando cuotas de Stake y Pinnacle.
+
+## Idea 31 - Validacion honesta del modelo de tenis (2026-11-18) — BLOQUEADA
+Script: `ideas/31_validacion_modelo_tenis/run.py` (walk-forward por anio, una fila por partido, Brier/log-loss y calibracion; el modelo de produccion en 2025-2026, que nunca vio).
+No se pudo ejecutar: el repo JeffSackmann/tennis_atp ya no existe en GitHub (404; Sackmann solo conserva tennis_MatchChartingProject). Afecta tambien a produccion: `src/agents/h2h_agent.py` (el H2H de la web sale vacio sin aviso), la fuente 5 de `scripts/check_results.py` y `scripts/train_model.py` (no se puede reentrenar).
+Alternativa encontrada sin descargar nada: Tennismylife/TML-Database (CSV por anio 1968-2026, actualizada 29/10/2026, sin licencia declarada). Pendiente de que el usuario decida si se usa.
+Dato del modelo actual (`models/lr_model.json`): los coeficientes de superficie son ~0 (1e-18): con filas espejo la superficie es igual para los dos jugadores y no aporta nada; el modelo usa solo puntos y ranking.
+
+## Idea 32 - Edge del pick de tenis contra la cuota de Stake (2026-11-18)
+Script: `ideas/32_edge_cuota_stake/run.py` (lee `data/predictions` y `data/track_record.json`; 42 picks individuales con cuota de Stake, 26/08-04/11).
+- Edge contra Stake en vez de contra la media de casas: solo 3 de 42 picks se caerian (2 ganaron). Cambio de poco impacto.
+- ROI a 1 u a la cuota de Stake: +16,1 % (27/42), pero IC 95 % de -11 % a +41 %: no se puede distinguir de suerte.
+- Brier en esos mismos picks: Stake (con margen) 0,2288, media de casas 0,2341, modelo 0,2364. El mercado predijo mejor que el modelo, aunque el modelo creia tener +14 % de ventaja media. La medida que decide es el CLV contra Pinnacle (idea 30).
+- Aclarado con el usuario (18/11): Stake solo paga por adelantado si el jugador gana el 1er set 6-0 o 6-1 (un 6-2 no). Es raro, asi que liquidar por ganador del partido es correcto; se corrigio el texto de la web y la docstring, que decian "gana el 1er set y cobras" con un ~70 % sin fuente.
+
+### Resultado de la idea 31 (2026-11-18), con datos de Tennismylife/TML-Database (solo para esta prueba; produccion no la usa)
+- Walk-forward 2021-2025 (~2.600-2.900 partidos/anio): acierto 63,6-64,9 %. El 63,7 % de train_model.py NO estaba inflado.
+- Pero el acierto es practicamente igual al de "gana el mejor clasificado" (p. ej. 2025: 64,6 % frente a 64,5 %): el modelo no elige ganadores mejor que el ranking. Su probabilidad si es algo mejor que la formula de puntos (Brier 0,2195 frente a 0,2249 en 2025).
+- Modelo de produccion en 2025 (no lo vio al entrenar): 64,6 %, Brier 0,2195 y muy bien calibrado (p. ej. dice 72,4 % y gana el 72,0 %). Es un modelo honesto de "ranking", no esta roto.
+- 2026: solo 130 partidos (TML llega al 17/01): ruido, no sacar conclusiones.
+- Conclusion: el modelo solo sabe lo que dice el ranking, y eso el mercado ya lo sabe (y ademas forma, lesiones, superficie). Cuadra con la idea 32: en nuestros picks, la probabilidad de Stake acerto mejor que la del modelo. El "edge" de +14 % medio es sobre todo desacuerdo con un mercado mejor informado. Lo que decide es el CLV contra Pinnacle (idea 30); para tener ventaja real haria falta informacion que el ranking no tiene (Elo por superficie, forma reciente) y probarla con este mismo walk-forward.

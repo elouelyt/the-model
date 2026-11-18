@@ -13,13 +13,10 @@ combined odds requires ~76% accuracy per leg to break even — a bar the
 model cannot clear. Singles are the only mathematically sound strategy
 given the current accuracy range.
 
-Stake "First Set, You Win" boost: when betting a single on Stake, the
-effective win condition is winning the first set — not the full match.
-A player the model rates at 63% to win the match typically wins the first
-set ~70% of the time (serve dominance, no fatigue, no momentum shift).
-Betting at match-winner odds with a first-set win condition yields
-~6-8 pp extra effective win rate, significantly improving EV.
-Always place the pick as a "First Set Winner" single on Stake.
+The pick is placed on Stake's match "Ganador" (winner) market. Stake's early
+payout only settles it as won early if the player takes the first set 6-0 or
+6-1 (a 6-2 does not count), so it rarely changes the outcome: results are
+measured by the match winner.
 """
 
 import logging
