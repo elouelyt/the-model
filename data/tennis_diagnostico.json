@@ -7196,7 +7196,7 @@
     {
      "players": [
       {
-       "edge": 0.0548,
+       "edge": 0.0551,
        "fails": [
         "probabilidad 52 % < 61 %"
        ],
@@ -7206,7 +7206,7 @@
        "signal": "value_bet"
       },
       {
-       "edge": -0.1049,
+       "edge": -0.105,
        "fails": [
         "el modelo marca «no apostar»",
         "probabilidad 48 % < 61 %",
@@ -7283,7 +7283,7 @@
    "pick": null,
    "source": "pipeline",
    "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 1 la ventaja). Más cercano: Flavio Cobolli (modelo 52 %, ventaja +5.5 %, cuota 2.20), falla: probabilidad 52 % < 61 %.",
-   "updated": "2026-11-18 16:54 UTC"
+   "updated": "2026-11-18 17:01 UTC"
   }
  }
 }
