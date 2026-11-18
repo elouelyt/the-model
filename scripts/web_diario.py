@@ -17,6 +17,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
+
+from safe_json import load_json, save_json  # noqa: E402
 OUT = ROOT / "data" / "web_diario.json"
 OK, WARN, FAIL = "ok", "aviso", "fallo"
 
@@ -124,14 +126,14 @@ def check(now: datetime | None = None) -> dict:
 
 
 def load() -> dict:
-    return _json(OUT) or {"days": {}}
+    return load_json(OUT, {"days": {}})
 
 
 def save_today() -> dict:
     now = datetime.now(timezone.utc)
     data = load()
     data["days"][now.strftime("%Y-%m-%d")] = {"hora": now.strftime("%H:%M UTC"), "secciones": check(now)}
-    OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
+    save_json(OUT, data, ensure_ascii=False, indent=1, sort_keys=True)
     return data
 
 

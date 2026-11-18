@@ -46,6 +46,7 @@ jobs:
         run: python scripts/check_results.py
 
       - name: Run prediction pipeline
+        id: pipeline
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
           THE_ODDS_API_KEY_2: ${{ secrets.THE_ODDS_API_KEY_2 || secrets.THE_ODDS_API_KEY2 }}
@@ -64,6 +65,9 @@ jobs:
           python scripts/build_private.py --from-build
 
       - name: Commit and push
+        # Also after a failed pipeline: keeps the diary entry explaining why there was no pick
+        # (the panel is not rebuilt, so the previous site stays published).
+        if: success() || steps.pipeline.outcome == 'failure'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -37,17 +37,17 @@ _AVOID_PLAYERS: frozenset[str] = frozenset()  # populated dynamically from track
 
 
 def _load_struggling_players() -> frozenset[str]:
-    """Read track_record.json and flag players who lost ≥3 parlays in the last 7 days.
+    """Read track_record.json and flag players with 4+ losing entries in the whole history.
 
-    Used to add a soft warning on picks — does not exclude them entirely,
-    but reduces edge threshold so they only surface with a strong signal.
+    Used to add a soft warning on picks — does not exclude them: a flagged player
+    is only ranked after the unflagged candidates and shows a warning banner.
     """
     try:
         tr_path = Path(__file__).parent.parent.parent / "data" / "track_record.json"
         if not tr_path.exists():
             return frozenset()
 
-        tr = json.loads(tr_path.read_text())
+        tr = json.loads(tr_path.read_text(encoding="utf-8"))
         loss_count: dict[str, int] = {}
 
         for month_data in tr.get("months", {}).values():
@@ -58,12 +58,12 @@ def _load_struggling_players() -> frozenset[str]:
                             loss_count[leg] = loss_count.get(leg, 0) + 1
 
         # Flag players with 4+ parlay losses (appears in many losing combos)
-        struggling = frozenset(p for p, n in loss_count.items() if n >= 4)
+        struggling = frozenset(p.lower() for p, n in loss_count.items() if n >= 4)
         if struggling:
             logger.info("[single_bet_agent] Struggling players (4+ losses): %s", list(struggling))
         return struggling
     except Exception as exc:
-        logger.debug("[single_bet_agent] Could not load track_record: %s", exc)
+        logger.warning("[single_bet_agent] Could not load track_record, losing-streak check disabled: %s", exc)
         return frozenset()
 
 
@@ -115,9 +115,7 @@ def select_daily_pick(results: list[dict]) -> dict | None:
                 None,
             )
 
-            is_struggling = any(
-                s.lower() in p["player"].lower() for s in struggling
-            )
+            is_struggling = p["player"].lower() in struggling
 
             candidates.append({
                 "player":         p["player"],
@@ -191,7 +189,7 @@ def select_pick_for_player(results: list[dict], player: str) -> dict | None:
                 (q.get("rank") for q in match["players"] if q["player"] == opponent),
                 None,
             )
-            is_struggling = any(s.lower() in p["player"].lower() for s in struggling)
+            is_struggling = p["player"].lower() in struggling
             return {
                 "player": p["player"], "rank": p["rank"], "points": p["points"],
                 "opponent": opponent, "opponent_rank": opponent_rank,

@@ -12,6 +12,7 @@ import json
 import logging
 import subprocess
 import sys
+import unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -77,6 +78,7 @@ def bnb_usd(placed: datetime) -> float | None:
     try:
         r = requests.get("https://api.binance.com/api/v3/klines", timeout=15,
                          params={"symbol": "BNBUSDT", "interval": "1m", "startTime": int(placed.timestamp() * 1000), "limit": 1})
+        r.raise_for_status()
         return float(r.json()[0][4])
     except Exception as exc:  # noqa: BLE001
         logger.warning("no BNB price: %s", str(exc)[:80])
@@ -86,9 +88,23 @@ def bnb_usd(placed: datetime) -> float | None:
 TRACK = ROOT / "data" / "track_record.json"
 
 
+def _name_tokens(name: str) -> list[str]:
+    plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    return plain.replace("-", " ").replace(".", " ").split()
+
+
+def same_player(a: str, b: str) -> bool:
+    """Same tennis player: equal surname (whole word, accents ignored) and same first initial.
+
+    Not a substring test ("lee" must not match "Cleeve"); not full equality either, because Stake and the
+    track record spell some first names differently ("Francis" / "Frances Tiafoe").
+    """
+    ta, tb = _name_tokens(a), _name_tokens(b)
+    return bool(ta and tb) and ta[-1] == tb[-1] and ta[0][0] == tb[0][0]
+
+
 def espn_tennis_result(player: str, placed: datetime) -> bool | None:
     """First finished ATP match of `player` that starts after the bet was placed (ESPN scoreboard): True/False, None if not played yet."""
-    surname = player.lower().split()[-1]
     best = None
     for back in range(0, 4):
         day = (placed + timedelta(days=back)).strftime("%Y%m%d")
@@ -103,7 +119,7 @@ def espn_tennis_result(player: str, placed: datetime) -> bool | None:
                     if start <= placed or comp["status"]["type"]["state"] != "post":
                         continue
                     for c in comp["competitors"]:
-                        if surname in c.get("athlete", {}).get("displayName", "").lower() and (best is None or start < best[0]):
+                        if same_player(player, c.get("athlete", {}).get("displayName", "")) and (best is None or start < best[0]):
                             best = (start, bool(c.get("winner")))
     return best[1] if best else None
 
@@ -112,17 +128,19 @@ def tennis_result(player: str, placed: datetime) -> bool | None:
     """Result of a tennis 'Ganador' leg: the bot's daily pick of the day the bet was placed (or later), else the first match played after the bet (ESPN).
 
     Never an earlier day's pick: a bet on the same player the day after would otherwise inherit the previous match's result.
+    Only single-leg entries: a multi-leg parlay's `won` also depends on its other legs.
     """
     try:
         months = json.loads(TRACK.read_text(encoding="utf-8"))["months"]
-    except Exception:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("track record unreadable, using ESPN only: %s", str(exc)[:80])
         months = {}
-    surname = player.lower().split()[-1]
     local = placed.astimezone(MADRID)
     for back in range(-1 if local.hour < 6 else 0, 5):
         day = (local + timedelta(days=back)).date()
         for p in months.get(day.strftime("%Y-%m"), {}).get("days", {}).get(str(day.day), {}).get("parlays", []):
-            if p.get("won") is not None and any(surname in leg.lower() for leg in p.get("legs", [])):
+            legs = p.get("legs", [])
+            if p.get("won") is not None and len(legs) == 1 and same_player(player, legs[0]):
                 return p["won"]
     return espn_tennis_result(player, placed)
 
@@ -169,13 +187,24 @@ def settle_bet(bet: dict, nba, nfl) -> dict:
     else:
         status = "won"
     profit = {"won": odds - 1, "lost": -1.0, "void": 0.0}.get(status)
-    price = bnb_usd(placed)
-    amount_usd = round(bet["amount"] * price, 4) if price and bet.get("amount") else None
+    row = {"id": bet["id"], "placed_at": bet["placed_at"], "day": placed.astimezone(MADRID).strftime("%Y-%m-%d"), "kind": bet["kind"],
+           "stake_odds": bet["odds"], "odds": round(odds, 2), "amount": bet.get("amount"), "currency": bet.get("currency"),
+           "status": status, "profit_u": None if profit is None else round(profit, 2), "legs": legs, "suggested": bet.get("suggested")}
+    return add_usd(row, placed)
+
+
+def add_usd(row: dict, placed: datetime) -> dict:
+    """Fill bnb_usd / amount_usd / profit_usd. The extension records BNB amounts (an empty currency means BNB)."""
+    currency = (row.get("currency") or "BNB").upper()
+    if currency != "BNB":
+        logger.warning("bet %s in %s: no USD conversion", row["id"], currency)
+        price = None
+    else:
+        price = bnb_usd(placed)
+    amount_usd = round(row["amount"] * price, 4) if price and row.get("amount") else None
+    profit = row.get("profit_u")
     profit_usd = None if profit is None or amount_usd is None else round(profit * amount_usd, 4)
-    return {"id": bet["id"], "placed_at": bet["placed_at"], "day": placed.astimezone(MADRID).strftime("%Y-%m-%d"), "kind": bet["kind"],
-            "stake_odds": bet["odds"], "odds": round(odds, 2), "amount": bet.get("amount"), "currency": bet.get("currency"),
-            "status": status, "profit_u": None if profit is None else round(profit, 2), "bnb_usd": price, "amount_usd": amount_usd,
-            "profit_usd": profit_usd, "legs": legs, "suggested": bet.get("suggested")}
+    return {**row, "bnb_usd": price, "amount_usd": amount_usd, "profit_usd": profit_usd}
 
 
 def main() -> list[dict]:
@@ -194,6 +223,8 @@ def main() -> list[dict]:
         seen.append((sig, when))
         prev = old.get(bet["id"])
         if prev and prev["status"] in ("won", "lost", "void"):
+            if prev.get("amount_usd") is None and prev.get("amount"):   # a transient Binance failure: retry the conversion
+                prev = add_usd(prev, when)
             out.append(prev)
             continue
         out.append(settle_bet(bet, nba, nfl))

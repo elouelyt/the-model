@@ -117,6 +117,8 @@ Nested JSON flattened with Pandas, schema confirmed via EDA (see `docs/MIAMI_OPE
 
 `generate_dashboard.py` lee `data/track_record.json` y genera un panel (1 unidad fija por parlay, cuota de Stake): beneficio, ROI, aciertos, curva acumulada, resultado por mes y acierto por rango de cuota. El workflow diario lo cifra con `staticrypt` (secret `DASHBOARD_PASSWORD`) y publica `panel.html` (pestañas Recomendaciones + Rendimiento, via `scripts/build_panel.py`). `generate_html.py` deja la web completa en `build/site.html` (gitignored) y `index.html` es solo una página neutra: la web completa nunca se publica sin cifrar. Si el secret no existe, el paso se salta: nunca se publica sin cifrar.
 
+**Key lesson (18/11, revisión ECC python-reviewer):** todo texto externo (nombres, titulares RSS, Gemini, errores) va por `_e()` (html.escape) en `generate_html.py`; si el pipeline falla, `main()` sale con código 1 sin sobrescribir la web (el commit de `daily.yml` corre igual para guardar el diario); los registros diarios (`tennis_diagnostico.json`, `web_diario.json`) se leen/escriben con `scripts/safe_json.py` (escritura atómica; un JSON corrupto se aparta como `.corrupt-<fecha>`, no se machaca). Emparejar tenistas con `real_bets.same_player()` (apellido exacto + inicial), nunca por subcadena: Stake y el track record escriben distinto algunos nombres ("Francis"/"Frances Tiafoe").
+
 **Key lesson:** `staticrypt` pide confirmación interactiva si la contraseña tiene menos de 14 caracteres y se cuelga en CI — usar siempre `--short`. Fijar `--salt` para que "recordar contraseña" no caduque cada día.
 
 ## NBA player props (value finder) — IN PROGRESS

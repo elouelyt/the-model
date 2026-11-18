@@ -7,6 +7,7 @@ Usage:
     python generate_html.py
 """
 
+import html
 import json
 import logging
 import os
@@ -20,6 +21,11 @@ load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s — %(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def _e(value: object) -> str:
+    """Escape external text (names, headlines, Gemini output, errors) for HTML."""
+    return html.escape("" if value is None else str(value), quote=True)
 
 # ── Signal styling ─────────────────────────────────────────────────────────────
 _SURFACE_META: dict[str, dict] = {
@@ -78,8 +84,8 @@ def _sentiment_html(sentiment: dict) -> str:
     s = _SENTIMENT_STYLE[flag]
     return (
         f'<span class="sentiment-flag" style="color:{s["color"]};" '
-        f'title="{sentiment.get("headline") or ""}">'
-        f'{s["icon"]} {label}</span>'
+        f'title="{_e(sentiment.get("headline"))}">'
+        f'{s["icon"]} {_e(label)}</span>'
     )
 
 
@@ -96,7 +102,7 @@ def _bookmaker_table_html(bookmakers: list[dict]) -> str:
         price_style = ' style="color:#10b981;font-weight:700;"' if is_best else ""
         rows_html += (
             f'<tr>'
-            f'<td class="bk-name">{b["bookmaker_title"]}</td>'
+            f'<td class="bk-name">{_e(b["bookmaker_title"])}</td>'
             f'<td class="bk-price"{price_style}>{b["price"]:.2f}</td>'
             f'<td class="bk-implied">{b["raw_implied"]:.1%}</td>'
             f'</tr>'
@@ -161,7 +167,7 @@ def _player_card_html(p: dict) -> str:
     stake_html = _stake_badge_html(p["stake_price"]) if p.get("stake_price") else ""
     return f"""
         <div class="player-card" style="border-top: 2px solid {meta['border']};">
-            <div class="player-name">{p['player']}{(" <span class='sentiment-sep'>·</span> " + sentiment_tag) if sentiment_tag else ""}</div>
+            <div class="player-name">{_e(p['player'])}{(" <span class='sentiment-sep'>·</span> " + sentiment_tag) if sentiment_tag else ""}</div>
             <div class="player-meta">Rank <strong>#{p['rank']}</strong> &nbsp;·&nbsp; {p['points']:,} pts</div>
             {prob_bars}
             {stake_html}
@@ -178,7 +184,7 @@ def _player_card_html(p: dict) -> str:
             <div class="signal-pill" style="color:{meta['color']};background:{meta['bg']};border:1px solid {meta['border']}20;">
                 <span class="signal-dot" style="background:{meta['color']};"></span>{meta['label']}
             </div>
-            <div class="recommendation">{p['recommendation']}</div>
+            <div class="recommendation">{_e(p['recommendation'])}</div>
             {_bookmaker_table_html(p.get("bookmakers", []))}
         </div>"""
 
@@ -193,8 +199,8 @@ def _h2h_html(h2h: dict, home: str, away: str, surface: str) -> str:
     if not h2h.get("available"):
         return ""
 
-    home_short = home.split()[-1]
-    away_short = away.split()[-1]
+    home_short = _e(home.split()[-1])
+    away_short = _e(away.split()[-1])
     total = h2h.get("total", 0)
 
     # ── No previous meetings ──────────────────────────────────────────────
@@ -282,10 +288,10 @@ def _match_card_html(match: dict) -> str:
         return f"""
     <div class="match-card match-error">
         <div class="match-header">
-            <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
+            <span class="match-teams">{_e(match['home'])} <span class="vs">vs</span> {_e(match['away'])}</span>
             <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
         </div>
-        <div class="error-msg">⚠ {match['error']}</div>
+        <div class="error-msg">⚠ {_e(match['error'])}</div>
     </div>"""
 
     players = match["players"]
@@ -303,12 +309,12 @@ def _match_card_html(match: dict) -> str:
 
     withdrawal_alert = match.get("withdrawal_alert")
     if withdrawal_alert:
-        wd_headline = withdrawal_alert.get("headline") or ""
+        wd_headline = _e(withdrawal_alert.get("headline"))
         wd_text = f': &ldquo;{wd_headline}&rdquo;' if wd_headline else ""
         withdrawal_html = (
             f'<div class="withdrawal-alert">'
             f'<span class="withdrawal-icon">⚠</span>'
-            f'<strong>WITHDRAWAL REPORTED</strong> &mdash; {withdrawal_alert["player"]}{wd_text}'
+            f'<strong>WITHDRAWAL REPORTED</strong> &mdash; {_e(withdrawal_alert["player"])}{wd_text}'
             f'</div>'
         )
         # Override accent to red when there's a withdrawal
@@ -320,7 +326,7 @@ def _match_card_html(match: dict) -> str:
     return f"""
     <div class="match-card" style="border-left: 3px solid {accent}; --card-glow: {glow_color};">
         <div class="match-header">
-            <span class="match-teams">{match['home']} <span class="vs">vs</span> {match['away']}</span>
+            <span class="match-teams">{_e(match['home'])} <span class="vs">vs</span> {_e(match['away'])}</span>
             <span class="match-meta">{surface_badge}<span class="match-time">{ct_str}</span></span>
         </div>
         {withdrawal_html}{h2h_html}
@@ -344,7 +350,7 @@ def _error_html(message: str) -> str:
     <div class="empty-state" style="border-color:#ef4444;">
         <div class="empty-icon" style="color:#ef4444;">✕</div>
         <div class="empty-title" style="color:#ef4444;">Pipeline error</div>
-        <div class="empty-body">{message}</div>
+        <div class="empty-body">{_e(message)}</div>
     </div>"""
 
 
@@ -399,17 +405,17 @@ def _daily_pick_html(pick: dict | None) -> str:
 
     opp_rank_str = f"#{pick['opponent_rank']}" if pick.get("opponent_rank") else ""
     bk_label = pick.get("best_bookmaker", "")
-    bk_html = f'<span class="dp-bk">@ {bk_label}</span>' if bk_label else ""
+    bk_html = f'<span class="dp-bk">@ {_e(bk_label)}</span>' if bk_label else ""
 
     return f"""
-<div class="daily-pick-card" data-start="{pick.get("commence_time") or ""}">
+<div class="daily-pick-card" data-start="{_e(pick.get("commence_time"))}">
     <div class="dp-eyebrow">APUESTA DEL DÍA</div>
     <div class="dp-main">
         <div class="dp-player">
-            <div class="dp-player-name">{pick["player"]}</div>
+            <div class="dp-player-name">{_e(pick["player"])}</div>
             <div class="dp-player-meta">
                 Rank <strong>#{pick["rank"]}</strong>
-                &nbsp;·&nbsp; vs {pick["opponent"]} {opp_rank_str}
+                &nbsp;·&nbsp; vs {_e(pick["opponent"])} {opp_rank_str}
                 &nbsp;·&nbsp; <span style="color:{surf_color};font-weight:600;">{surf_label}</span>
                 {("&nbsp;·&nbsp;" + sentiment_html) if sentiment_html else ""}
             </div>
@@ -669,7 +675,7 @@ def _parlays_html(parlays: list[dict]) -> str:
         risk = parlay.get("risk", "medium")
         risk_meta = _RISK_META.get(risk, _RISK_META["medium"])
         rating = parlay.get("rating", 5)
-        summary = parlay.get("summary", "")
+        summary = _e(parlay.get("summary"))
 
         # Rating bar fill (out of 10)
         rating_pct = rating * 10
@@ -684,12 +690,12 @@ def _parlays_html(parlays: list[dict]) -> str:
             sent_icon = "↑" if sent_flag == "positive" else ("⚠" if sent_flag == "concern" else "")
             sent_color = "#10b981" if sent_flag == "positive" else ("#f87171" if sent_flag == "concern" else "")
             bk_name = p.get("best_bookmaker", "")
-            bk_html = f'&nbsp;<span style="color:#f97316;font-size:10px;opacity:0.8;">@ {bk_name}</span>' if bk_name and bk_name != "Stake" else ""
+            bk_html = f'&nbsp;<span style="color:#f97316;font-size:10px;opacity:0.8;">@ {_e(bk_name)}</span>' if bk_name and bk_name != "Stake" else ""
             opp_rank = p.get("opponent_rank")
             rank_html = f'#{p["rank"]} <span style="color:var(--muted);font-size:10px;">vs #{opp_rank}</span>' if opp_rank else f'#{p["rank"]}'
             picks_html += f"""
                 <div class="parlay-pick">
-                    <span class="parlay-pick-name">{p['player']}</span>
+                    <span class="parlay-pick-name">{_e(p['player'])}</span>
                     <span class="parlay-pick-meta">
                         {rank_html} &nbsp;·&nbsp;
                         <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
@@ -763,7 +769,7 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
         risk = parlay.get("risk", "medium")
         risk_meta = _RISK_META.get(risk, _RISK_META["medium"])
         rating = parlay.get("rating", 5)
-        summary = parlay.get("summary", "")
+        summary = _e(parlay.get("summary"))
         is_today = parlay.get("today_pick", False)
         rating_pct = rating * 10
 
@@ -776,12 +782,12 @@ def _safe_parlays_html(safe_parlays: list[dict]) -> str:
             sent_icon = "↑" if sent_flag == "positive" else ("⚠" if sent_flag == "concern" else "")
             sent_color = "#10b981" if sent_flag == "positive" else ("#f87171" if sent_flag == "concern" else "")
             bk_name = p.get("best_bookmaker", "")
-            bk_html = f'&nbsp;<span style="color:#f97316;font-size:10px;opacity:0.8;">@ {bk_name}</span>' if bk_name and bk_name != "Stake" else ""
+            bk_html = f'&nbsp;<span style="color:#f97316;font-size:10px;opacity:0.8;">@ {_e(bk_name)}</span>' if bk_name and bk_name != "Stake" else ""
             opp_rank = p.get("opponent_rank")
             rank_html = f'#{p["rank"]} <span style="color:var(--muted);font-size:10px;">vs #{opp_rank}</span>' if opp_rank else f'#{p["rank"]}'
             picks_html += f"""
                 <div class="parlay-pick">
-                    <span class="parlay-pick-name">{p['player']}</span>
+                    <span class="parlay-pick-name">{_e(p['player'])}</span>
                     <span class="parlay-pick-meta">
                         {rank_html} &nbsp;·&nbsp;
                         <span style="color:{surf_color};font-weight:600;">{surf_label}</span> &nbsp;·&nbsp;
@@ -884,8 +890,8 @@ def _month_table_html(days: dict, stake_per_bet: float = 15.0) -> str:
 
         detail_rows = ""
         for i, p in enumerate(parlays_day, 1):
-            legs     = ", ".join(p.get("legs", []))
-            opponent = p.get("opponent")
+            legs     = _e(", ".join(p.get("legs", [])))
+            opponent = _e(p.get("opponent"))
             legs_display = f"{legs} vs {opponent}" if opponent else legs
             odds     = p.get("stake_odds") or p.get("best_odds")
             odds_str = f"{odds:.2f}" if odds else "—"
@@ -1215,8 +1221,8 @@ def _mma_section_html(fights: list) -> str:
 <div class="mma-pick-card">
   <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">🥊 PICK DEL DÍA MMA</div>
   <div style="font-size:11px;color:#10b981;font-weight:700;letter-spacing:0.3px;margin-bottom:2px;">✓ APOSTAR A GANADOR:</div>
-  <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">{pick["best_fighter"]}</div>
-  <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">vs {pick["fighter2"] if pick["best_fighter"]==pick["fighter1"] else pick["fighter1"]} · {pick["commence_dt"].strftime("%d/%m %H:%M UTC")}</div>
+  <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">{_e(pick["best_fighter"])}</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">vs {_e(pick["fighter2"] if pick["best_fighter"]==pick["fighter1"] else pick["fighter1"])} · {pick["commence_dt"].strftime("%d/%m %H:%M UTC")}</div>
   <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
     {signal_badge}
     <span style="font-size:18px;font-weight:700;color:#f97316;">{pick["best_odds"]:.2f}</span>
@@ -1284,7 +1290,7 @@ def _mma_section_html(fights: list) -> str:
           <div class="mma-fight-date">{date_str} UTC {f'· <span style="font-size:10px;color:var(--muted);">{f["division1"] or ""}</span>' if f.get("division1") else ""}</div>
           <div class="mma-fighters">
             <div class="mma-fighter" style="{card_bg1}">
-              <span class="mma-name">{n1} <span style="color:var(--muted);font-size:10px;">{rank1_str}</span></span>
+              <span class="mma-name">{_e(n1)} <span style="color:var(--muted);font-size:10px;">{rank1_str}</span></span>
               {stats_row1}
               <div style="display:flex;align-items:baseline;gap:6px;">
                 <span class="mma-odds" style="color:{c1_color};">{o1:.2f}</span>
@@ -1295,7 +1301,7 @@ def _mma_section_html(fights: list) -> str:
             </div>
             <div class="mma-vs">vs</div>
             <div class="mma-fighter" style="text-align:right;{card_bg2}">
-              <span class="mma-name">{n2} <span style="color:var(--muted);font-size:10px;">{rank2_str}</span></span>
+              <span class="mma-name">{_e(n2)} <span style="color:var(--muted);font-size:10px;">{rank2_str}</span></span>
               {stats_row2}
               <div style="display:flex;align-items:baseline;gap:6px;justify-content:flex-end;">
                 {edge_badge2}
@@ -2407,6 +2413,12 @@ def main() -> None:
     except Exception as exc:  # nunca romper el pipeline por el diario
         logger.warning("tennis_audit failed: %s", exc)
 
+    # A failed pipeline must not publish an empty/error site with exit code 0:
+    # keep the previous build and fail the workflow so the failure is visible.
+    if error:
+        logger.error("Pipeline failed - site not regenerated: %s", error)
+        sys.exit(1)
+
     html = generate_html(
         results, parlays=parlays, safe_parlays=safe_parlays,
         error=error, track_record=track_record, daily_pick=daily_pick,
@@ -2557,26 +2569,39 @@ def _log_daily_pick_to_track_record(pick: dict, track_record: dict) -> None:
     logger.info("Auto-logged daily pick: %s @ %s (pending)", pick["player"], best_odds)
 
 
-def _inject_all_predictions(track_record: dict) -> None:
+def _inject_all_predictions(track_record: dict, lookback_days: int = 6) -> None:
     """Scan all data/predictions/*.json files and add any missing days as pending entries.
 
     Preserves won/lost outcomes already set by check_results.py.
     Skips days that are already fully resolved.
-    Deduplicates parlays: if the same leg-set appeared in a previous day, it's stale API data
-    (player already eliminated but still showing in odds) and is excluded from the new day.
+    Deduplicates parlays: a leg-set still PENDING (won=None) on one of the previous
+    `lookback_days` days is stale API data (same real-world match not played yet) and is
+    excluded from the new day. A resolved leg-set, or one older than the window, is a
+    new bet (another round / another match) and is kept - same rule as _pick_already_pending.
     """
     preds_dir = Path("data/predictions")
     if not preds_dir.exists():
         return
 
-    # Track leg-sets already seen in earlier days to detect stale API duplicates
-    seen_leg_sets: set[frozenset] = set()
+    def _day(month_str: str, day_key: str) -> datetime | None:
+        try:
+            return datetime.strptime(f"{month_str}-{int(day_key):02d}", "%Y-%m-%d")
+        except ValueError:
+            return None
 
-    # Pre-populate seen_leg_sets from existing track_record data (before scanning new files)
-    for month_data in track_record.get("months", {}).values():
-        for day_data in month_data.get("days", {}).values():
-            for parl in day_data.get("parlays", []):
-                seen_leg_sets.add(frozenset(parl["legs"]))
+    # Pending leg-sets already in the track record -> days on which they were logged
+    pending: dict[frozenset, list[datetime]] = {}
+
+    def _register(day_date: datetime | None, parlays: list[dict]) -> None:
+        if day_date is None:
+            return
+        for parl in parlays:
+            if parl.get("won") is None:
+                pending.setdefault(frozenset(parl["legs"]), []).append(day_date)
+
+    for month_str, month_data in track_record.get("months", {}).items():
+        for day_key, day_data in month_data.get("days", {}).items():
+            _register(_day(month_str, day_key), day_data.get("parlays", []))
 
     for pred_file in sorted(preds_dir.glob("*.json")):
         try:
@@ -2588,29 +2613,22 @@ def _inject_all_predictions(track_record: dict) -> None:
             continue
         month_str = day_str[:7]
         day_key = str(int(day_str[8:10]))
+        day_date = _day(month_str, day_key)
         track_record.setdefault("months", {}).setdefault(month_str, {"days": {}})
         existing = track_record["months"][month_str]["days"].get(day_key, {})
-        if existing.get("resolved"):
-            # Still register its leg-sets as seen so later days can detect duplicates
-            for parl in existing.get("parlays", []):
-                seen_leg_sets.add(frozenset(parl["legs"]))
-            continue
-        if existing.get("parlays"):
-            for parl in existing.get("parlays", []):
-                seen_leg_sets.add(frozenset(parl["legs"]))
-            continue  # already has pending data (possibly with partial won/lost from check_results)
+        if existing.get("resolved") or existing.get("parlays"):
+            continue  # resolved, or already has pending data (possibly partial won/lost from check_results)
 
         parlays = pred.get("parlays", [])
-        if not parlays:
+        if not parlays or day_date is None:
             continue
 
-        # Filter out parlays whose exact leg-set already appeared in a previous day
         new_parlays = []
         for parl in parlays:
             legs = [p["player"] for p in parl.get("picks", [])]
             key = frozenset(legs)
-            if key in seen_leg_sets:
-                logger.info("Skipping duplicate parlay %s (same legs seen on earlier day)", legs)
+            if any(timedelta(0) < day_date - d <= timedelta(days=lookback_days) for d in pending.get(key, [])):
+                logger.info("Skipping duplicate parlay %s (still pending from an earlier day)", legs)
                 continue
             new_parlays.append({
                 "legs": legs,
@@ -2618,7 +2636,6 @@ def _inject_all_predictions(track_record: dict) -> None:
                 "best_odds": parl.get("total_odds"),
                 "won": None,
             })
-            seen_leg_sets.add(key)
 
         if not new_parlays:
             logger.info("Day %s has no unique parlays after deduplication — skipping", day_str)
@@ -2628,6 +2645,7 @@ def _inject_all_predictions(track_record: dict) -> None:
             "parlays": new_parlays,
             "resolved": False,
         }
+        _register(day_date, new_parlays)
 
 
 if __name__ == "__main__":

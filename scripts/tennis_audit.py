@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from safe_json import load_json, save_json  # noqa: E402
 from src.agents.single_bet_agent import _MIN_EDGE, _MIN_MODEL_PROB, _MIN_PRICE  # noqa: E402
 
 DIAG = ROOT / "data" / "tennis_diagnostico.json"
@@ -31,17 +32,11 @@ TRACK = ROOT / "data" / "track_record.json"
 
 
 def load() -> dict:
-    if DIAG.exists():
-        try:
-            return json.loads(DIAG.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return {"days": {}}
+    return load_json(DIAG, {"days": {}})
 
 
 def save(diag: dict) -> None:
-    DIAG.parent.mkdir(parents=True, exist_ok=True)
-    DIAG.write_text(json.dumps(diag, ensure_ascii=False, indent=1, sort_keys=True, default=str), encoding="utf-8")
+    save_json(DIAG, diag, ensure_ascii=False, indent=1, sort_keys=True, default=str)
 
 
 def fails(model_prob, edge, price, signal) -> list[str]:
