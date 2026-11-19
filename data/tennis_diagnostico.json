@@ -7284,6 +7284,99 @@
    "source": "pipeline",
    "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 1 la ventaja). Más cercano: Flavio Cobolli (modelo 52 %, ventaja +5.5 %, cuota 2.20), falla: probabilidad 52 % < 61 %.",
    "updated": "2026-11-18 17:01 UTC"
+  },
+  "2026-11-19": {
+   "matches": [
+    {
+     "players": [
+      {
+       "edge": -0.137,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "probabilidad 57 % < 61 %",
+        "ventaja -13.7 % < 3 %"
+       ],
+       "model_prob": 0.57,
+       "name": "Daniil Medvedev",
+       "price": 1.41,
+       "signal": "no_bet"
+      },
+      {
+       "edge": 0.1145,
+       "fails": [
+        "probabilidad 46 % < 61 %"
+       ],
+       "model_prob": 0.4583,
+       "name": "Frances Tiafoe",
+       "price": 2.85,
+       "signal": "value_bet"
+      }
+     ],
+     "teams": "Daniil Medvedev vs Frances Tiafoe",
+     "time": "2026-11-20 19:30:00+00:00"
+    },
+    {
+     "players": [
+      {
+       "edge": -0.1026,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "ventaja -10.3 % < 3 %",
+        "cuota 1.18 < 1.30"
+       ],
+       "model_prob": 0.7365,
+       "name": "Carlos Alcaraz",
+       "price": 1.18,
+       "signal": "no_bet"
+      },
+      {
+       "edge": 0.1015,
+       "fails": [
+        "probabilidad 31 % < 61 %"
+       ],
+       "model_prob": 0.3143,
+       "name": "Flavio Cobolli",
+       "price": 4.9,
+       "signal": "value_bet"
+      }
+     ],
+     "teams": "Carlos Alcaraz vs Flavio Cobolli",
+     "time": "2026-11-20 13:00:00+00:00"
+    },
+    {
+     "players": [
+      {
+       "edge": -0.034,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "ventaja -3.4 % < 3 %"
+       ],
+       "model_prob": 0.7095,
+       "name": "Alexander Zverev",
+       "price": 1.36,
+       "signal": "no_bet"
+      },
+      {
+       "edge": 0.0037,
+       "fails": [
+        "probabilidad 31 % < 61 %",
+        "ventaja +0.4 % < 3 %"
+       ],
+       "model_prob": 0.3065,
+       "name": "Arthur Fils",
+       "price": 3.3,
+       "signal": "marginal"
+      }
+     ],
+     "teams": "Alexander Zverev vs Arthur Fils",
+     "time": "2026-11-19 19:30:00+00:00"
+    }
+   ],
+   "n_matches": 3,
+   "pick": null,
+   "source": "pipeline",
+   "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (2 cumplen la probabilidad, 2 la ventaja). Más cercano: Frances Tiafoe (modelo 46 %, ventaja +11.5 %, cuota 2.85), falla: probabilidad 46 % < 61 %.",
+   "updated": "2026-11-19 17:00 UTC"
   }
  }
 }
