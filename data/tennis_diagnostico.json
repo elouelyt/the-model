@@ -7441,6 +7441,43 @@
    "source": "pipeline",
    "summary": "2 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (1 cumplen la probabilidad, 2 la ventaja). Más cercano: Frances Tiafoe (modelo 45 %, ventaja +12.1 %, cuota 3.00), falla: probabilidad 45 % < 61 %.",
    "updated": "2026-11-20 17:01 UTC"
+  },
+  "2026-11-22": {
+   "matches": [
+    {
+     "players": [
+      {
+       "edge": 0.2068,
+       "fails": [
+        "probabilidad 57 % < 61 %"
+       ],
+       "model_prob": 0.5723,
+       "name": "Alexander Zverev",
+       "price": 2.8,
+       "signal": "value_bet"
+      },
+      {
+       "edge": -0.22,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "probabilidad 46 % < 61 %",
+        "ventaja -22.0 % < 3 %"
+       ],
+       "model_prob": 0.4603,
+       "name": "Carlos Alcaraz",
+       "price": 1.47,
+       "signal": "no_bet"
+      }
+     ],
+     "teams": "Alexander Zverev vs Carlos Alcaraz",
+     "time": "2026-11-22 17:00:00+00:00"
+    }
+   ],
+   "n_matches": 1,
+   "pick": null,
+   "source": "pipeline",
+   "summary": "1 partido: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (0 cumplen la probabilidad, 1 la ventaja). Más cercano: Alexander Zverev (modelo 57 %, ventaja +20.7 %, cuota 2.80), falla: probabilidad 57 % < 61 %.",
+   "updated": "2026-11-22 15:51 UTC"
   }
  }
 }
