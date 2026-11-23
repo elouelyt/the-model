@@ -7449,6 +7449,14 @@
    "source": "pipeline",
    "summary": "La API de cuotas no devolvió ningún partido de ATP ese día (no hay torneo activo o no hay cuotas).",
    "updated": "2026-11-22 17:01 UTC"
+  },
+  "2026-11-23": {
+   "matches": [],
+   "n_matches": 0,
+   "pick": null,
+   "source": "pipeline",
+   "summary": "La API de cuotas no devolvió ningún partido de ATP ese día (no hay torneo activo o no hay cuotas).",
+   "updated": "2026-11-23 17:01 UTC"
   }
  }
 }
