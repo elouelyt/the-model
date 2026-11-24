@@ -7459,42 +7459,12 @@
    "updated": "2026-11-23 19:46 UTC"
   },
   "2026-11-24": {
-   "matches": [
-    {
-     "players": [
-      {
-       "edge": -0.0833,
-       "fails": [
-        "el modelo marca «no apostar»",
-        "probabilidad 50 % < 61 %",
-        "ventaja -8.3 % < 3 %"
-       ],
-       "model_prob": 0.5049,
-       "name": "Jiri Lehecka",
-       "price": 1.7,
-       "signal": "no_bet"
-      },
-      {
-       "edge": 0.0234,
-       "fails": [
-        "probabilidad 50 % < 61 %",
-        "ventaja +2.3 % < 3 %"
-       ],
-       "model_prob": 0.4951,
-       "name": "Felix Auger-Aliassime",
-       "price": 2.12,
-       "signal": "marginal"
-      }
-     ],
-     "teams": "Jiri Lehecka vs Felix Auger-Aliassime",
-     "time": "2026-11-24 17:20:00+00:00"
-    }
-   ],
-   "n_matches": 1,
+   "matches": [],
+   "n_matches": 0,
    "pick": null,
    "source": "pipeline",
-   "summary": "1 partido: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (0 cumplen la probabilidad, 0 la ventaja). Más cercano: Felix Auger-Aliassime (modelo 50 %, ventaja +2.3 %, cuota 2.12), falla: probabilidad 50 % < 61 %, ventaja +2.3 % < 3 %.",
-   "updated": "2026-11-24 17:01 UTC"
+   "summary": "La API de cuotas no devolvió ningún partido de ATP ese día (no hay torneo activo o no hay cuotas).",
+   "updated": "2026-11-24 19:17 UTC"
   }
  }
 }
