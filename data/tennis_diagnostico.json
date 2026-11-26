@@ -7471,35 +7471,6 @@
     {
      "players": [
       {
-       "edge": 0.0101,
-       "fails": [
-        "probabilidad 19 % < 61 %",
-        "ventaja +1.0 % < 3 %"
-       ],
-       "model_prob": 0.1886,
-       "name": "Jurji Rodionov",
-       "price": 5.6,
-       "signal": "marginal"
-      },
-      {
-       "edge": -0.0271,
-       "fails": [
-        "el modelo marca «no apostar»",
-        "ventaja -2.7 % < 3 %",
-        "cuota 1.14 < 1.30"
-       ],
-       "model_prob": 0.8501,
-       "name": "Rafael Jodar",
-       "price": 1.14,
-       "signal": "no_bet"
-      }
-     ],
-     "teams": "Jurji Rodionov vs Rafael Jodar",
-     "time": "2026-11-26 17:25:00+00:00"
-    },
-    {
-     "players": [
-      {
        "edge": 0.0045,
        "fails": [
         "probabilidad 49 % < 61 %",
@@ -7555,11 +7526,11 @@
      "time": "2026-11-27 10:00:00+00:00"
     }
    ],
-   "n_matches": 3,
+   "n_matches": 2,
    "pick": null,
    "source": "pipeline",
-   "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (1 cumplen la probabilidad, 1 la ventaja). Más cercano: Blanch, Dali (modelo 55 %, ventaja +10.1 %, cuota 2.22), falla: probabilidad 55 % < 61 %.",
-   "updated": "2026-11-26 17:01 UTC"
+   "summary": "2 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (0 cumplen la probabilidad, 1 la ventaja). Más cercano: Blanch, Dali (modelo 55 %, ventaja +10.1 %, cuota 2.22), falla: probabilidad 55 % < 61 %.",
+   "updated": "2026-11-26 18:03 UTC"
   }
  }
 }
