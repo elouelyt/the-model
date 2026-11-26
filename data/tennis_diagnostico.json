@@ -7465,6 +7465,101 @@
    "source": "pipeline",
    "summary": "La API de cuotas no devolvió ningún partido de ATP ese día (no hay torneo activo o no hay cuotas).",
    "updated": "2026-11-24 19:17 UTC"
+  },
+  "2026-11-26": {
+   "matches": [
+    {
+     "players": [
+      {
+       "edge": 0.0101,
+       "fails": [
+        "probabilidad 19 % < 61 %",
+        "ventaja +1.0 % < 3 %"
+       ],
+       "model_prob": 0.1886,
+       "name": "Jurji Rodionov",
+       "price": 5.6,
+       "signal": "marginal"
+      },
+      {
+       "edge": -0.0271,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "ventaja -2.7 % < 3 %",
+        "cuota 1.14 < 1.30"
+       ],
+       "model_prob": 0.8501,
+       "name": "Rafael Jodar",
+       "price": 1.14,
+       "signal": "no_bet"
+      }
+     ],
+     "teams": "Jurji Rodionov vs Rafael Jodar",
+     "time": "2026-11-26 17:25:00+00:00"
+    },
+    {
+     "players": [
+      {
+       "edge": 0.0045,
+       "fails": [
+        "probabilidad 49 % < 61 %",
+        "ventaja +0.4 % < 3 %"
+       ],
+       "model_prob": 0.4923,
+       "name": "Omar Jasika",
+       "price": 2.05,
+       "signal": "marginal"
+      },
+      {
+       "edge": -0.084,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "probabilidad 51 % < 61 %",
+        "ventaja -8.4 % < 3 %"
+       ],
+       "model_prob": 0.5077,
+       "name": "Alex Bolt",
+       "price": 1.69,
+       "signal": "no_bet"
+      }
+     ],
+     "teams": "Omar Jasika vs Alex Bolt",
+     "time": "2026-11-27 03:10:00+00:00"
+    },
+    {
+     "players": [
+      {
+       "edge": -0.1737,
+       "fails": [
+        "el modelo marca «no apostar»",
+        "probabilidad 47 % < 61 %",
+        "ventaja -17.4 % < 3 %"
+       ],
+       "model_prob": 0.4673,
+       "name": "Coppejans, Kimmer",
+       "price": 1.56,
+       "signal": "no_bet"
+      },
+      {
+       "edge": 0.1006,
+       "fails": [
+        "probabilidad 55 % < 61 %"
+       ],
+       "model_prob": 0.5511,
+       "name": "Blanch, Dali",
+       "price": 2.22,
+       "signal": "value_bet"
+      }
+     ],
+     "teams": "Coppejans, Kimmer vs Blanch, Dali",
+     "time": "2026-11-27 10:00:00+00:00"
+    }
+   ],
+   "n_matches": 3,
+   "pick": null,
+   "source": "pipeline",
+   "summary": "3 partidos: ningún jugador cumple a la vez probabilidad ≥ 61 % y ventaja ≥ 3 % (1 cumplen la probabilidad, 1 la ventaja). Más cercano: Blanch, Dali (modelo 55 %, ventaja +10.1 %, cuota 2.22), falla: probabilidad 55 % < 61 %.",
+   "updated": "2026-11-26 17:01 UTC"
   }
  }
 }
